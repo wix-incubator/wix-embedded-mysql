@@ -11,12 +11,12 @@ import de.flapdoodle.embed.process.runtime.Executable
  * @since 18/09/14
  */
 class MysqldExecutable(
-  p1: Distribution,
-  p2: MysqldConfig,
-  p3: IRuntimeConfig,
-  p4: IExtractedFileSet) extends Executable[MysqldConfig, MysqldProcess](p1, p2, p3, p4) {
+  distribution: Distribution,
+  config: MysqldConfig,
+  runtimeConfig: IRuntimeConfig,
+  val extractedFiles: IExtractedFileSet) extends Executable[MysqldConfig, MysqldProcess](distribution, config, runtimeConfig, extractedFiles) {
 
 
-  override def start(p1: Distribution, p2: MysqldConfig, p3: IRuntimeConfig): MysqldProcess =
-    new MysqldProcess()
+  override def start(distribution: Distribution, config: MysqldConfig, runtimeConfig: IRuntimeConfig): MysqldProcess =
+    new MysqldProcess(distribution, config, runtimeConfig, this)
 }

@@ -18,9 +18,13 @@ class RunnerTest extends SpecificationWithJUnit {
 
       val config = new MysqldConfigBuilder().build()
       val executable = starter.prepare(config)
-
+      println("prepared")
       try {
         val mysqld = executable.start()
+        println("started")
+      } catch {
+        case e : Exception => println(e.getMessage); e.printStackTrace;
+
       } finally { executable.stop() }
     }
 

@@ -11,11 +11,10 @@ class PackageResolver extends IPackageResolver {
 
   override def getFileSet(distribution: Distribution): FileSet = {
     //TODO: make proper platform aware
-    FileSet.builder().addEntry(FileType.Executable, "mysqld").build()
+    FileSet.builder().addEntry(FileType.Executable, "bin/mysqld").build()
   }
 
   override def getArchiveType(distribution: Distribution): ArchiveType = ArchiveType.TGZ
 
-  override def getPath(distribution: Distribution): String = "MySQL-5.6/mysql-5.6.20-linux-glibc2.5-i686.tar.gz"
-
+  override def getPath(distribution: Distribution): String = "MySQL-5.6/mysql-5.6.20-osx10.8-x86_64.tar.gz"
 }

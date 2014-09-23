@@ -18,7 +18,10 @@ class MysqldStarter(p1: IRuntimeConfig)
       p1: MysqldConfig,
       p2: Distribution,
       p3: IRuntimeConfig,
-      p4: IExtractedFileSet): MysqldExecutable = new MysqldExecutable(p2, p1, p3, p4)
+      p4: IExtractedFileSet): MysqldExecutable = {
+    println(p4)
+    new MysqldExecutable(p2, p1, p3, p4)
+  }
 }
 
 object MysqldStarter {
