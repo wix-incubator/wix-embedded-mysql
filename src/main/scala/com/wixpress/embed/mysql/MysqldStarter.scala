@@ -27,5 +27,5 @@ class MysqldStarter(p1: IRuntimeConfig)
 object MysqldStarter {
 
   def instance(config: IRuntimeConfig) = new MysqldStarter(config)
-  def defaultInstance = new MysqldStarter(new RuntimeConfigBuilder().default().build())
+  def defaultInstance = new MysqldStarter(new RuntimeConfigBuilder().defaults().build())
 }

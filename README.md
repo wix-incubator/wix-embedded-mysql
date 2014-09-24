@@ -1,5 +1,11 @@
 This is an trial to build a sensible version of embedded mysql implementation for IT/unit tests using https://github.com/flapdoodle-oss/de.flapdoodle.embed.process library.
 
+## Building/usage
+
+For this to build you need to install https://github.com/wix/de.flapdoodle.embed.process into local maven repo - checkout and 'mvn clean install'
+
+Sorry for inconvenience:/
+
 ## Some thoughts
 
  - Current flapdoodle impl does not have a notion of multiple files like main process file, scripts, support files (libs/.sql scripts etc.). For that purpose a fork of process lib has been created with initial short-cuts: https://github.com/wix/de.flapdoodle.embed.process.

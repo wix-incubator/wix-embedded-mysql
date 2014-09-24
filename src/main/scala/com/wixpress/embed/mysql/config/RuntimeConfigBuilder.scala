@@ -9,10 +9,10 @@ import de.flapdoodle.embed.process.runtime.ICommandLinePostProcessor
  */
 class RuntimeConfigBuilder extends de.flapdoodle.embed.process.config.RuntimeConfigBuilder {
 
-  def default(): RuntimeConfigBuilder = {
+  def defaults(): RuntimeConfigBuilder = {
     processOutput().setDefault(ProcessOutput.getDefaultInstance("mysqld"))
     commandLinePostProcessor().setDefault(new ICommandLinePostProcessor.Noop)
-    artifactStore().setDefault(new ArtifactStoreBuilder().default().build())
+    artifactStore().setDefault(new ArtifactStoreBuilder().defaults().build())
     return this
   }
 }

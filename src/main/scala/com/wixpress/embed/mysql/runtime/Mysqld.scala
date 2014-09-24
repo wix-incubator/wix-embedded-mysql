@@ -12,7 +12,8 @@ import collection.JavaConversions._
 object Mysqld {
 
   def getCommandLine(config: MysqldConfig, extractedFiles: IExtractedFileSet, pidFile: File) : java.util.List[String] = {
-    val baseDir = s"${extractedFiles.generatedBaseDir()}/mysql-5.6.20-osx10.8-x86_64"
+    //FIXME: ouch
+    val baseDir = s"${extractedFiles.generatedBaseDir()}/mysql-5.6.21-osx10.8-x86_64"
 
     List[String](
       extractedFiles.executable().getAbsolutePath,

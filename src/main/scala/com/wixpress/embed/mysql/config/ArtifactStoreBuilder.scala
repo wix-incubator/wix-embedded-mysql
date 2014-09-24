@@ -2,10 +2,9 @@ package com.wixpress.embed.mysql.config
 
 import java.io.File
 import java.nio.file.Files
-import java.util.UUID
 
-import de.flapdoodle.embed.process.extract.{ITempNaming, UUIDTempNaming}
-import de.flapdoodle.embed.process.io.directories.{IDirectory, PlatformTempDir, PropertyOrPlatformTempDir}
+import de.flapdoodle.embed.process.extract.ITempNaming
+import de.flapdoodle.embed.process.io.directories.IDirectory
 
 /**
  * @author viliusl
@@ -13,26 +12,22 @@ import de.flapdoodle.embed.process.io.directories.{IDirectory, PlatformTempDir, 
  */
 class ArtifactStoreBuilder extends de.flapdoodle.embed.process.store.ArtifactStoreBuilder {
 
-  def default(): ArtifactStoreBuilder = {
-    tempDir().setDefault(ArtifactStoreBuilder.tempDir)
-    executableNaming().setDefault(ArtifactStoreBuilder.notTempNaming())
-    download().setDefault(new DownloadConfigBuilder().default().build())
-    libraries().setDefault(new MysqlLibraryStore())
+  def defaults(): ArtifactStoreBuilder = {
+    tempDir().setDefault(new TempDirectory())
+    executableNaming().setDefault(new OriginalNaming())
+    download().setDefault(new DownloadConfigBuilder().defaults().build())
     this
   }
 
-}
-
-object ArtifactStoreBuilder {
-
-  def tempDir = new IDirectory {
-    override def isGenerated: Boolean = true
-
+  //put everything in temp folder
+  class TempDirectory extends IDirectory {
     override def asFile(): File = Files.createTempDirectory("mysql").toFile
+    override def isGenerated: Boolean = true
   }
 
-  def notTempNaming() = new ITempNaming {
-    //I don't need temp naming - temp dir is enough for me
+  //do not rename artifacts
+  class OriginalNaming extends ITempNaming {
     override def nameFor(prefix: String, postfix: String): String = postfix
   }
+
 }

@@ -13,7 +13,7 @@ import scala.io.BufferedSource
  */
 class Support(files: IExtractedFileSet) {
 
-  def baseDir: File = new File(s"${files.generatedBaseDir()}/mysql-5.6.20-osx10.8-x86_64/")
+  def baseDir: File = new File(s"${files.generatedBaseDir()}/mysql-5.6.21-osx10.8-x86_64/")
   def setExec(relPath: String) = absPath(relPath).setExecutable(true)
   def absPath(relPath: String) = new File(baseDir.getAbsolutePath, relPath)
 
