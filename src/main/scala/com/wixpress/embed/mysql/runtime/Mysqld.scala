@@ -25,7 +25,8 @@ object Mysqld {
       s"--datadir=$baseDir/data",
       s"--plugin-dir=$baseDir/lib/plugin",
       s"--log-error=$baseDir/data/localhost.err",
-      s"--pid-file=${Mysqld.pidFile(extractedFiles.executable()).getAbsolutePath}"
+      s"--pid-file=${Mysqld.pidFile(extractedFiles.executable()).getAbsolutePath}",
+      s"--port=${config.port}"
     )
   }
 
