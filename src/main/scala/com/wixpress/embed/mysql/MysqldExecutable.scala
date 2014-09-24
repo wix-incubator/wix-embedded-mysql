@@ -14,8 +14,8 @@ class MysqldExecutable(
   distribution: Distribution,
   config: MysqldConfig,
   runtimeConfig: IRuntimeConfig,
-  val extractedFiles: IExtractedFileSet) extends Executable[MysqldConfig, MysqldProcess](distribution, config, runtimeConfig, extractedFiles) {
-
+  val extractedFiles: IExtractedFileSet)
+  extends Executable[MysqldConfig, MysqldProcess](distribution, config, runtimeConfig, extractedFiles) {
 
   override def start(distribution: Distribution, config: MysqldConfig, runtimeConfig: IRuntimeConfig): MysqldProcess =
     new MysqldProcess(distribution, config, runtimeConfig, this)

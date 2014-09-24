@@ -10,7 +10,7 @@ import de.flapdoodle.embed.process.distribution.IVersion
 class MysqldConfig(version: IVersion) extends ExecutableProcessConfig(version, new MysqldSupportConfig())
 
 class MysqldSupportConfig extends ISupportConfig {
-  override def messageOnException(context: Class[_], exception: Exception): String = "woops"
+  override def messageOnException(context: Class[_], exception: Exception): String = ""
   override def getName: String = "mysqld"
-  override def getSupportUrl: String = "http://example.org"
+  override def getSupportUrl: String = "https://github.com/wix/wix-embedded-mysql/issues"
 }

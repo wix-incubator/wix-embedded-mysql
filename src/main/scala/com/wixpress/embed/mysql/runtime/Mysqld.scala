@@ -11,6 +11,10 @@ import collection.JavaConversions._
  */
 object Mysqld {
 
+  def pidFile(executableFile: File): File = {
+    new File(s"${executableFile.getAbsolutePath}.pid")
+  }
+
   def getCommandLine(config: MysqldConfig, extractedFiles: IExtractedFileSet, pidFile: File) : java.util.List[String] = {
     //FIXME: ouch
     val baseDir = s"${extractedFiles.generatedBaseDir()}/mysql-5.6.21-osx10.8-x86_64"
@@ -21,7 +25,7 @@ object Mysqld {
       s"--datadir=$baseDir/data",
       s"--plugin-dir=$baseDir/lib/plugin",
       s"--log-error=$baseDir/data/localhost.err",
-      s"--pid-file=$baseDir/data/localhost.pid"
+      s"--pid-file=${Mysqld.pidFile(extractedFiles.executable()).getAbsolutePath}"
     )
   }
 

@@ -17,18 +17,19 @@ import scala.io.BufferedSource
  * @since 18/09/14
  */
 class MysqldProcess(
-  val distribution: Distribution,
-  val config: MysqldConfig,
-  val runtimeConfig: IRuntimeConfig,
-  val executable: MysqldExecutable) extends AbstractProcess[MysqldConfig, MysqldExecutable, MysqldProcess](distribution, config, runtimeConfig, executable) {
+    distribution: Distribution,
+    config: MysqldConfig,
+    runtimeConfig: IRuntimeConfig,
+    val executable: MysqldExecutable)
+  extends AbstractProcess[MysqldConfig, MysqldExecutable, MysqldProcess](distribution, config, runtimeConfig, executable) {
 
-  val processBuilder = ProcessControl.newProcessBuilder(
-    runtimeConfig.getCommandLinePostProcessor().process(distribution,
-      getCommandLine(distribution, config, executable.getFile())),
-    getEnvironment(distribution, config, executable.getFile()), true);
+  val postProcessor = runtimeConfig.getCommandLinePostProcessor().process(
+    distribution,
+    getCommandLine(distribution, config, executable.getFile()))
+
+  val processBuilder = ProcessControl.newProcessBuilder(postProcessor, true);
 
   val process = ProcessControl.start(config.supportConfig(), processBuilder);
-
 
   override def onBeforeProcess(runtimeConfig: IRuntimeConfig): Unit = {
     super.onBeforeProcess(runtimeConfig)
@@ -36,15 +37,17 @@ class MysqldProcess(
   }
 
   override def getCommandLine(distribution: Distribution, config: MysqldConfig, exe: IExtractedFileSet): util.List[String] = {
-  Mysqld.getCommandLine(config, exe, null)
-}
+    Mysqld.getCommandLine(config, exe, null)
+  }
 
-override def stopInternal(): Unit = {
-  Support(executable.extractedFiles).stopInstance()
-}
+  override def stopInternal(): Unit = {
+    Support(executable.extractedFiles).stopInstance()
+  }
 
-override def cleanupInternal(): Unit = {
+  override def cleanupInternal(): Unit = {
+  }
 
-}
-
+  override def pidFile(executableFile: File): File = {
+    Mysqld.pidFile(executableFile)
+  }
 }

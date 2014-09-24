@@ -11,21 +11,18 @@ import de.flapdoodle.embed.process.runtime.Starter
  * @author viliusl
  * @since 18/09/14
  */
-class MysqldStarter(p1: IRuntimeConfig)
-  extends Starter[MysqldConfig, MysqldExecutable, MysqldProcess](p1) {
+class MysqldStarter(runtimeConfig: IRuntimeConfig) extends Starter[MysqldConfig, MysqldExecutable, MysqldProcess](runtimeConfig) {
 
   override def newExecutable(
-      p1: MysqldConfig,
-      p2: Distribution,
-      p3: IRuntimeConfig,
-      p4: IExtractedFileSet): MysqldExecutable = {
-    println(p4)
-    new MysqldExecutable(p2, p1, p3, p4)
+      mysqldConfig: MysqldConfig,
+      distribution: Distribution,
+      runtimeConfig: IRuntimeConfig,
+      extractedFiles: IExtractedFileSet): MysqldExecutable = {
+    new MysqldExecutable(distribution, mysqldConfig, runtimeConfig, extractedFiles)
   }
 }
 
 object MysqldStarter {
-
   def instance(config: IRuntimeConfig) = new MysqldStarter(config)
   def defaultInstance = new MysqldStarter(new RuntimeConfigBuilder().defaults().build())
 }
