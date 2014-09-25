@@ -14,6 +14,7 @@ import de.flapdoodle.embed.process.runtime.{AbstractProcess, ProcessControl}
 
 import scala.collection.JavaConversions._
 import scala.io.BufferedSource
+import scala.util.{Success, Try}
 
 /**
  * @author viliusl
@@ -26,6 +27,7 @@ class MysqldProcess(
     val executable: MysqldExecutable)
   extends AbstractProcess[MysqldConfig, MysqldExecutable, MysqldProcess](distribution, config, runtimeConfig, executable) with LoggingSupport {
 
+  var stopped = false
   val postProcessor = runtimeConfig.getCommandLinePostProcessor().process(
     distribution,
     getCommandLine(distribution, config, executable.getFile()))
@@ -44,7 +46,27 @@ class MysqldProcess(
   }
 
   override def stopInternal(): Unit = {
-    stopInstance()
+    this synchronized {
+      if (!stopped) {
+        stopped = true
+
+        log.info("try to stop mysqld")
+        stopUsingMysqldadmin().orElse {
+          log.warn("could not stop mysqld via mysqladmin, try next")
+          if (!sendKillToProcess) {
+            log.warn("could not stop mysqld, try next")
+            if (!sendTermToProcess) {
+              log.warn("could not stop mysqld, try next")
+              if (!tryKillToProcess) {
+                log.warn("could not stop mysqld the second time, try one last thing")
+              }
+            }
+          }
+          stopProcess
+          Success()
+        }
+      }
+    }
   }
 
   override def cleanupInternal(): Unit = {
@@ -71,13 +93,14 @@ class MysqldProcess(
     new File(s"${executableFile.getAbsolutePath}.pid")
   }
 
-  private def stopInstance(): Unit = {
+  private def stopUsingMysqldadmin(): Try[Unit] = Try {
     val p = Runtime.getRuntime.exec(Array[String](
       "bin/mysqladmin",
       "-uroot",//user, should be different if auth method is different, password is needed as well
       "-hlocalhost",
       "--protocol=tcp",
       //"--count=3", "--sleep=3",//try 3 times with 3 seconds interval
+      s"--port=${config.port}",
       "shutdown"),
       Array[String](),
       executable.extractedFiles.generatedBaseDir())
@@ -100,9 +123,7 @@ class MysqldProcess(
 
     val retCode = p.waitFor()
 
-    new BufferedSource(p.getInputStream).getLines().foreach(line =>
-      log.trace(s"scripts/mysql_install_db out: $line")
-    )
+    new BufferedSource(p.getInputStream).getLines().foreach(line => log.trace(s"scripts/mysql_install_db out: $line"))
     new BufferedSource(p.getErrorStream).getLines().foreach(line => log.trace(s"scripts/mysql_install_db err: $line"))
 
     if (retCode != 0) throw new RuntimeException(s"'scripts/mysql_install_db' command exited with error code: $retCode")

@@ -19,7 +19,7 @@ class RunnerTest extends SpecificationWithJUnit {
     val starter = MysqldStarter.defaultInstance
 
     def verifyConnection(dataSource: DataSource): Unit = {
-      val template = new JdbcTemplate(DataSourceProvider.dataSourceFor())
+      val template = new JdbcTemplate(dataSource)
       template.queryForObject("select 1 from dual;", classOf[java.lang.Long]) must_== 1
     }
   }

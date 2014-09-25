@@ -38,35 +38,17 @@ class PackagePaths extends IPackageResolver {
     //TODO: all needed files should be included in a platform-specific way
     //we need folder, script, misc types. or maybe exclude folder and add one-by-one
     FileSet.builder()
-      .addEntry(FileType.Executable, "bin/mysqld")
-      .addEntry(FileType.Script,     "bin/mysqladmin")
-      .addEntry(FileType.Script, "bin/my_print_defaults")
-
-      .addEntry(FileType.Library, "lib/plugin/adt_null.so")
-      .addEntry(FileType.Library, "lib/plugin/auth.so")
-      .addEntry(FileType.Library, "lib/plugin/auth_test_plugin.so")
-      .addEntry(FileType.Library, "lib/plugin/innodb_engine.so")
-      .addEntry(FileType.Library, "lib/plugin/mypluglib.so")
-      .addEntry(FileType.Library, "lib/plugin/mypluglib.so")
-      .addEntry(FileType.Library, "lib/plugin/mypluglib.so")
-
-      .addEntry(FileType.Script, "scripts/mysql_install_db")
-
-      .addEntry(FileType.Support, "share/english/errmsg.sys")
-
-      .addEntry(FileType.Support, "share/fill_help_tables.sql")
-      .addEntry(FileType.Support, "share/mysql_security_commands.sql")
-      .addEntry(FileType.Support, "share/mysql_system_tables.sql")
-      .addEntry(FileType.Support, "share/mysql_system_tables_data.sql")
-      .addEntry(FileType.Support, "share/mysql_test_data_timezone.sql")
-
-      .addEntry(FileType.Support, "support-files/binary-configure")
-      .addEntry(FileType.Support, "support-files/magic")
-      .addEntry(FileType.Support, "support-files/my-default.cnf")
-      .addEntry(FileType.Support, "support-files/mysql-log-rotate")
-      .addEntry(FileType.Support, "support-files/mysql.server")
-      .addEntry(FileType.Support, "support-files/mysqld_multi.server")
-
+      .addEntry(FileType.Executable,  "bin/mysqld")
+      .addEntry(FileType.Script,      "bin/mysqladmin")
+      .addEntry(FileType.Script,      "bin/my_print_defaults")
+      .addEntry(FileType.Script,      "scripts/mysql_install_db")
+      .addEntry(FileType.Library,     "lib/plugin/innodb_engine.so")
+      .addEntry(FileType.Support,     "share/english/errmsg.sys")
+      .addEntry(FileType.Support,     "share/fill_help_tables.sql")
+      .addEntry(FileType.Support,     "share/mysql_security_commands.sql")
+      .addEntry(FileType.Support,     "share/mysql_system_tables.sql")
+      .addEntry(FileType.Support,     "share/mysql_system_tables_data.sql")
+      .addEntry(FileType.Support,     "support-files/my-default.cnf")
       .build()
   }
 
