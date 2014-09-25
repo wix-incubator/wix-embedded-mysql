@@ -13,6 +13,8 @@ Sorry for inconvenience:/
  - get rid of wix deps;
  - windows/linux;
  - figure out a way to test on different platforms - windows, linux, freebsd?
+ - implement custom credentials support and custom db creation support?
+ - test more cases with locales etc. Now version is really stripped-down, so something might be just missing;
 
 ## Some thoughts
 
