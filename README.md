@@ -6,14 +6,18 @@ For this to build you need to install https://github.com/wix/de.flapdoodle.embed
 
 Sorry for inconvenience:/
 
+## TODO
+ - submit a patch to flapdoodle process to get rid of a fork;
+ - figure out if it should be in scala or java? I think java would be better in case of oss and maybe scala adapter/testing support libraries as an addition;
+ - get rid of slf4j;
+ - get rid of wix deps;
+ - windows/linux;
+ - figure out a way to test on different platforms - windows, linux, freebsd?
+
 ## Some thoughts
 
  - Current flapdoodle impl does not have a notion of multiple files like main process file, scripts, support files (libs/.sql scripts etc.). For that purpose a fork of process lib has been created with initial short-cuts: https://github.com/wix/de.flapdoodle.embed.process.
  - Need to figure out a good way to enable multi-platform support/testing - vagrant?
- - Scala or java?
- - Current impl is a piece of sh**t to see if it's feasible and what amount of work is needed;
- - I would go with some different model for extracting/caching files than what main process library has, but we'll see. For simplicity sake current impl is ok;
- - then all test-framework, custom db, user, password etc will need to follow.
 
 ## Minimal file-set to have a simple working mysql server
 

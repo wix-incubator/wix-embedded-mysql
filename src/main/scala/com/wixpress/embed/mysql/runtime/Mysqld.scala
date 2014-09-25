@@ -19,7 +19,6 @@ object Mysqld {
       s"--basedir=$baseDir",
       s"--datadir=$baseDir/data",
       s"--plugin-dir=$baseDir/lib/plugin",
-      //s"--log-error=$baseDir/data/localhost.err",
       s"--pid-file=${pidFile.getAbsolutePath}",
       s"--port=${config.port}"
     )
