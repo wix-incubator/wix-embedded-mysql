@@ -13,6 +13,7 @@ import org.springframework.jdbc.core.JdbcTemplate
  * @since 18/09/14
  */
 class RunnerTest extends SpecificationWithJUnit {
+  sequential
 
   trait ctx extends Scope {
     val starter = MysqldStarter.defaultInstance
@@ -42,7 +43,7 @@ class RunnerTest extends SpecificationWithJUnit {
 
       try {
         val mysqld = executable.start()
-        verifyConnection(DataSourceProvider.dataSourceFor(url = s"jdbc:mysql://localhost:${config.port}/information_schema"))
+        verifyConnection(DataSourceProvider.dataSourceFor(url = s"jdbc:mysql://localhost:3301/information_schema"))
       } catch {
         case e : Exception => println(e.getMessage); e.printStackTrace; throw e;
       } finally { executable.stop() }

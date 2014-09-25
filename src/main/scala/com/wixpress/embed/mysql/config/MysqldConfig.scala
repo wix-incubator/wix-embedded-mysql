@@ -9,7 +9,8 @@ import de.flapdoodle.embed.process.distribution.IVersion
  */
 class MysqldConfig(
   version: IVersion,
-  val port: Int = 3306) extends ExecutableProcessConfig(version, new MysqldSupportConfig()) {
+  val port: Int = 3306,
+  val timeout: Int = 6000) extends ExecutableProcessConfig(version, new MysqldSupportConfig()) {
 }
 
 class MysqldSupportConfig extends ISupportConfig {

@@ -1,11 +1,11 @@
 package com.wixpress.embed.mysql.support
 
-import java.util.logging.Logger
+import org.slf4j.LoggerFactory
 
 /**
  * @author viliusl
  * @since 24/09/14
  */
 trait LoggingSupport {
-  val log = Logger.getLogger(getClass.getName)
+  lazy val log = LoggerFactory.getLogger(this.getClass)
 }
