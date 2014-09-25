@@ -27,34 +27,7 @@ This might be trimmed down on a file-by-file basis, but it's basically down from
 │   └── mysqld
 ├── lib
 │   └── plugin
-│       ├── adt_null.so
-│       ├── auth.so
-│       ├── auth_test_plugin.so
-│       ├── daemon_example.ini
-│       ├── debug
-│       │   ├── adt_null.so
-│       │   ├── auth.so
-│       │   ├── auth_test_plugin.so
-│       │   ├── innodb_engine.so
-│       │   ├── libdaemon_example.so
-│       │   ├── libmemcached.so
-│       │   ├── mypluglib.so
-│       │   ├── qa_auth_client.so
-│       │   ├── qa_auth_interface.so
-│       │   ├── qa_auth_server.so
-│       │   ├── semisync_master.so
-│       │   ├── semisync_slave.so
-│       │   └── validate_password.so
-│       ├── innodb_engine.so
-│       ├── libdaemon_example.so
-│       ├── libmemcached.so
-│       ├── mypluglib.so
-│       ├── qa_auth_client.so
-│       ├── qa_auth_interface.so
-│       ├── qa_auth_server.so
-│       ├── semisync_master.so
-│       ├── semisync_slave.so
-│       └── validate_password.so
+│       └── innodb_engine.so
 ├── scripts
 │   └── mysql_install_db
 ├── share
@@ -63,15 +36,9 @@ This might be trimmed down on a file-by-file basis, but it's basically down from
 │   ├── fill_help_tables.sql
 │   ├── mysql_security_commands.sql
 │   ├── mysql_system_tables.sql
-│   ├── mysql_system_tables_data.sql
-│   └── mysql_test_data_timezone.sql
+│   └── mysql_system_tables_data.sql
 └── support-files
-    ├── binary-configure
-    ├── magic
-    ├── my-default.cnf
-    ├── mysql-log-rotate
-    ├── mysql.server
-    └── mysqld_multi.server
+    └── my-default.cnf
 ```
 
 ## Other platforms
