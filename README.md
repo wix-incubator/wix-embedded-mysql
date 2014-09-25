@@ -6,6 +6,11 @@ For this to build you need to install https://github.com/wix/de.flapdoodle.embed
 
 Sorry for inconvenience:/
 
+## Problems
+ - ubuntu precise linux32 fails due to missing libaio1.so - 'apt-get install libaio1' fixed this, but maybe we should instruct to make sure it exists or fetch it? Basically need a strategy on missing dependencies here.
+
+  
+
 ## TODO
  - submit a patch to flapdoodle process to get rid of a fork;
  - figure out if it should be in scala or java? I think java would be better in case of oss and maybe scala adapter/testing support libraries as an addition;

@@ -60,11 +60,12 @@ class DownloadConfigBuilder extends de.flapdoodle.embed.process.config.store.Dow
     override def getPath(distribution: Distribution): String = {
       val ver = distribution.getVersion().asInstanceOf[Version]
       (distribution.getPlatform, distribution.getBitsize) match {
-
-        case (Platform.OS_X, BitSize.B32) => s"mysql-${ver}-osx${}-x86.tar.gz"
-        case (Platform.OS_X, BitSize.B64) => s"mysql-${ver.name}-osx${ver.osVersion}-x86_64.tar.gz"
-        case (Platform.Linux, _) => ???
+        case (Platform.OS_X, BitSize.B32) =>  s"mysql-${ver.name}-osx${ver.osVersion}-x86.tar.gz"
+        case (Platform.OS_X, BitSize.B64) =>  s"mysql-${ver.name}-osx${ver.osVersion}-x86_64.tar.gz"
+        case (Platform.Linux, BitSize.B32) => s"mysql-${ver.name}-linux-glibc2.5-i686.tar.gz"
+        case (Platform.Linux, BitSize.B64) => s"mysql-${ver.name}-linux-glibc2.5-x86_64.tar.gz"
         case (Platform.Windows, _) => ???
+        case (_, _) => ???
       }
     }
   }
