@@ -9,7 +9,7 @@ import com.wixpress.embed.mysql.support.LoggingSupport
 import de.flapdoodle.embed.process.config.IRuntimeConfig
 import de.flapdoodle.embed.process.distribution.Distribution
 import de.flapdoodle.embed.process.extract.IExtractedFileSet
-import de.flapdoodle.embed.process.io.{LogWatchStreamProcessor, Processors, StreamToLineProcessor}
+import de.flapdoodle.embed.process.io.{ConsoleOutputStreamProcessor, LogWatchStreamProcessor, Processors, StreamToLineProcessor}
 import de.flapdoodle.embed.process.runtime.{AbstractProcess, ProcessControl}
 
 import scala.collection.JavaConversions._
@@ -38,7 +38,9 @@ class MysqldProcess(
 
   override def onBeforeProcess(runtimeConfig: IRuntimeConfig): Unit = {
     super.onBeforeProcess(runtimeConfig)
-    initDatabase()
+
+    if (distribution.getPlatform.isUnixLike)// windows already comes with data - otherwise installed python is needed:/
+      initDatabase()
   }
 
   override def getCommandLine(distribution: Distribution, config: MysqldConfig, exe: IExtractedFileSet): util.List[String] = {
@@ -74,7 +76,7 @@ class MysqldProcess(
 
   override def onAfterProcessStart(process: ProcessControl, runtimeConfig: IRuntimeConfig): Unit = {
     val logWatch: LogWatchStreamProcessor = new LogWatchStreamProcessor(
-      "bin/mysqld: ready for connections",
+      "ready for connections",
       Set[String]("[ERROR]"),
       StreamToLineProcessor.wrap(runtimeConfig.getProcessOutput.getOutput))
 
@@ -83,8 +85,9 @@ class MysqldProcess(
 
     logWatch.waitForResult(config.timeout)
 
-    if (!logWatch.isInitWithSuccess)
-      throw new RuntimeException("mysql start failed with error: " + logWatch.getFailureFound)
+    if (!logWatch.isInitWithSuccess) {
+      throw new RuntimeException("mysql start failed with error: " + logWatch.getFailureFound);
+    }
     else
       setProcessId(AbstractProcess.getPidFromFile(pidFile))
   }

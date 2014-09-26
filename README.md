@@ -7,9 +7,7 @@ For this to build you need to install https://github.com/wix/de.flapdoodle.embed
 Sorry for inconvenience:/
 
 ## Problems
- - ubuntu precise linux32 fails due to missing libaio1.so - 'apt-get install libaio1' fixed this, but maybe we should instruct to make sure it exists or fetch it? Basically need a strategy on missing dependencies here.
-
-  
+ - ubuntu precise linux32/64 fails due to missing libaio1.so - 'apt-get install libaio1' fixed this. Guess we should leave it for devs to make sure deps are in proper shape on their machines.
 
 ## TODO
  - submit a patch to flapdoodle process to get rid of a fork;

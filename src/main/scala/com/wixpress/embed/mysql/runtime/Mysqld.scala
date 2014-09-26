@@ -20,7 +20,8 @@ object Mysqld {
       s"--datadir=$baseDir/data",
       s"--plugin-dir=$baseDir/lib/plugin",
       s"--pid-file=${pidFile.getAbsolutePath}",
-      s"--port=${config.port}"
+      s"--port=${config.port}",
+      "--console"
     )
   }
 
