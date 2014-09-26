@@ -21,7 +21,7 @@ object Mysqld {
       s"--plugin-dir=$baseDir/lib/plugin",
       s"--pid-file=${pidFile.getAbsolutePath}",
       s"--port=${config.port}",
-      "--console"
+      "--console" //windows specific
     )
   }
 

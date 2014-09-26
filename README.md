@@ -8,25 +8,19 @@ Sorry for inconvenience:/
 
 ## Problems
  - ubuntu precise linux32/64 fails due to missing libaio1.so - 'apt-get install libaio1' fixed this. Guess we should leave it for devs to make sure deps are in proper shape on their machines.
+ - windows pops-up firewall window - will need to find a way to come around this;
 
 ## TODO
  - submit a patch to flapdoodle process to get rid of a fork;
- - figure out if it should be in scala or java? I think java would be better in case of oss and maybe scala adapter/testing support libraries as an addition;
  - get rid of slf4j;
- - get rid of wix deps;
- - windows/linux;
  - figure out a way to test on different platforms - windows, linux, freebsd?
+ - support multiple major versions, test those on all supported plaforms;
  - implement custom credentials support and custom db creation support?
  - test more cases with locales etc. Now version is really stripped-down, so something might be just missing;
 
-## Some thoughts
-
- - Current flapdoodle impl does not have a notion of multiple files like main process file, scripts, support files (libs/.sql scripts etc.). For that purpose a fork of process lib has been created with initial short-cuts: https://github.com/wix/de.flapdoodle.embed.process.
- - Need to figure out a good way to enable multi-platform support/testing - vagrant?
-
 ## Minimal file-set to have a simple working mysql server
 
-This might be trimmed down on a file-by-file basis, but it's basically down from like 300M to 22M
+Minimal for linux:
 
 ```
 .
@@ -49,7 +43,3 @@ This might be trimmed down on a file-by-file basis, but it's basically down from
 └── support-files
     └── my-default.cnf
 ```
-
-## Other platforms
-
-Now development is being done on osx so osx and linux should be covered with generic packages, but windows might just have it's own gotchas. This might need to be tackled separately
