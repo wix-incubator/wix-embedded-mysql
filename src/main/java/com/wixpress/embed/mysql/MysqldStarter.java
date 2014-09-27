@@ -30,7 +30,7 @@ public class MysqldStarter extends Starter<MysqldConfig, MysqldExecutable, Mysql
         return new MysqldStarter(config);
     }
 
-    public static MysqldStarter defaultInstance(final IRuntimeConfig config) {
+    public static MysqldStarter defaultInstance() {
         return new MysqldStarter(new RuntimeConfigBuilder().defaults().build());
     }
 }
