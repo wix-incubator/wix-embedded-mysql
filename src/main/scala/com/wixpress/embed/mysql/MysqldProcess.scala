@@ -106,7 +106,7 @@ class MysqldProcess(
       s"--port=${config.port}",
       "shutdown"),
       Array[String](),
-      executable.extractedFiles.generatedBaseDir())
+      executable.getFile().generatedBaseDir())
 
     val retCode = p.waitFor()
 
@@ -122,7 +122,7 @@ class MysqldProcess(
       "--force", // do not lookup dns - no need for resolveip command to be present
       "--no-defaults"), // do not read defaults file.
       Array[String](),
-      executable.extractedFiles.generatedBaseDir())
+      executable.getFile().generatedBaseDir())
 
     val retCode = p.waitFor()
 
