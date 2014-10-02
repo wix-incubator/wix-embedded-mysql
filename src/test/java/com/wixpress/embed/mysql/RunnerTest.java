@@ -1,77 +1,50 @@
 package com.wixpress.embed.mysql;
 
-import com.mchange.v2.c3p0.ComboPooledDataSource;
-import com.wixpress.embed.mysql.config.MysqldConfig;
-import com.wixpress.embed.mysql.distribution.Version;
 import org.junit.Test;
-import org.springframework.jdbc.core.JdbcTemplate;
 
-import javax.sql.DataSource;
-import static org.junit.Assert.*;
+import static com.wixpress.embed.mysql.distribution.Version.v5_5_39;
+import static com.wixpress.embed.mysql.distribution.Version.v5_6_21;
 
 /**
  * @author viliusl
  * @since 27/09/14
  */
-public class RunnerTest {
+public class RunnerTest extends EmbeddedMySqlTestSupport {
+
 
     @Test
-    public void allDefaults56() throws Exception {
-        MysqldStarter starter = MysqldStarter.defaultInstance();
-
-        MysqldConfig config = new MysqldConfig(Version.v5_6_21);
-        MysqldExecutable executable = starter.prepare(config);
+    public void runMySql_5_6_onDefaultPort() throws Exception {
+        MysqldExecutable executable = givenMySqlWithVersion(v5_6_21);
         try {
-            MysqldProcess mysqld = executable.start();
-            verifyConnection(defaultDataSource());
+            executable.start();
+            verifyDBIsStartedOn(3306);
         } finally {
             executable.stop();
         }
     }
 
     @Test
-    public void allDefaults55() throws Exception {
-        MysqldStarter starter = MysqldStarter.defaultInstance();
-
-        MysqldConfig config = new MysqldConfig(Version.v5_5_39);
-        MysqldExecutable executable = starter.prepare(config);
+    public void runMySql_5_5_onDefaultPort() throws Exception {
+        MysqldExecutable executable = givenMySqlWithVersion(v5_5_39);
         try {
-            MysqldProcess mysqld = executable.start();
-            verifyConnection(defaultDataSource());
+            executable.start();
+            verifyDBIsStartedOn(3306);
         } finally {
             executable.stop();
         }
     }
 
     @Test
-    public void customPort() throws Exception {
-        MysqldStarter starter = MysqldStarter.defaultInstance();
-
-        MysqldConfig config = new MysqldConfig(Version.v5_6_21, 3301);
-        MysqldExecutable executable = starter.prepare(config);
+    public void runMySql_5_6_onCustomPort() throws Exception {
+        MysqldExecutable executable = givenMySqlWithVersionAndPort(v5_6_21, 3301);
         try {
-            MysqldProcess mysqld = executable.start();
-            verifyConnection(dataSourceFor("jdbc:mysql://localhost:3301/information_schema"));
+            executable.start();
+
+            verifyDBIsStartedOn(3301);
         } finally {
             executable.stop();
         }
     }
 
-    private void verifyConnection(DataSource dataSource) {
-        long res = new JdbcTemplate(dataSource).queryForObject("select 1 from dual;", java.lang.Long.class);
-        assertEquals(1, res);
-    }
-
-    private DataSource defaultDataSource() throws Exception {
-        return dataSourceFor("jdbc:mysql://localhost:3306/information_schema");
-    }
-
-    private DataSource dataSourceFor(String url) throws Exception {
-        ComboPooledDataSource cpds = new ComboPooledDataSource();
-        cpds.setDriverClass("com.mysql.jdbc.Driver");
-        cpds.setJdbcUrl(url);
-        cpds.setUser("root");
-        cpds.setPassword(null);
-        return cpds;
-    }
 }
+

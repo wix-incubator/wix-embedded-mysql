@@ -13,6 +13,8 @@ import java.io.InputStreamReader;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static de.flapdoodle.embed.process.io.Processors.logTo;
+
 /**
  * @author viliusl
  * @since 27/09/14
@@ -53,8 +55,8 @@ public class MysqldExecutable extends Executable<MysqldConfig, MysqldProcess> {
                 null,
                 this.executable.generatedBaseDir());
 
-            Processors.connect(new InputStreamReader(p.getInputStream()), Processors.logTo(log, Level.FINER));
-            Processors.connect(new InputStreamReader(p.getErrorStream()), Processors.logTo(log, Level.FINER));
+            Processors.connect(new InputStreamReader(p.getInputStream()), logTo(log, Level.FINER));
+            Processors.connect(new InputStreamReader(p.getErrorStream()), logTo(log, Level.FINER));
 
             int retCode = p.waitFor();
 

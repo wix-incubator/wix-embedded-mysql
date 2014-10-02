@@ -4,9 +4,10 @@ import com.wixpress.embed.mysql.config.MysqldConfig;
 import de.flapdoodle.embed.process.collections.Collections;
 import de.flapdoodle.embed.process.config.IRuntimeConfig;
 import de.flapdoodle.embed.process.distribution.Distribution;
-import de.flapdoodle.embed.process.distribution.Platform;
 import de.flapdoodle.embed.process.extract.IExtractedFileSet;
-import de.flapdoodle.embed.process.io.*;
+import de.flapdoodle.embed.process.io.LogWatchStreamProcessor;
+import de.flapdoodle.embed.process.io.Processors;
+import de.flapdoodle.embed.process.io.StreamToLineProcessor;
 import de.flapdoodle.embed.process.runtime.AbstractProcess;
 import de.flapdoodle.embed.process.runtime.ProcessControl;
 
@@ -118,8 +119,8 @@ public class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutabl
                 null,
                 executable.getFile().generatedBaseDir());
 
-            Processors.connect(new InputStreamReader(p.getInputStream()), Processors.logTo(log, Level.FINER));
-            Processors.connect(new InputStreamReader(p.getErrorStream()), Processors.logTo(log, Level.FINER));
+            Processors.connect(new InputStreamReader(p.getInputStream()), Processors.logTo(log, Level.INFO));
+            Processors.connect(new InputStreamReader(p.getErrorStream()), Processors.logTo(log, Level.INFO));
 
             int retCode = p.waitFor();
 
