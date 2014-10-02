@@ -25,7 +25,7 @@ import java.util.logging.Logger;
  */
 public class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutable, MysqldProcess> {
 
-    private final Logger log = Logger.getLogger(this.getClass().getName());
+    private final Logger log = Logger.getLogger("MysqldProcess");
     private boolean stopped = false;
     private final int timeout;
     final MysqldExecutable executable;
@@ -122,17 +122,13 @@ public class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutabl
             Processors.connect(new InputStreamReader(p.getInputStream()), Processors.logTo(log, Level.INFO));
             Processors.connect(new InputStreamReader(p.getErrorStream()), Processors.logTo(log, Level.INFO));
 
-            int retCode = p.waitFor();
-
-            if (retCode != 0) {
-                throw new RuntimeException(String.format("'bin/mysqladmin' stop command exited with error code: %s", retCode));
-            } else
-                return true;
-
+            return p.waitFor() == 0;
         } catch (InterruptedException e) {
-            throw new RuntimeException(e);
+            log.log(Level.WARNING, "Encountered error why shutting down process.", e);
+            return false;
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            log.log(Level.WARNING, "Encountered error why shutting down process.", e);
+            return false;
         }
     }
 }

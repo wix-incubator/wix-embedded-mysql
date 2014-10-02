@@ -6,11 +6,11 @@ import de.flapdoodle.embed.process.extract.ITempNaming;
 import de.flapdoodle.embed.process.extract.mapper.DestinationEntry;
 import de.flapdoodle.embed.process.extract.mapper.IDestinationFileMapper;
 import de.flapdoodle.embed.process.io.directories.IDirectory;
+import de.flapdoodle.embed.process.io.file.Files;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.util.Arrays;
 
 /**
@@ -30,12 +30,20 @@ public class ArtifactStoreBuilder extends de.flapdoodle.embed.process.store.Arti
     //put everything in temp folder
     public static class TempDirectory implements IDirectory {
 
+        private File baseTempDir = new File("target").getAbsoluteFile();
+
         @Override
         public File asFile() {
+            if (!baseTempDir.exists() || !baseTempDir.isDirectory()) {
+                throw new RuntimeException("Could not locate target build dir. \n" +
+                        "Have you set your working directory to the $MODULE_DIR$?");
+            }
+
             try {
-                return Files.createTempDirectory("mysql").toFile();
+                File mysql = Files.createTempDir(baseTempDir, "mysql");
+                return mysql.getAbsoluteFile();
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                throw new RuntimeException("unable to create mysql temp directory.", e);
             }
         }
 
