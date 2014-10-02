@@ -1,7 +1,7 @@
-package com.wixpress.embed.mysql;
+package com.wix.mysql;
 
-import com.wixpress.embed.mysql.config.MysqldConfig;
-import com.wixpress.embed.mysql.config.RuntimeConfigBuilder;
+import com.wix.mysql.config.MysqldConfig;
+import com.wix.mysql.config.RuntimeConfigBuilder;
 import de.flapdoodle.embed.process.config.IRuntimeConfig;
 import de.flapdoodle.embed.process.distribution.Distribution;
 import de.flapdoodle.embed.process.extract.IExtractedFileSet;

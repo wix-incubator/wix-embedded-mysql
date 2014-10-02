@@ -1,6 +1,6 @@
-package com.wixpress.embed.mysql.config;
+package com.wix.mysql.config;
 
-import com.wixpress.embed.mysql.PackagePaths;
+import com.wix.mysql.PackagePaths;
 import de.flapdoodle.embed.process.config.store.IDownloadPath;
 import de.flapdoodle.embed.process.distribution.Distribution;
 import de.flapdoodle.embed.process.extract.UUIDTempNaming;

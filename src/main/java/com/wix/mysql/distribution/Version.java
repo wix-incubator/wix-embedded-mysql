@@ -1,4 +1,4 @@
-package com.wixpress.embed.mysql.distribution;
+package com.wix.mysql.distribution;
 
 import de.flapdoodle.embed.process.distribution.IVersion;
 

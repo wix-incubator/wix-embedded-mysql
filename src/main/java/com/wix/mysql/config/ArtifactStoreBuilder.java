@@ -1,4 +1,4 @@
-package com.wixpress.embed.mysql.config;
+package com.wix.mysql.config;
 
 import de.flapdoodle.embed.process.config.store.FileSet;
 import de.flapdoodle.embed.process.extract.IArchiveEntry;

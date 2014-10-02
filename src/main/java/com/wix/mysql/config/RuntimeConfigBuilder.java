@@ -1,4 +1,4 @@
-package com.wixpress.embed.mysql.config;
+package com.wix.mysql.config;
 
 import de.flapdoodle.embed.process.config.io.ProcessOutput;
 import de.flapdoodle.embed.process.io.Processors;

@@ -1,6 +1,6 @@
-package com.wixpress.embed.mysql;
+package com.wix.mysql;
 
-import com.wixpress.embed.mysql.distribution.Version;
+import com.wix.mysql.distribution.Version;
 import de.flapdoodle.embed.process.config.store.FileSet;
 import de.flapdoodle.embed.process.config.store.FileType;
 import de.flapdoodle.embed.process.config.store.IPackageResolver;

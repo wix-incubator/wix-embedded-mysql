@@ -1,9 +1,9 @@
-package com.wixpress.embed.mysql;
+package com.wix.mysql;
 
 import org.junit.Test;
 
-import static com.wixpress.embed.mysql.distribution.Version.v5_5_39;
-import static com.wixpress.embed.mysql.distribution.Version.v5_6_21;
+import static com.wix.mysql.distribution.Version.v5_5_39;
+import static com.wix.mysql.distribution.Version.v5_6_21;
 
 /**
  * @author viliusl
