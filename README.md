@@ -11,12 +11,13 @@ Sorry for inconvenience:/
  - windows pops-up firewall window - will need to find a way to come around this;
 
 ## TODO
- - submit a patch to flapdoodle process to get rid of a fork;
- - get rid of slf4j;
- - figure out a way to test on different platforms - windows, linux, freebsd?
- - support multiple major versions, test those on all supported plaforms;
  - implement custom credentials support and custom db creation support?
  - test more cases with locales etc. Now version is really stripped-down, so something might be just missing;
+ - optimize for faster execution - pre-extract;
+
+ - submit a patch to flapdoodle process to get rid of a fork;
+ - figure out a way to test on different platforms - windows, linux, freebsd?
+ - support multiple major versions, test those on all supported plaforms;
 
 ## Minimal file-set to have a simple working mysql server
 
