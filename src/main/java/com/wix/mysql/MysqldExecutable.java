@@ -2,12 +2,14 @@ package com.wix.mysql;
 
 import com.wix.mysql.config.MysqldConfig;
 import de.flapdoodle.embed.process.config.IRuntimeConfig;
+import de.flapdoodle.embed.process.config.store.FileType;
 import de.flapdoodle.embed.process.distribution.Distribution;
 import de.flapdoodle.embed.process.distribution.Platform;
 import de.flapdoodle.embed.process.extract.IExtractedFileSet;
 import de.flapdoodle.embed.process.io.Processors;
 import de.flapdoodle.embed.process.runtime.Executable;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.logging.Level;
@@ -40,20 +42,29 @@ public class MysqldExecutable extends Executable<MysqldConfig, MysqldProcess> {
             final MysqldConfig config,
             final IRuntimeConfig runtime) throws IOException {
 
+        markAllLibraryFilesExecutable();
+
         if (Platform.detect().isUnixLike())// windows already comes with data - otherwise installed python is needed:/
             this.initDatabase();
 
         return new MysqldProcess(distribution, config, runtime, this, config.getTimeout());
     }
 
+    private void markAllLibraryFilesExecutable() {
+        for (File f: executable.files(FileType.Library)) {
+            f.setExecutable(true);
+        }
+    }
+
     private void initDatabase() throws IOException {
         try {
+            // this probably can be written better than what it is now.
             Process p = Runtime.getRuntime().exec(new String[]{
-                "scripts/mysql_install_db",
-                "--force", // do not lookup dns - no need for resolveip command to be present
-                "--no-defaults"}, // do not read defaults file.
-                null,
-                this.executable.generatedBaseDir());
+                            "scripts/mysql_install_db",
+                            "--force", // do not lookup dns - no need for resolveip command to be present
+                            "--no-defaults"}, // do not read defaults file.
+                    null,
+                    this.executable.generatedBaseDir());
 
             Processors.connect(new InputStreamReader(p.getInputStream()), logTo(log, Level.FINER));
             Processors.connect(new InputStreamReader(p.getErrorStream()), logTo(log, Level.FINER));

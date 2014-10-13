@@ -2,7 +2,7 @@ package com.wix.mysql;
 
 import org.junit.Test;
 
-import static com.wix.mysql.distribution.Version.v5_5_39;
+import static com.wix.mysql.distribution.Version.v5_5_40;
 import static com.wix.mysql.distribution.Version.v5_6_21;
 
 /**
@@ -25,7 +25,7 @@ public class RunnerTest extends EmbeddedMySqlTestSupport {
 
     @Test
     public void runMySql_5_5_onDefaultPort() throws Exception {
-        MysqldExecutable executable = givenMySqlWithVersion(v5_5_39);
+        MysqldExecutable executable = givenMySqlWithVersion(v5_5_40);
         try {
             executable.start();
             verifyDBIsStartedOn(3306);

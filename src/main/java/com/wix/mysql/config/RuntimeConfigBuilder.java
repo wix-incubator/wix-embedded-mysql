@@ -1,7 +1,6 @@
 package com.wix.mysql.config;
 
 import de.flapdoodle.embed.process.config.io.ProcessOutput;
-import de.flapdoodle.embed.process.io.Processors;
 import de.flapdoodle.embed.process.runtime.ICommandLinePostProcessor;
 
 /**
@@ -11,7 +10,7 @@ import de.flapdoodle.embed.process.runtime.ICommandLinePostProcessor;
 public class RuntimeConfigBuilder extends de.flapdoodle.embed.process.config.RuntimeConfigBuilder {
 
     public RuntimeConfigBuilder defaults() {
-        processOutput().setDefault(new ProcessOutput(Processors.console(), Processors.console(), Processors.console()));
+        processOutput().setDefault(ProcessOutput.getDefaultInstanceSilent());
         commandLinePostProcessor().setDefault(new ICommandLinePostProcessor.Noop());
         artifactStore().setDefault(new ArtifactStoreBuilder().defaults().build());
         return this;
