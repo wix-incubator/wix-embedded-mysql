@@ -38,7 +38,7 @@ public class VersionTest {
     public void testLinuxVersions() {
         givenPlatformSetTo(Linux);
 
-        assertThat(v5_6_21.asInDownloadPath(), is("MySQL-5.6/mysql-5.6.21"));
+        assertThat(v5_6_21.asInDownloadPath(), is("MySQL-5.6/mysql-5.6.21-linux-glibc2.5"));
     }
 
     @Test

@@ -84,7 +84,7 @@ public class PackagePaths implements IPackageResolver {
                       v.asInDownloadPath(),
                       bs == B32 ? "" : "_64");
             case Linux:
-              return format("%s-linux-glibc2.5-%s.tar.gz",
+              return format("%s-%s.tar.gz",
                       v.asInDownloadPath(),
                       bs == B32 ? "i686" : "x86_64");
             case Windows:
