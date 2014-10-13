@@ -62,7 +62,8 @@ public class MysqldExecutable extends Executable<MysqldConfig, MysqldProcess> {
             Process p = Runtime.getRuntime().exec(new String[]{
                             "scripts/mysql_install_db",
                             "--force", // do not lookup dns - no need for resolveip command to be present
-                            "--no-defaults"}, // do not read defaults file.
+                            "--no-defaults",
+                            "--explicit_defaults_for_timestamp"}, // do not read defaults file.
                     null,
                     this.executable.generatedBaseDir());
 
