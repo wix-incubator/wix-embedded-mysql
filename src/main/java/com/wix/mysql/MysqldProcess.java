@@ -55,6 +55,8 @@ public class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutabl
                 String.format("--pid-file=%s.pid", pidFile(exe.executable())),
                 String.format("--port=%s", config.getPort()),
                 "--slow_query_log=0",
+                "--explicit_defaults_for_timestamp",
+                "--lower_case_table_names=2",
                 "--console");//windows specific
     }
 
