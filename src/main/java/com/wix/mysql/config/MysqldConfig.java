@@ -24,5 +24,5 @@ public class MysqldConfig extends ExecutableProcessConfig {
     }
 
     public int getPort() { return port; }
-    public int getTimeout() { return 6000; }
+    public int getTimeout() { return 30000; }
 }
