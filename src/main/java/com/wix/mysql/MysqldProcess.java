@@ -64,15 +64,15 @@ public class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutabl
             if (!stopped) {
                 stopped = true;
 
-//                log.info("try to stop mysqld");
+                log.info("try to stop mysqld");
                 if (!stopUsingMysqldadmin()) {
-//                    log.warning("could not stop mysqld via mysqladmin, try next");
+                    log.warning("could not stop mysqld via mysqladmin, try next");
                     if (!sendKillToProcess()) {
-//                        log.warning("could not stop mysqld, try next");
+                        log.warning("could not stop mysqld, try next");
                         if (!sendTermToProcess()) {
-//                            log.warning("could not stop mysqld, try next");
+                            log.warning("could not stop mysqld, try next");
                             if (!tryKillToProcess()) {
-//                                log.warning("could not stop mysqld the second time, try one last thing");
+                                log.warning("could not stop mysqld the second time, try one last thing");
                             }
                         }
                     }
@@ -118,7 +118,7 @@ public class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutabl
                 String.format("--port=%s", config.getPort()),
                 "shutdown"},
                 null,
-                executable.getFile().generatedBaseDir());
+                executable.getFile().generatedBaseDir()); // throwing an NPE, fix this !!!
 
             Processors.connect(new InputStreamReader(p.getInputStream()), Processors.logTo(log, Level.INFO));
             Processors.connect(new InputStreamReader(p.getErrorStream()), Processors.logTo(log, Level.INFO));
