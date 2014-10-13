@@ -38,9 +38,9 @@ public enum Version implements IVersion {
 
     private String gcLibVersion() {
         if (majorVersion.equals("5.6"))
-            return "2.5";
+            return "linux-glibc2.5";
         if (majorVersion.equals("5.5"))
-            return "2.6";
+            return "linux2.6";
         throw new UnsupportedOperationException();
     }
 
@@ -57,7 +57,7 @@ public enum Version implements IVersion {
             case OS_X:
                 return format("%s/mysql-%s.%s-osx%s", path(), majorVersion, minorVersion, osVersion());
             case Linux:
-                return format("%s/mysql-%s.%s-linux-glibc%s", path(), majorVersion, minorVersion, gcLibVersion());
+                return format("%s/mysql-%s.%s-%s", path(), majorVersion, minorVersion, gcLibVersion());
             default:
                 throw new UnsupportedPlatformException("Unrecognized platform, currently not supported");
         }
