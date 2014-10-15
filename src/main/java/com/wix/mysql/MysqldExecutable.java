@@ -66,6 +66,7 @@ public class MysqldExecutable extends Executable<MysqldConfig, MysqldProcess> {
                             "--explicit_defaults_for_timestamp"}, // do not read defaults file.
                     null,
                     this.executable.generatedBaseDir());
+//                            "--character_set_client",
 
             Processors.connect(new InputStreamReader(p.getInputStream()), logTo(log, Level.FINER));
             Processors.connect(new InputStreamReader(p.getErrorStream()), logTo(log, Level.FINER));

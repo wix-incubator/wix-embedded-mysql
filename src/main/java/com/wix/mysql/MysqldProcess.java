@@ -54,10 +54,14 @@ public class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutabl
                 String.format("--plugin-dir=%s/lib/plugin", baseDir),
                 String.format("--pid-file=%s.pid", pidFile(exe.executable())),
                 String.format("--port=%s", config.getPort()),
+                "--no-defaults",
                 "--slow_query_log=0",
                 "--explicit_defaults_for_timestamp",
                 "--lower_case_table_names=2",
                 "--console");//windows specific
+
+        //[/tmp/test-mxj/bin/mysqld][--no-defaults][--port=3336][--socket=mysql.sock][--basedir=/tmp/test-mxj][--datadir=/tmp/test-mxj/data][--pid-file=/tmp/test-mxj/data/MysqldResource.pid]
+//        [01:43:32][com.wixpress.mobile:mobile-services-web] [
     }
 
     @Override
