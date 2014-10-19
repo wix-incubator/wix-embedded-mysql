@@ -61,7 +61,7 @@ public class MysqldExecutable extends Executable<MysqldConfig, MysqldProcess> {
             // this probably can be written better than what it is now.
             Process p = Runtime.getRuntime().exec(new String[]{
                             "scripts/mysql_install_db",
-                            "--force", // do not lookup dns - no need for resolveip command to be present
+                            "--force", // do not lookup dns - no need for resolve ip command to be present
                             "--no-defaults"}, // do not read defaults file.
                     null,
                     this.executable.generatedBaseDir());

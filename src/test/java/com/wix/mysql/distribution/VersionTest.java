@@ -9,6 +9,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.Mockito;
 
+import static com.wix.mysql.distribution.Version.v5_5_40;
 import static de.flapdoodle.embed.process.distribution.Platform.*;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -38,11 +39,9 @@ public class VersionTest {
     public void testLinuxVersions() {
         givenPlatformSetTo(Linux);
 
-        Version.v5_5_40.setPlatformProvider(platformProvider);
+        v5_5_40.setPlatformProvider(platformProvider);
 
-        System.out.println(Version.v5_5_40.asInDownloadPath());
-
-        assertThat(v5_6_21.asInDownloadPath(), is("MySQL-5.6/mysql-5.6.21-linux-glibc2.5"));
+        assertThat(v5_5_40.asInDownloadPath(), is("MySQL-5.5/mysql-5.5.40-linux2.6"));
     }
 
     @Test
@@ -74,6 +73,7 @@ public class VersionTest {
 
     @After public void cleanup() {
         v5_6_21.setPlatformProvider(new PlatformProvider());
+        v5_5_40.setPlatformProvider(new PlatformProvider());
     }
 
 }
