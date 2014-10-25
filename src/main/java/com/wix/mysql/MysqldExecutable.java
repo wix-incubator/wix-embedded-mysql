@@ -25,7 +25,7 @@ public class MysqldExecutable extends Executable<MysqldConfig, MysqldProcess> {
 
     private final Logger log = Logger.getLogger(getClass().getName());
 
-    private final IExtractedFileSet executable;
+    public final IExtractedFileSet executable;
 
     public MysqldExecutable(
             final Distribution distribution,
@@ -47,7 +47,7 @@ public class MysqldExecutable extends Executable<MysqldConfig, MysqldProcess> {
         if (Platform.detect().isUnixLike())// windows already comes with data - otherwise installed python is needed:/
             this.initDatabase();
 
-        return new MysqldProcess(distribution, config, runtime, this, config.getTimeout());
+        return new MysqldProcess(distribution, config, runtime, this);
     }
 
     private void markAllLibraryFilesExecutable() {
@@ -58,11 +58,13 @@ public class MysqldExecutable extends Executable<MysqldConfig, MysqldProcess> {
 
     private void initDatabase() throws IOException {
         try {
-            // this probably can be written better than what it is now.
+            String baseDir = this.executable.generatedBaseDir().getAbsolutePath();
+
             Process p = Runtime.getRuntime().exec(new String[]{
                             "scripts/mysql_install_db",
-                            "--force", // do not lookup dns - no need for resolve ip command to be present
-                            "--no-defaults"}, // do not read defaults file.
+                            "--no-defaults",
+                            String.format("--basedir=%s", baseDir),
+                            String.format("--datadir=%s/data", baseDir)},
                     null,
                     this.executable.generatedBaseDir());
 

@@ -4,6 +4,8 @@ import de.flapdoodle.embed.process.config.ExecutableProcessConfig;
 import de.flapdoodle.embed.process.config.ISupportConfig;
 import de.flapdoodle.embed.process.distribution.IVersion;
 
+import java.io.File;
+
 /**
  * @author viliusl
  * @since 27/09/14
@@ -25,4 +27,5 @@ public class MysqldConfig extends ExecutableProcessConfig {
 
     public int getPort() { return port; }
     public int getTimeout() { return 30000; }
+
 }

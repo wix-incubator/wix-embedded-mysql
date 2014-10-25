@@ -6,7 +6,6 @@ import de.flapdoodle.embed.process.distribution.ArchiveType;
 import de.flapdoodle.embed.process.distribution.BitSize;
 import de.flapdoodle.embed.process.distribution.Distribution;
 import de.flapdoodle.embed.process.distribution.IVersion;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import static de.flapdoodle.embed.process.config.store.FileType.Executable;
 import static de.flapdoodle.embed.process.config.store.FileType.Library;
@@ -33,6 +32,7 @@ public class PackagePaths implements IPackageResolver {
     private FileSet buildWindowsFileSet() {
         FileSet.Builder builder = FileSet.builder()
                 .addEntry(Executable, "bin/mysqld.exe")
+                .addEntry(Library,    "bin/resolveip.exe")
                 .addEntry(Library,    "bin/mysqladmin.exe")
                 .addEntry(Library,    "share/english/errmsg.sys")
                 .addEntry(Library,    "data/test/db.opt");
@@ -50,10 +50,12 @@ public class PackagePaths implements IPackageResolver {
     private FileSet buildNixFileSet() {
         return FileSet.builder()
                 .addEntry(Executable, "bin/mysqld")
+                .addEntry(Library,    "bin/resolveip")
                 .addEntry(Library,    "bin/mysqladmin")
                 .addEntry(Library,    "bin/my_print_defaults")
                 .addEntry(Library,    "scripts/mysql_install_db")
                 .addEntry(Library,    "lib/plugin/innodb_engine.so")
+                .addEntry(Library,    "lib/plugin/auth_socket.so")
                 .addEntry(Library,    "share/english/errmsg.sys")
                 .addEntry(Library,    "share/fill_help_tables.sql")
                 .addEntry(Library,    "share/mysql_security_commands.sql")
@@ -92,7 +94,7 @@ public class PackagePaths implements IPackageResolver {
                         v.asInDownloadPath(),
                         bs == B32 ? "32" : "x64");
             default:
-                throw new NotImplementedException();
+                throw new RuntimeException("Not implemented");
         }
     }
 }

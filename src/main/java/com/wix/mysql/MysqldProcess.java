@@ -1,6 +1,7 @@
 package com.wix.mysql;
 
 import com.wix.mysql.config.MysqldConfig;
+import com.wix.mysql.input.LogFileProcessor;
 import de.flapdoodle.embed.process.collections.Collections;
 import de.flapdoodle.embed.process.config.IRuntimeConfig;
 import de.flapdoodle.embed.process.distribution.Distribution;
@@ -11,8 +12,11 @@ import de.flapdoodle.embed.process.io.StreamToLineProcessor;
 import de.flapdoodle.embed.process.runtime.AbstractProcess;
 import de.flapdoodle.embed.process.runtime.ProcessControl;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.lang.reflect.Field;
+import java.nio.file.Files;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -27,20 +31,13 @@ public class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutabl
 
     private final Logger log = Logger.getLogger("MysqldProcess");
     private boolean stopped = false;
-    private final int timeout;
-    final MysqldExecutable executable;
-    final MysqldConfig config;
 
     public MysqldProcess(
             final Distribution distribution,
             final MysqldConfig config,
             final IRuntimeConfig runtimeConfig,
-            final MysqldExecutable executable,
-            final int timeout) throws IOException {
+            final MysqldExecutable executable) throws IOException {
         super(distribution, config, runtimeConfig, executable);
-        this.timeout = timeout;
-        this.executable = executable;
-        this.config = config;
     }
 
     @Override
@@ -53,8 +50,11 @@ public class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutabl
                 String.format("--datadir=%s/data", baseDir),
                 String.format("--plugin-dir=%s/lib/plugin", baseDir),
                 String.format("--pid-file=%s.pid", pidFile(exe.executable())),
+                String.format("--lc-messages-dir=%s/share", baseDir),
+                String.format("--socket=%s", sockFile(exe)),
                 String.format("--port=%s", config.getPort()),
-                "--console");//windows specific
+                String.format("--log-error=%s/data/error.log", baseDir));
+                //"--console");//does not properly work, dodgy between versions.
     }
 
     @Override
@@ -83,9 +83,7 @@ public class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutabl
     }
 
     @Override
-    protected void cleanupInternal() {
-
-    }
+    protected void cleanupInternal() {}
 
     @Override
     public void onAfterProcessStart(final ProcessControl process, final IRuntimeConfig runtimeConfig) throws IOException {
@@ -96,16 +94,16 @@ public class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutabl
                 errors,
                 StreamToLineProcessor.wrap(runtimeConfig.getProcessOutput().getOutput()));
 
-        Processors.connect(process.getReader(), logWatch);
-        Processors.connect(process.getError(), logWatch);
+        new LogFileProcessor(
+                new File(this.getExecutable().executable.generatedBaseDir() + "/data/error.log"),
+                logWatch);
 
-        logWatch.waitForResult(timeout);
+        logWatch.waitForResult(getConfig().getTimeout());
 
         if (!logWatch.isInitWithSuccess()) {
             throw new RuntimeException("mysql start failed with error: " + logWatch.getFailureFound());
         }
     }
-
 
     private boolean stopUsingMysqldadmin() {
         try {
@@ -114,10 +112,10 @@ public class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutabl
                 "-uroot",//user, should be different if auth method is different, password is needed as well
                 "-hlocalhost",
                 "--protocol=tcp",
-                String.format("--port=%s", config.getPort()),
+                String.format("--port=%s", getConfig().getPort()),
                 "shutdown"},
                 null,
-                executable.getFile().generatedBaseDir()); // throwing an NPE, fix this !!!
+                getExecutable().getFile().generatedBaseDir());
 
             Processors.connect(new InputStreamReader(p.getInputStream()), Processors.logTo(log, Level.INFO));
             Processors.connect(new InputStreamReader(p.getErrorStream()), Processors.logTo(log, Level.INFO));
@@ -131,4 +129,33 @@ public class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutabl
             return false;
         }
     }
+
+    /**
+     * Work-around to get Executable in hooks where it's not provided and as
+     * all init is done in base class constructor, local vars are still not
+     * initialized:/
+     */
+    private MysqldExecutable getExecutable() {
+        try {
+            Field f = AbstractProcess.class.getDeclaredField("executable");
+            f.setAccessible(true);
+            return (MysqldExecutable)f.get(this);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * .sock file needs to be in system temp dir and not in ex. target/...
+     *
+     * This is due to possible problems with existing mysql installation and apparmor profiles
+     * in linuxes.
+     */
+    private String sockFile(IExtractedFileSet exe) throws IOException {
+        File f = Files.createTempFile("mysql", "sock").toFile();
+        String path = f.getAbsolutePath();
+        f.delete();
+        return path;
+    }
+
 }

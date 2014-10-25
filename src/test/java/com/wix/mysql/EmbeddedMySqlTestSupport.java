@@ -13,10 +13,6 @@ import static org.junit.Assert.assertEquals;
 
 public abstract class EmbeddedMySqlTestSupport {
 
-    public MysqldExecutable givenMySqlWithVersion(Version version) {
-        return givenMySqlWithVersionAndPort(version, 3306);
-    }
-
     public MysqldExecutable givenMySqlWithVersionAndPort(Version version, int port) {
         MysqldStarter starter = MysqldStarter.defaultInstance();
 

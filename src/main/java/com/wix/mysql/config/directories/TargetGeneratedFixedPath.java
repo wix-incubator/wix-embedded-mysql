@@ -7,18 +7,15 @@ import java.util.UUID;
 
 public class TargetGeneratedFixedPath implements IDirectory {
 
-    private final String prefix;
     private final String baseDir;
 
     public TargetGeneratedFixedPath(String prefix) {
-        this.prefix = prefix;
-        this.baseDir = "target/" + prefix + "-"+ UUID.randomUUID().toString();
+        this.baseDir = String.format("target/%s-%s", prefix, UUID.randomUUID().toString());
     }
 
     @Override
     public File asFile() {
         generateNeededDirs();
-
         return new File(baseDir).getAbsoluteFile();
     }
 
