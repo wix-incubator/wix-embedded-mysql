@@ -46,6 +46,8 @@ public class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutabl
 
         return Collections.newArrayList(
                 exe.executable().getAbsolutePath(),
+                "--no-defaults",
+                "--log-output=NONE",
                 String.format("--basedir=%s", baseDir),
                 String.format("--datadir=%s/data", baseDir),
                 String.format("--plugin-dir=%s/lib/plugin", baseDir),
