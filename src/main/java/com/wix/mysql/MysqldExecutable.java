@@ -1,6 +1,8 @@
 package com.wix.mysql;
 
 import com.wix.mysql.config.MysqldConfig;
+import com.wix.mysql.exceptions.MissingDependencyException;
+import com.wix.mysql.input.CollectingLogOutputProcessor;
 import de.flapdoodle.embed.process.config.IRuntimeConfig;
 import de.flapdoodle.embed.process.config.store.FileType;
 import de.flapdoodle.embed.process.distribution.Distribution;
@@ -14,8 +16,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import static de.flapdoodle.embed.process.io.Processors.logTo;
 
 /**
  * @author viliusl
@@ -59,6 +59,7 @@ public class MysqldExecutable extends Executable<MysqldConfig, MysqldProcess> {
     private void initDatabase() throws IOException {
         try {
             String baseDir = this.executable.generatedBaseDir().getAbsolutePath();
+            CollectingLogOutputProcessor logTo = new CollectingLogOutputProcessor(log, Level.FINER);
 
             Process p = Runtime.getRuntime().exec(new String[]{
                             "scripts/mysql_install_db",
@@ -68,17 +69,30 @@ public class MysqldExecutable extends Executable<MysqldConfig, MysqldProcess> {
                     null,
                     this.executable.generatedBaseDir());
 
-            Processors.connect(new InputStreamReader(p.getInputStream()), logTo(log, Level.FINER));
-            Processors.connect(new InputStreamReader(p.getErrorStream()), logTo(log, Level.FINER));
+            Processors.connect(new InputStreamReader(p.getInputStream()), logTo);
+            Processors.connect(new InputStreamReader(p.getErrorStream()), logTo);
 
             int retCode = p.waitFor();
 
             if (retCode != 0) {
-                throw new RuntimeException(String.format("'scripts/mysql_install_db' command exited with error code: %s", retCode));
+                resolveException(retCode, logTo.getOuptut());
             }
 
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
     }
+
+    private void resolveException(int retCode, String output) {
+        if (output.contains("error while loading shared libraries: libaio.so")) {
+            throw new MissingDependencyException(
+                    "System library 'libaio.so.1' missing. " +
+                    "Please install it via system package manager, ex. 'sudo apt-get install libaio1'.\n" +
+                    "For details see: http://bugs.mysql.com/bug.php?id=60544");
+        } else {
+            throw new RuntimeException(String.format("'scripts/mysql_install_db' command exited with error code: %s", retCode));
+        }
+    }
+
+
 }

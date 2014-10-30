@@ -1,8 +1,6 @@
 package com.wix.mysql;
 
 import com.mchange.v2.c3p0.ComboPooledDataSource;
-import com.wix.mysql.MysqldExecutable;
-import com.wix.mysql.MysqldStarter;
 import com.wix.mysql.config.MysqldConfig;
 import com.wix.mysql.distribution.Version;
 import org.springframework.jdbc.core.JdbcTemplate;
