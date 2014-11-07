@@ -1,36 +1,53 @@
-This is an trial to build a sensible version of embedded mysql implementation for IT/unit tests using https://github.com/flapdoodle-oss/de.flapdoodle.embed.process library.
+# About
 
-## Problems
- - ubuntu precise linux32/64 fails due to missing libaio1.so - 'apt-get install libaio1' fixed this. Guess we should leave it for devs to make sure deps are in proper shape on their machines.
- - windows pops-up firewall window - will need to find a way to come around this;
+Embedded mysql implementation using https://github.com/flapdoodle-oss/de.flapdoodle.embed.process library intended for usage in tests.
 
-## TODO
- - implement custom credentials support and custom db creation support?
- - test more cases with locales etc. Now version is really stripped-down, so something might be just missing;
- 
- 
-## Minimal file-set to have a simple working mysql server
+# How it works
 
-Minimal for linux:
+ - Based on platform where tests are being executed and target mysql version proper vanilla mysql package (tgz, zip) is downloaded from http://dev.mysql.com/get/Downloads/. This is a one-time action, where subsequent invocations use pre-downloaded/cached package.
+ - Upon exeution needed files are being extracted into **target** folder, database created, service started and post-configuration (user, schema, etc.) performed.
+ - On jvm shutdown mysqld process is stopped and temporary files cleaned-up.
 
+#Usage
+
+Add dependency to your pom.xml:
+
+```xml
+    <dependency>
+        <groupId>com.wixpress.mysql</groupId>
+        <artifactId>wix-embedded-mysql</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+        <scope>test</scope>
+    <dependency>        
 ```
-.
-├── bin
-│   ├── my_print_defaults
-│   ├── mysqladmin
-│   └── mysqld
-├── lib
-│   └── plugin
-│       └── innodb_engine.so
-├── scripts
-│   └── mysql_install_db
-├── share
-│   ├── english
-│   │   └── errmsg.sys
-│   ├── fill_help_tables.sql
-│   ├── mysql_security_commands.sql
-│   ├── mysql_system_tables.sql
-│   └── mysql_system_tables_data.sql
-└── support-files
-    └── my-default.cnf
+
+also library depends on mysql-connector-java artifact to be provided by project using it.
+
+Basic usage example:
+
+```java
+        MysqldConfig config = new MysqldConfigBuilder(com.wix.mysql.distribution.Version.v5_5_40)
+                .withUsername("auser")
+                .withPassword("sa")
+                .withSchema("some_schema")
+                .withPort(9913)
+                .build();
+
+        MysqldStarter starter = MysqldStarter.defaultInstance();
+        MysqldExecutable executable = starter.prepare(config);
+        
+        try {
+            executable.start();
+            //do work
+        } finally {
+            executable.stop();
+        }
 ```
+
+# Works on
+ - latest osx;
+ - ubuntu precise 32/64;
+
+# Known problems
+ - some linux distros does not have libaio1.so which is a requirement by latest version of mysql. Proper error is emitted if it's missing;
+ - windows version does not work - pull req pending towards https://github.com/flapdoodle-oss/de.flapdoodle.embed.process;

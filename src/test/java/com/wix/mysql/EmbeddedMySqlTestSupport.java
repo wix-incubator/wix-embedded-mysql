@@ -2,6 +2,7 @@ package com.wix.mysql;
 
 import com.mchange.v2.c3p0.ComboPooledDataSource;
 import com.wix.mysql.config.MysqldConfig;
+import com.wix.mysql.config.MysqldConfigBuilder;
 import com.wix.mysql.distribution.Version;
 import org.springframework.jdbc.core.JdbcTemplate;
 
@@ -11,28 +12,26 @@ import static org.junit.Assert.assertEquals;
 
 public abstract class EmbeddedMySqlTestSupport {
 
-    public MysqldExecutable givenMySqlWithVersionAndPort(Version version, int port) {
+    public MysqldExecutable givenMySqlWithConfig(MysqldConfig config) {
         MysqldStarter starter = MysqldStarter.defaultInstance();
-
-        MysqldConfig config = new MysqldConfig(version, port);
         return starter.prepare(config);
     }
 
-    private DataSource dataSourceFor(String url) throws Exception {
+    private DataSource dataSourceFor(MysqldConfig config) throws Exception {
         ComboPooledDataSource cpds = new ComboPooledDataSource();
         cpds.setDriverClass("com.mysql.jdbc.Driver");
-        cpds.setJdbcUrl(url);
-        cpds.setUser("root");
-        cpds.setPassword(null);
+        cpds.setJdbcUrl(connectionUrlFor(config));
+        cpds.setUser(config.getUsername());
+        cpds.setPassword(config.getPassword());
         return cpds;
     }
 
-    private String connectionUrlOn(int port) {
-        return String.format("jdbc:mysql://localhost:%s/information_schema", port);
+    private String connectionUrlFor(MysqldConfig config) {
+        return String.format("jdbc:mysql://localhost:%s/%s", config.getPort(), config.getSchema());
     }
 
-    public void verifyDBIsStartedOn(int port) throws Exception {
-        long res = new JdbcTemplate(dataSourceFor(connectionUrlOn(port))).queryForObject("select 1;", Long.class);
+    public void verifyDBIsStartedFor(MysqldConfig config) throws Exception {
+        long res = new JdbcTemplate(dataSourceFor(config)).queryForObject("select 1;", Long.class);
         assertEquals(1, res);
     }
 

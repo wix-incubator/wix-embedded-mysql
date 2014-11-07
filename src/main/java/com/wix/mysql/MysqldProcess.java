@@ -105,6 +105,8 @@ public class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutabl
         if (!logWatch.isInitWithSuccess()) {
             throw new RuntimeException("mysql start failed with error: " + logWatch.getFailureFound());
         }
+
+        new MysqlConfigurer(getConfig()).configure();
     }
 
     private boolean stopUsingMysqldadmin() {
