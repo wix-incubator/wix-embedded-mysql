@@ -21,7 +21,7 @@ Add dependency to your pom.xml:
     <dependency>        
 ```
 
-also library depends on mysql-connector-java artifact to be provided by project using it.
+also library depends on **mysql-connector-java** artifact to be provided by project using it.
 
 Basic usage example:
 
