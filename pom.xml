@@ -11,15 +11,13 @@
         <maven.compiler.target>1.7</maven.compiler.target>
         <encoding>UTF-8</encoding>
 
-        <flapdoodle.process.version>1.40.0</flapdoodle.process.version>
+        <flapdoodle.process.version>1.40.1</flapdoodle.process.version>
         <common.io.version>2.4</common.io.version>
         <commons.compress.version>1.3</commons.compress.version>
         <c3p0.version>0.9.2-pre5</c3p0.version>
         <spring.jdbc.version>4.0.7.RELEASE</spring.jdbc.version>
         <mysql.connector.version>5.1.31</mysql.connector.version>
     </properties>
-
-
 
     <dependencies>
 
