@@ -61,19 +61,24 @@ public class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutabl
 
     @Override
     protected void stopInternal() {
+        //in cases when startup fails during ex 'onAfterProcessStart' class-scoped log is unavailabe as 'onAfterProcessStart'
+        //is called in base class constructor and this class is not yet instantiated.
+        //TODO: submit a pull request to make logger of {@AbstractProcess} protected instead of private.
+        Logger logger = Logger.getLogger("MysqldProcess");
+
         synchronized (this) {
             if (!stopped) {
                 stopped = true;
 
-                log.info("try to stop mysqld");
+                logger.info("try to stop mysqld");
                 if (!stopUsingMysqldadmin()) {
-                    log.warning("could not stop mysqld via mysqladmin, try next");
+                    logger.warning("could not stop mysqld via mysqladmin, try next");
                     if (!sendKillToProcess()) {
-                        log.warning("could not stop mysqld, try next");
+                        logger.warning("could not stop mysqld, try next");
                         if (!sendTermToProcess()) {
-                            log.warning("could not stop mysqld, try next");
+                            logger.warning("could not stop mysqld, try next");
                             if (!tryKillToProcess()) {
-                                log.warning("could not stop mysqld the second time, try one last thing");
+                                logger.warning("could not stop mysqld the second time, try one last thing");
                             }
                         }
                     }
