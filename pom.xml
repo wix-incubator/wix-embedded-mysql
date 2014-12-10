@@ -4,7 +4,19 @@
     <groupId>com.wixpress.mysql</groupId>
     <artifactId>wix-embedded-mysql</artifactId>
     <version>1.0.0-SNAPSHOT</version>
-    <name>Wix Embedded MySql Testkit</name>
+    <name>Wix Embedded MySql</name>
+    <description>Embedded MySql for testing purposes</description>
+
+    <developers>
+        <developer>
+            <name>Noam Almog</name>
+            <email>noama@wix.com</email>
+            <roles>
+                <role>owner</role>
+            </roles>
+        </developer>
+    </developers>
+
 
     <properties>
         <maven.compiler.source>1.7</maven.compiler.source>
