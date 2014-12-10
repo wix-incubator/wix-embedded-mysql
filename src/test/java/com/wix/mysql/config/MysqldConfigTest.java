@@ -1,4 +1,4 @@
-package com.wix.mysql;
+package com.wix.mysql.config;
 
 import com.wix.mysql.config.MysqldConfig;
 import com.wix.mysql.distribution.Version;

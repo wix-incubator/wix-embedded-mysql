@@ -1,4 +1,4 @@
-package com.wix.mysql;
+package com.wix.mysql.config;
 
 import static com.wix.mysql.config.MysqldConfig.*;
 
