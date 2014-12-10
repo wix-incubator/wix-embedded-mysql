@@ -15,6 +15,13 @@
                 <role>owner</role>
             </roles>
         </developer>
+        <developer>
+            <name>Vilius Lukosius</name>
+            <email>vilius@wix.com</email>
+            <roles>
+                <role>developer</role>
+            </roles>
+        </developer>
     </developers>
 
 
