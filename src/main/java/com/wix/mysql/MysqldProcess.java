@@ -29,7 +29,7 @@ import java.util.logging.Logger;
  */
 public class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutable, MysqldProcess> {
 
-    private final Logger log = Logger.getLogger("MysqldProcess");
+    private final static Logger log = Logger.getLogger("MysqldProcess");
     private boolean stopped = false;
 
     public MysqldProcess(
@@ -95,6 +95,7 @@ public class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutabl
     @Override
     public void onAfterProcessStart(final ProcessControl process, final IRuntimeConfig runtimeConfig) throws IOException {
         Set<String> errors = new HashSet<String>();
+
         errors.add("[ERROR]");
         LogWatchStreamProcessor logWatch = new LogWatchStreamProcessor(
                 "ready for connections",
@@ -111,7 +112,12 @@ public class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutabl
             throw new RuntimeException("mysql start failed with error: " + logWatch.getFailureFound());
         }
 
-        new MysqlConfigurer(getConfig()).configure();
+        try {
+            new MysqlConfigurer(getConfig()).configure();
+        } catch (Exception e) {
+            // emit IO exception for {@link AbstractProcess} would try to stop running process gracefully
+            throw new IOException(e);
+        }
     }
 
     private boolean stopUsingMysqldadmin() {
