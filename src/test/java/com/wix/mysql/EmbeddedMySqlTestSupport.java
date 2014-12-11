@@ -12,9 +12,22 @@ import static org.junit.Assert.assertEquals;
 
 public abstract class EmbeddedMySqlTestSupport {
 
-    public MysqldExecutable givenMySqlWithConfig(MysqldConfig config) {
+    protected MysqldExecutable givenMySqlWithConfig(final MysqldConfig config) {
         MysqldStarter starter = MysqldStarter.defaultInstance();
         return starter.prepare(config);
+    }
+
+    protected void startAndVerifyDatabase(final MysqldConfig config) {
+        MysqldExecutable executable = givenMySqlWithConfig(config);
+        try {
+            executable.start();
+            long res = new JdbcTemplate(dataSourceFor(config)).queryForObject("select 1;", Long.class);
+            assertEquals(1, res);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        } finally {
+            executable.stop();
+        }
     }
 
     private DataSource dataSourceFor(MysqldConfig config) throws Exception {
@@ -30,9 +43,5 @@ public abstract class EmbeddedMySqlTestSupport {
         return String.format("jdbc:mysql://localhost:%s/%s", config.getPort(), config.getSchema());
     }
 
-    public void verifyDBIsStartedFor(MysqldConfig config) throws Exception {
-        long res = new JdbcTemplate(dataSourceFor(config)).queryForObject("select 1;", Long.class);
-        assertEquals(1, res);
-    }
 
 }

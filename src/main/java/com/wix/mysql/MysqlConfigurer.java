@@ -1,6 +1,7 @@
 package com.wix.mysql;
 
 import com.wix.mysql.config.MysqldConfig;
+import static com.wix.mysql.config.MysqldConfig.*;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -20,25 +21,20 @@ public class MysqlConfigurer {
 
     public MysqlConfigurer(MysqldConfig config) { this.config = config; }
 
-
-
     public void configure() {
-        if (!config.isDefaultUsername() || !config.isDefaultSchema()) {
             Connection con = null;
             try {
                 con = DriverManager.getConnection(
                         connectionStringFor(config),
-                        MysqldConfig.Defaults.USERNAME,
-                        MysqldConfig.Defaults.PASSWORD);
+                        SystemDefaults.USERNAME,
+                        SystemDefaults.PASSWORD);
 
-                if (!config.isDefaultSchema()) {
-                    executeStmt(con, String.format("create database %s;", config.getSchema()));
-                }
-
-                if (!config.isDefaultUsername()) {
+                if (config.shouldCreateUser()) {
                     executeStmt(con, String.format("CREATE USER '%s'@'localhost' IDENTIFIED BY '%s';", config.getUsername(), config.getPassword()));
-                    executeStmt(con, String.format("GRANT ALL ON %s.* TO '%s'@'localhost';", config.getSchema(), config.getUsername()));
                 }
+
+                executeStmt(con, String.format("create database %s;", config.getSchema()));
+                executeStmt(con, String.format("GRANT ALL ON %s.* TO '%s'@'localhost';", config.getSchema(), config.getUsername()));
 
             } catch (Exception e) {
                 log.severe(e.getMessage());
@@ -46,7 +42,6 @@ public class MysqlConfigurer {
             } finally {
                 try { if ( con != null ) con.close(); } catch (SQLException e) { throw new RuntimeException(e); }
             }
-        }
     }
 
     private void executeStmt(Connection con, String sql) {
@@ -68,6 +63,6 @@ public class MysqlConfigurer {
     }
 
     private String connectionStringFor(MysqldConfig config) {
-        return String.format("jdbc:mysql://localhost:%s/%s", config.getPort(), MysqldConfig.Defaults.SCHEMA);
+        return String.format("jdbc:mysql://localhost:%s/%s", config.getPort(), SystemDefaults.SCHEMA);
     }
 }
