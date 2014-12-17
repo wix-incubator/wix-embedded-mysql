@@ -18,7 +18,7 @@ Add dependency to your pom.xml:
         <artifactId>wix-embedded-mysql</artifactId>
         <version>1.0.0-SNAPSHOT</version>
         <scope>test</scope>
-    <dependency>        
+    </dependency>        
 ```
 
 also library depends on **mysql-connector-java** artifact to be provided by project using it.
