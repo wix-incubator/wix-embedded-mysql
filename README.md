@@ -66,4 +66,4 @@ and use them.
 
 # Known problems
  - some linux distros does not have libaio1.so which is a requirement by latest version of mysql. Proper error is emitted if it's missing;
- - windows version does not work - pull req pending towards https://github.com/flapdoodle-oss/de.flapdoodle.embed.process;
+ - windows version does not work - need to make it happen;
