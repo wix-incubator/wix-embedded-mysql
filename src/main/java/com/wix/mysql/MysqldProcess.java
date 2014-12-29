@@ -1,5 +1,6 @@
 package com.wix.mysql;
 
+import com.google.common.collect.Sets;
 import com.wix.mysql.config.MysqldConfig;
 import com.wix.mysql.input.LogFileProcessor;
 import de.flapdoodle.embed.process.collections.Collections;
@@ -29,7 +30,7 @@ import java.util.logging.Logger;
  */
 public class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutable, MysqldProcess> {
 
-    private final static Logger log = Logger.getLogger("MysqldProcess");
+    private final static Logger log = Logger.getLogger(MysqldProcess.class.getName());
     private boolean stopped = false;
 
     public MysqldProcess(
@@ -61,27 +62,23 @@ public class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutabl
 
     @Override
     protected void stopInternal() {
-        //in cases when startup fails during ex 'onAfterProcessStart' class-scoped log is unavailabe as 'onAfterProcessStart'
-        //is called in base class constructor and this class is not yet instantiated.
-        //TODO: submit a pull request to make logger of {@AbstractProcess} protected instead of private.
-        Logger logger = Logger.getLogger("MysqldProcess");
-
         synchronized (this) {
             if (!stopped) {
                 stopped = true;
 
-                logger.info("try to stop mysqld");
+                log.info("try to stop mysqld");
                 if (!stopUsingMysqldadmin()) {
-                    logger.warning("could not stop mysqld via mysqladmin, try next");
+                    log.warning("could not stop mysqld via mysqladmin, try next");
                     if (!sendKillToProcess()) {
-                        logger.warning("could not stop mysqld, try next");
+                        log.warning("could not stop mysqld, try next");
                         if (!sendTermToProcess()) {
-                            logger.warning("could not stop mysqld, try next");
+                            log.warning("could not stop mysqld, try next");
                             if (!tryKillToProcess()) {
-                                logger.warning("could not stop mysqld the second time, try one last thing");
+                                log.warning("could not stop mysqld the second time, try one last thing");
                             }
                         }
                     }
+
                     stopProcess();
                 }
             }
@@ -94,7 +91,7 @@ public class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutabl
 
     @Override
     public void onAfterProcessStart(final ProcessControl process, final IRuntimeConfig runtimeConfig) throws IOException {
-        Set<String> errors = new HashSet<String>();
+        Set<String> errors = Sets.newHashSet();
 
         errors.add("[ERROR]");
         LogWatchStreamProcessor logWatch = new LogWatchStreamProcessor(
@@ -124,10 +121,10 @@ public class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutabl
         try {
             Process p = Runtime.getRuntime().exec(new String[] {
                 "bin/mysqladmin",
-                "-uroot",//user, should be different if auth method is different, password is needed as well
-                "-hlocalhost",
-                "--protocol=tcp",
-                String.format("--port=%s", getConfig().getPort()),
+                "--no-defaults",
+                String.format("-u%s", MysqldConfig.SystemDefaults.USERNAME),
+                "--protocol=socket",
+                String.format("--socket=%s", sockFile(getExecutable().executable)),
                 "shutdown"},
                 null,
                 getExecutable().getFile().generatedBaseDir());
@@ -161,16 +158,20 @@ public class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutabl
     }
 
     /**
-     * .sock file needs to be in system temp dir and not in ex. target/...
+     * Helper for getting stable sock file. Saving to local instance variable on service start does not work due
+     * to the way flapdoodle process library works - it does all init in {@link AbstractProcess} and instance of
+     * {@link MysqldProcess} is not yet present, so vars are not initialized.
+     * This algo gives stable sock file based on single run profile, but can leave trash sock files in tmp dir.
      *
+     * Notes:
+     * .sock file needs to be in system temp dir and not in ex. target/...
      * This is due to possible problems with existing mysql installation and apparmor profiles
      * in linuxes.
      */
     private String sockFile(IExtractedFileSet exe) throws IOException {
-        File f = Files.createTempFile("mysql", "sock").toFile();
-        String path = f.getAbsolutePath();
-        f.delete();
-        return path;
+        String sysTempDir = System.getProperty("java.io.tmpdir");
+        String pidFile = String.format("%s.pid", exe.generatedBaseDir().getName());
+        return new File(sysTempDir, pidFile).getAbsolutePath();
     }
 
 }

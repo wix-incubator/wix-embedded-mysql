@@ -11,7 +11,6 @@ public class RuntimeConfigBuilder extends de.flapdoodle.embed.process.config.Run
 
     public RuntimeConfigBuilder defaults() {
         processOutput().setDefault(ProcessOutput.getDefaultInstance("mysql"));
-//        processOutput().setDefault(ProcessOutput.getDefaultInstance("MySQL"));
         commandLinePostProcessor().setDefault(new ICommandLinePostProcessor.Noop());
         artifactStore().setDefault(new ArtifactStoreBuilder().defaults().build());
         return this;
