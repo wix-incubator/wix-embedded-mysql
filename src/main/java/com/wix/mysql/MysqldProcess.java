@@ -37,7 +37,7 @@ public class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutabl
             final Distribution distribution,
             final MysqldConfig config,
             final IRuntimeConfig runtimeConfig,
-            final MysqldExecutable executable) throws IOException {
+            final MysqldExecutable§ executable) throws IOException {
         super(distribution, config, runtimeConfig, executable);
     }
 
@@ -170,7 +170,7 @@ public class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutabl
      */
     private String sockFile(IExtractedFileSet exe) throws IOException {
         String sysTempDir = System.getProperty("java.io.tmpdir");
-        String pidFile = String.format("%s.pid", exe.generatedBaseDir().getName());
+        String pidFile = String.format("%s.sock", exe.generatedBaseDir().getName());
         return new File(sysTempDir, pidFile).getAbsolutePath();
     }
 
