@@ -19,6 +19,7 @@ import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -29,7 +30,7 @@ import java.util.logging.Logger;
 public class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutable, MysqldProcess> {
 
     private final static Logger log = Logger.getLogger(MysqldProcess.class.getName());
-    private boolean stopped = false;
+    private AtomicBoolean stopped = new AtomicBoolean(false);
 
     public MysqldProcess(
             final Distribution distribution,
@@ -60,28 +61,23 @@ public class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutabl
 
     @Override
     protected void stopInternal() {
-        synchronized (this) {
-            if (!stopped) {
-                stopped = true;
-
-                log.info("try to stop mysqld");
-                if (!stopUsingMysqldadmin()) {
-                    log.warning("could not stop mysqld via mysqladmin, try next");
-                    if (!sendKillToProcess()) {
+        if ( stopped.compareAndSet(false, true) ) {
+            log.info("try to stop mysqld");
+            if (!stopUsingMysqldadmin()) {
+                log.warning("could not stop mysqld via mysqladmin, try next");
+                if (!sendKillToProcess()) {
+                    log.warning("could not stop mysqld, try next");
+                    if (!sendTermToProcess()) {
                         log.warning("could not stop mysqld, try next");
-                        if (!sendTermToProcess()) {
-                            log.warning("could not stop mysqld, try next");
-                            if (!tryKillToProcess()) {
-                                log.warning("could not stop mysqld the second time, try one last thing");
-                            }
+                        if (!tryKillToProcess()) {
+                            log.warning("could not stop mysqld the second time, try one last thing");
                         }
                     }
-
-                    stopProcess();
                 }
+
+                stopProcess();
             }
         }
-
     }
 
     @Override
