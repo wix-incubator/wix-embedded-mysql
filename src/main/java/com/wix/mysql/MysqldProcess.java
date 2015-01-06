@@ -30,7 +30,6 @@ import java.util.logging.Logger;
 public class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutable, MysqldProcess> {
 
     private final static Logger log = Logger.getLogger(MysqldProcess.class.getName());
-    private AtomicBoolean stopped = new AtomicBoolean(false);
 
     public MysqldProcess(
             final Distribution distribution,
@@ -61,23 +60,23 @@ public class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutabl
 
     @Override
     protected void stopInternal() {
-        if ( stopped.compareAndSet(false, true) ) {
-            log.info("try to stop mysqld");
-            if (!stopUsingMysqldadmin()) {
-                log.warning("could not stop mysqld via mysqladmin, try next");
-                if (!sendKillToProcess()) {
-                    log.warning("could not stop mysqld, try next");
-                    if (!sendTermToProcess()) {
+        synchronized (this) {
+                log.info("try to stop mysqld");
+                if (!stopUsingMysqldadmin()) {
+                    log.warning("could not stop mysqld via mysqladmin, try next");
+                    if (!sendKillToProcess()) {
                         log.warning("could not stop mysqld, try next");
-                        if (!tryKillToProcess()) {
-                            log.warning("could not stop mysqld the second time, try one last thing");
+                        if (!sendTermToProcess()) {
+                            log.warning("could not stop mysqld, try next");
+                            if (!tryKillToProcess()) {
+                                log.warning("could not stop mysqld the second time, try one last thing");
+                            }
                         }
                     }
-                }
 
-                stopProcess();
+                    stopProcess();
+                }
             }
-        }
     }
 
     @Override
@@ -112,28 +111,28 @@ public class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutabl
     }
 
     private boolean stopUsingMysqldadmin() {
+        boolean retValue = false;
+
         try {
             Process p = Runtime.getRuntime().exec(new String[] {
-                "bin/mysqladmin",
+                "mysqladmin",
                 "--no-defaults",
                 String.format("-u%s", MysqldConfig.SystemDefaults.USERNAME),
                 "--protocol=socket",
                 String.format("--socket=%s", sockFile(getExecutable().executable)),
                 "shutdown"},
                 null,
-                getExecutable().getFile().generatedBaseDir());
-
+                new File(getExecutable().getFile().generatedBaseDir(), "bin"));
             Processors.connect(new InputStreamReader(p.getInputStream()), Processors.logTo(log, Level.INFO));
             Processors.connect(new InputStreamReader(p.getErrorStream()), Processors.logTo(log, Level.INFO));
-
-            return p.waitFor() == 0;
+            retValue = p.waitFor() == 0;
         } catch (InterruptedException e) {
             log.log(Level.WARNING, "Encountered error why shutting down process.", e);
-            return false;
         } catch (IOException e) {
             log.log(Level.WARNING, "Encountered error why shutting down process.", e);
-            return false;
         }
+
+        return retValue;
     }
 
     /**
