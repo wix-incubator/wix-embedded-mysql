@@ -115,14 +115,14 @@ public class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutabl
 
         try {
             Process p = Runtime.getRuntime().exec(new String[] {
-                "mysqladmin",
+                "bin/mysqladmin",
                 "--no-defaults",
                 String.format("-u%s", MysqldConfig.SystemDefaults.USERNAME),
                 "--protocol=socket",
                 String.format("--socket=%s", sockFile(getExecutable().executable)),
                 "shutdown"},
                 null,
-                new File(getExecutable().getFile().generatedBaseDir(), "bin"));
+                getExecutable().getFile().generatedBaseDir());
             Processors.connect(new InputStreamReader(p.getInputStream()), Processors.logTo(log, Level.INFO));
             Processors.connect(new InputStreamReader(p.getErrorStream()), Processors.logTo(log, Level.INFO));
             retValue = p.waitFor() == 0;
