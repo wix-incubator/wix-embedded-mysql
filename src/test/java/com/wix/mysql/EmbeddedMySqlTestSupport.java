@@ -1,9 +1,8 @@
 package com.wix.mysql;
 
 import com.mchange.v2.c3p0.ComboPooledDataSource;
+import com.wix.mysql.common.LoggingAdapter;
 import com.wix.mysql.config.MysqldConfig;
-import com.wix.mysql.config.MysqldConfigBuilder;
-import com.wix.mysql.distribution.Version;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import javax.sql.DataSource;
@@ -11,6 +10,10 @@ import javax.sql.DataSource;
 import static org.junit.Assert.assertEquals;
 
 public abstract class EmbeddedMySqlTestSupport {
+
+    static {
+        LoggingAdapter.initLogging();
+    }
 
     protected MysqldExecutable givenMySqlWithConfig(final MysqldConfig config) {
         MysqldStarter starter = MysqldStarter.defaultInstance();

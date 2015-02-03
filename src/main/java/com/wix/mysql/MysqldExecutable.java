@@ -10,12 +10,12 @@ import de.flapdoodle.embed.process.distribution.Platform;
 import de.flapdoodle.embed.process.extract.IExtractedFileSet;
 import de.flapdoodle.embed.process.io.Processors;
 import de.flapdoodle.embed.process.runtime.Executable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * @author viliusl
@@ -23,7 +23,7 @@ import java.util.logging.Logger;
  */
 public class MysqldExecutable extends Executable<MysqldConfig, MysqldProcess> {
 
-    private final Logger log = Logger.getLogger(getClass().getName());
+    private final Logger log = LoggerFactory.getLogger(getClass().getName());
 
     public final IExtractedFileSet executable;
 
@@ -59,7 +59,7 @@ public class MysqldExecutable extends Executable<MysqldConfig, MysqldProcess> {
     private void initDatabase() throws IOException {
         try {
             String baseDir = this.executable.generatedBaseDir().getAbsolutePath();
-            CollectingLogOutputProcessor logTo = new CollectingLogOutputProcessor(log, Level.FINER);
+            CollectingLogOutputProcessor logTo = new CollectingLogOutputProcessor(log);
 
             Process p = Runtime.getRuntime().exec(new String[]{
                             "scripts/mysql_install_db",

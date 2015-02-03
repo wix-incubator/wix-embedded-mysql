@@ -3,12 +3,13 @@ package com.wix.mysql.input;
 import de.flapdoodle.embed.process.io.IStreamProcessor;
 import org.apache.commons.io.input.Tailer;
 import org.apache.commons.io.input.TailerListenerAdapter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Logger;
 
 /**
  * @author viliusl
@@ -16,7 +17,7 @@ import java.util.logging.Logger;
  */
 public class LogFileProcessor extends Thread {
 
-    private final Logger log = Logger.getLogger(getClass().getName());
+    private final Logger log = LoggerFactory.getLogger(getClass().getName());
 
     private final static long delaySec = 3000;
 
@@ -41,7 +42,7 @@ public class LogFileProcessor extends Thread {
                 processor.process(res);
             }
         } catch (InterruptedException iox) {
-            log.severe(iox.getMessage());
+            log.warn(iox.getMessage());
         } finally {
             processor.onProcessed();
             tailer.stop();

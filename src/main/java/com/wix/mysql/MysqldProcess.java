@@ -12,6 +12,8 @@ import de.flapdoodle.embed.process.io.Processors;
 import de.flapdoodle.embed.process.io.StreamToLineProcessor;
 import de.flapdoodle.embed.process.runtime.AbstractProcess;
 import de.flapdoodle.embed.process.runtime.ProcessControl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,9 +21,7 @@ import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * @author viliusl
@@ -29,7 +29,9 @@ import java.util.logging.Logger;
  */
 public class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutable, MysqldProcess> {
 
-    private final static Logger log = Logger.getLogger(MysqldProcess.class.getName());
+    private final static Logger logger = LoggerFactory.getLogger(MysqldProcess.class);
+
+
 
     public MysqldProcess(
             final Distribution distribution,
@@ -55,28 +57,32 @@ public class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutabl
                 String.format("--socket=%s", sockFile(exe)),
                 String.format("--port=%s", config.getPort()),
                 String.format("--log-error=%s/data/error.log", baseDir));
-                //"--console");//does not properly work, dodgy between versions.
+        //"--console");//does not properly work, dodgy between versions.
     }
 
     @Override
     protected void stopInternal() {
         synchronized (this) {
-                log.info("try to stop mysqld");
-                if (!stopUsingMysqldadmin()) {
-                    log.warning("could not stop mysqld via mysqladmin, try next");
-                    if (!sendKillToProcess()) {
-                        log.warning("could not stop mysqld, try next");
-                        if (!sendTermToProcess()) {
-                            log.warning("could not stop mysqld, try next");
-                            if (!tryKillToProcess()) {
-                                log.warning("could not stop mysqld the second time, try one last thing");
+            logger.info("try to stop mysqld");
+            if (!stopUsingMysqldadmin()) {
+                logger.warn("could not stop mysqld via mysqladmin, try next");
+                if (!sendKillToProcess()) {
+                    logger.warn("could not stop mysqld, try next");
+                    if (!sendTermToProcess()) {
+                        logger.warn("could not stop mysqld, try next");
+                        if (!tryKillToProcess()) {
+                            logger.warn("could not stop mysqld the second time, try one last thing");
+                            try {
+                                stopProcess();
+                            } catch (IllegalStateException e) {
+                                logger.error("error while trying to stop mysql process", e);
                             }
                         }
                     }
-
-                    stopProcess();
                 }
+
             }
+        }
     }
 
     @Override
@@ -115,21 +121,23 @@ public class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutabl
 
         try {
             Process p = Runtime.getRuntime().exec(new String[] {
-                "bin/mysqladmin",
-                "--no-defaults",
-                String.format("-u%s", MysqldConfig.SystemDefaults.USERNAME),
-                "--protocol=socket",
-                String.format("--socket=%s", sockFile(getExecutable().executable)),
-                "shutdown"},
-                null,
-                getExecutable().getFile().generatedBaseDir());
-            Processors.connect(new InputStreamReader(p.getInputStream()), Processors.logTo(log, Level.INFO));
-            Processors.connect(new InputStreamReader(p.getErrorStream()), Processors.logTo(log, Level.INFO));
+                            "bin/mysqladmin",
+                            "--no-defaults",
+                            String.format("-u%s", MysqldConfig.SystemDefaults.USERNAME),
+                            "--protocol=socket",
+                            String.format("--socket=%s", sockFile(getExecutable().executable)),
+                            "shutdown"},
+                    null,
+                    getExecutable().getFile().generatedBaseDir());
+
+            java.util.logging.Logger processLog = java.util.logging.Logger.getLogger(MysqldProcess.class.getName());
+            Processors.connect(new InputStreamReader(p.getInputStream()), Processors.logTo(processLog, Level.INFO));
+            Processors.connect(new InputStreamReader(p.getErrorStream()), Processors.logTo(processLog, Level.INFO));
             retValue = p.waitFor() == 0;
         } catch (InterruptedException e) {
-            log.log(Level.WARNING, "Encountered error why shutting down process.", e);
+            logger.warn("Encountered error why shutting down process.", e);
         } catch (IOException e) {
-            log.log(Level.WARNING, "Encountered error why shutting down process.", e);
+            logger.warn("Encountered error why shutting down process.", e);
         }
 
         return retValue;

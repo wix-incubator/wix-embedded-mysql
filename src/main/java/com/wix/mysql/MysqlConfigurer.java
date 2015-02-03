@@ -1,13 +1,15 @@
 package com.wix.mysql;
 
 import com.wix.mysql.config.MysqldConfig;
-import static com.wix.mysql.config.MysqldConfig.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.logging.Logger;
+
+import static com.wix.mysql.config.MysqldConfig.SystemDefaults;
 
 /**
  * @author viliusl
@@ -15,7 +17,7 @@ import java.util.logging.Logger;
  */
 public class MysqlConfigurer {
 
-    private Logger log = Logger.getLogger(getClass().getName());
+    private Logger log = LoggerFactory.getLogger(getClass().getName());
 
     private final MysqldConfig config;
 
@@ -37,7 +39,7 @@ public class MysqlConfigurer {
                 executeStmt(con, String.format("GRANT ALL ON %s.* TO '%s'@'localhost';", config.getSchema(), config.getUsername()));
 
             } catch (Exception e) {
-                log.severe(e.getMessage());
+                log.warn(e.getMessage());
                 throw new RuntimeException(e);
             } finally {
                 try { if ( con != null ) con.close(); } catch (SQLException e) { throw new RuntimeException(e); }
