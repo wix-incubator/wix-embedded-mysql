@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.Field;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
@@ -121,26 +122,12 @@ public class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutabl
         boolean retValue = false;
 
         try {
-            String cmd = "bin/mysqladmin";
-            File baseDir = getExecutable().getFile().generatedBaseDir();
-
-            //TODO: figure out what is happening/refactor
-            //problem is that linux/osx executes this differently and fails to find executable
-            //could not come up with unified command for now:(
-            if (Platform.detect() == Platform.OS_X) {
-                cmd = "mysqladmin";
-                baseDir = new File(getExecutable().getFile().generatedBaseDir(), "bin");
-            }
-
+            String cmd = Paths.get(getExecutable().getFile().generatedBaseDir().getAbsolutePath(), "bin", "mysqladmin").toString();
             Process p = Runtime.getRuntime().exec(new String[] {
-                            cmd,
-                            "--no-defaults",
-                            String.format("-u%s", MysqldConfig.SystemDefaults.USERNAME),
-                            "--protocol=socket",
-                            String.format("--socket=%s", sockFile(getExecutable().executable)),
-                            "shutdown"},
-                    null,
-                    baseDir);
+                    cmd, "--no-defaults", "--protocol=socket",
+                    String.format("-u%s", MysqldConfig.SystemDefaults.USERNAME),
+                    String.format("--socket=%s", sockFile(getExecutable().executable)),
+                    "shutdown"});
 
             java.util.logging.Logger processLog = java.util.logging.Logger.getLogger(MysqldProcess.class.getName());
             Processors.connect(new InputStreamReader(p.getInputStream()), Processors.logTo(processLog, Level.INFO));
