@@ -6,6 +6,7 @@ import com.wix.mysql.input.LogFileProcessor;
 import de.flapdoodle.embed.process.collections.Collections;
 import de.flapdoodle.embed.process.config.IRuntimeConfig;
 import de.flapdoodle.embed.process.distribution.Distribution;
+import de.flapdoodle.embed.process.distribution.Platform;
 import de.flapdoodle.embed.process.extract.IExtractedFileSet;
 import de.flapdoodle.embed.process.io.LogWatchStreamProcessor;
 import de.flapdoodle.embed.process.io.Processors;
@@ -120,15 +121,26 @@ public class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutabl
         boolean retValue = false;
 
         try {
+            String cmd = "bin/mysqladmin";
+            File baseDir = getExecutable().getFile().generatedBaseDir();
+
+            //TODO: figure out what is happening/refactor
+            //problem is that linux/osx executes this differently and fails to find executable
+            //could not come up with unified command for now:(
+            if (Platform.detect() == Platform.OS_X) {
+                cmd = "mysqladmin";
+                baseDir = new File(getExecutable().getFile().generatedBaseDir(), "bin");
+            }
+
             Process p = Runtime.getRuntime().exec(new String[] {
-                            "bin/mysqladmin",
+                            cmd,
                             "--no-defaults",
                             String.format("-u%s", MysqldConfig.SystemDefaults.USERNAME),
                             "--protocol=socket",
                             String.format("--socket=%s", sockFile(getExecutable().executable)),
                             "shutdown"},
                     null,
-                    getExecutable().getFile().generatedBaseDir());
+                    baseDir);
 
             java.util.logging.Logger processLog = java.util.logging.Logger.getLogger(MysqldProcess.class.getName());
             Processors.connect(new InputStreamReader(p.getInputStream()), Processors.logTo(processLog, Level.INFO));
