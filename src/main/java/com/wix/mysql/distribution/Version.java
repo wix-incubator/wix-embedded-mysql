@@ -1,7 +1,12 @@
 package com.wix.mysql.distribution;
 
+import com.google.common.base.Joiner;
 import com.wix.mysql.exceptions.UnsupportedPlatformException;
 import de.flapdoodle.embed.process.distribution.IVersion;
+import de.flapdoodle.embed.process.distribution.Platform;
+
+import java.util.Arrays;
+import java.util.List;
 
 import static java.lang.String.format;
 
@@ -14,20 +19,45 @@ public enum Version implements IVersion {
     v5_6_23("5.6", "23"),
     v5_6_22("5.6", "22"),
     v5_6_21("5.6", "21"),
-    v5_5_40("5.5", "40");
+    v5_5_40("5.5", "40", Platform.Linux, Platform.OS_X);
 
-	private final String majorVersion;
-	private final String minorVersion;
-	private PlatformProvider platformProvider = new PlatformProvider();
+    private final String majorVersion;
+    private final String minorVersion;
+    private final List<Platform> supportedPlatforms;
 
-    Version(String majorVersion, String minorVersion) {
+    private Version(String majorVersion, String minorVersion, Platform... supportedPlatforms) {
         this.majorVersion = majorVersion;
         this.minorVersion = minorVersion;
+        this.supportedPlatforms = Arrays.asList(supportedPlatforms);
     }
 
+    Version(String majorVersion, String minorVersion) {
+        this(majorVersion, minorVersion, Platform.Linux, Platform.Windows, Platform.OS_X);
+    }
 
-    protected void setPlatformProvider(PlatformProvider platformProvider) {
-        this.platformProvider = platformProvider;
+    public boolean supportsCurrentPlatform() {
+        return supportedPlatforms.contains(currentPlatform());
+    }
+
+    @Override
+    public String asInDownloadPath() {
+        assertPlatformIsSupported();
+
+        switch (currentPlatform()) {
+            case Windows:
+                return format("%s/mysql-%s.%s", path(), majorVersion, minorVersion);
+            case OS_X:
+                return format("%s/mysql-%s.%s-osx%s", path(), majorVersion, minorVersion, osVersion());
+            case Linux:
+                return format("%s/mysql-%s.%s-%s", path(), majorVersion, minorVersion, gcLibVersion());
+            default:
+                throw new UnsupportedPlatformException("Unrecognized platform, currently not supported");
+        }
+    }
+
+    @Override
+    public String toString() {
+        return String.format("Version %s.%s", majorVersion, minorVersion);
     }
 
     private String osVersion() {
@@ -46,27 +76,17 @@ public enum Version implements IVersion {
         throw new UnsupportedOperationException();
     }
 
+    private Platform currentPlatform() { return Platform.detect(); }
+
     private String path() {
         return format("MySQL-%s", majorVersion);
     }
 
-
-	@Override
-	public String asInDownloadPath() {
-        switch (platformProvider.getPlatform()) {
-            case Windows:
-                return format("%s/mysql-%s.%s", path(), majorVersion, minorVersion);
-            case OS_X:
-                return format("%s/mysql-%s.%s-osx%s", path(), majorVersion, minorVersion, osVersion());
-            case Linux:
-                return format("%s/mysql-%s.%s-%s", path(), majorVersion, minorVersion, gcLibVersion());
-            default:
-                throw new UnsupportedPlatformException("Unrecognized platform, currently not supported");
+    private void assertPlatformIsSupported() {
+        if (!supportsCurrentPlatform()) {
+            throw new UnsupportedPlatformException(String.format("Platform %s is not in a supported platform list: %s",
+                    currentPlatform().name(),
+                    Joiner.on(",").join(supportedPlatforms)));
         }
-	}
-
-	@Override
-	public String toString() {
-		return String.format("Version %s.%s", majorVersion, minorVersion);
-	}
+    }
 }

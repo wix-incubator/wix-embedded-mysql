@@ -3,11 +3,17 @@ package com.wix.mysql;
 import com.mchange.v2.c3p0.ComboPooledDataSource;
 import com.wix.mysql.common.LoggingAdapter;
 import com.wix.mysql.config.MysqldConfig;
+import org.junit.Rule;
+import org.junit.contrib.java.lang.system.StandardErrorStreamLog;
+import org.junit.contrib.java.lang.system.StandardOutputStreamLog;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import javax.sql.DataSource;
 
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 
 public abstract class EmbeddedMySqlTestSupport {
 
