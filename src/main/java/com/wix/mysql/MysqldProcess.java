@@ -1,6 +1,9 @@
 package com.wix.mysql;
 
+import ch.qos.logback.classic.LoggerContext;
 import com.google.common.collect.Sets;
+import com.google.common.io.CharStreams;
+import com.google.common.io.Closeables;
 import com.wix.mysql.config.MysqldConfig;
 import com.wix.mysql.input.LogFileProcessor;
 import de.flapdoodle.embed.process.collections.Collections;
@@ -8,17 +11,14 @@ import de.flapdoodle.embed.process.config.IRuntimeConfig;
 import de.flapdoodle.embed.process.distribution.Distribution;
 import de.flapdoodle.embed.process.distribution.Platform;
 import de.flapdoodle.embed.process.extract.IExtractedFileSet;
-import de.flapdoodle.embed.process.io.LogWatchStreamProcessor;
-import de.flapdoodle.embed.process.io.Processors;
-import de.flapdoodle.embed.process.io.StreamToLineProcessor;
+import de.flapdoodle.embed.process.io.*;
 import de.flapdoodle.embed.process.runtime.AbstractProcess;
 import de.flapdoodle.embed.process.runtime.ProcessControl;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.lang.reflect.Field;
 import java.nio.file.Paths;
 import java.util.List;
@@ -33,7 +33,9 @@ public class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutabl
 
     private final static Logger logger = LoggerFactory.getLogger(MysqldProcess.class);
 
-
+    private IRuntimeConfig unsafeRuntimeConfig;
+    private LogWatchStreamProcessor logWatch = null;
+    private LogFileProcessor logFile = null;
 
     public MysqldProcess(
             final Distribution distribution,
@@ -41,25 +43,76 @@ public class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutabl
             final IRuntimeConfig runtimeConfig,
             final MysqldExecutable executable) throws IOException {
         super(distribution, config, runtimeConfig, executable);
+        this.unsafeRuntimeConfig = runtimeConfig;
     }
+
+    @Override
+    protected void onBeforeProcessStart(ProcessBuilder processBuilder, MysqldConfig config, IRuntimeConfig runtimeConfig) {
+        super.onBeforeProcessStart(processBuilder, config, runtimeConfig);
+
+        logWatch = new LogWatchStreamProcessor(
+                "ready for connections",
+                Sets.newHashSet("[ERROR]"),
+                StreamToLineProcessor.wrap(runtimeConfig.getProcessOutput().getOutput()));
+
+        logFile = new LogFileProcessor(
+                new File(this.getExecutable().executable.generatedBaseDir() + "/data/error.log"),
+                logWatch);
+    }
+
+    @Override
+    public void onAfterProcessStart(final ProcessControl process, final IRuntimeConfig runtimeConfig) throws IOException {
+        try {
+
+            logWatch.waitForResult(getConfig().getTimeout());
+
+            if (!logWatch.isInitWithSuccess()) {
+                throw new RuntimeException("mysql start failed with error: " + logWatch.getFailureFound());
+            }
+
+            new MysqlConfigurer(getConfig()).configure();
+        } catch (Exception e) {
+            // emit IO exception for {@link AbstractProcess} would try to stop running process gracefully
+            throw new IOException(e);
+        } finally {
+            if (logFile != null) logFile.shutdown();
+        }
+    }
+
 
     @Override
     protected List<String> getCommandLine(Distribution distribution, MysqldConfig config, IExtractedFileSet exe) throws IOException {
         final String baseDir = exe.generatedBaseDir().getAbsolutePath();
 
-        return Collections.newArrayList(
-                exe.executable().getAbsolutePath(),
-                "--no-defaults",
-                "--log-output=NONE",
-                String.format("--basedir=%s", baseDir),
-                String.format("--datadir=%s/data", baseDir),
-                String.format("--plugin-dir=%s/lib/plugin", baseDir),
-                String.format("--pid-file=%s.pid", pidFile(exe.executable())),
-                String.format("--lc-messages-dir=%s/share", baseDir),
-                String.format("--socket=%s", sockFile(exe)),
-                String.format("--port=%s", config.getPort()),
-                String.format("--log-error=%s/data/error.log", baseDir));
-        //"--console");//does not properly work, dodgy between versions.
+        //TODO: create factory for platform-specific commands;
+        if (Platform.detect() == Platform.Windows) {
+            return Collections.newArrayList(
+                    exe.executable().getAbsolutePath(),
+                    "--no-defaults",
+                    "--log-output=NONE",
+                    "--enable-named-pipe",
+                    String.format("--basedir=%s", baseDir),
+                    String.format("--datadir=%s/data", baseDir),
+                    String.format("--plugin-dir=%s/lib/plugin", baseDir),
+                    String.format("--pid-file=%s.pid", pidFile(exe.executable())),
+                    String.format("--lc-messages-dir=%s/share", baseDir),
+                    String.format("--socket=%s", sockFile(exe)),
+                    String.format("--port=%s", config.getPort()),
+                    String.format("--log-error=%s/data/error.log", baseDir));
+        } else {
+            return Collections.newArrayList(
+                    exe.executable().getAbsolutePath(),
+                    "--no-defaults",
+                    "--log-output=NONE",
+                    String.format("--basedir=%s", baseDir),
+                    String.format("--datadir=%s/data", baseDir),
+                    String.format("--plugin-dir=%s/lib/plugin", baseDir),
+                    String.format("--pid-file=%s.pid", pidFile(exe.executable())),
+                    String.format("--lc-messages-dir=%s/share", baseDir),
+                    String.format("--socket=%s", sockFile(exe)),
+                    String.format("--port=%s", config.getPort()),
+                    String.format("--log-error=%s/data/error.log", baseDir));
+        }
     }
 
     @Override
@@ -90,53 +143,67 @@ public class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutabl
     @Override
     protected void cleanupInternal() {}
 
-    @Override
-    public void onAfterProcessStart(final ProcessControl process, final IRuntimeConfig runtimeConfig) throws IOException {
-        Set<String> errors = Sets.newHashSet();
-
-        errors.add("[ERROR]");
-        LogWatchStreamProcessor logWatch = new LogWatchStreamProcessor(
-                "ready for connections",
-                errors,
-                StreamToLineProcessor.wrap(runtimeConfig.getProcessOutput().getOutput()));
-
-        new LogFileProcessor(
-                new File(this.getExecutable().executable.generatedBaseDir() + "/data/error.log"),
-                logWatch);
-
-        logWatch.waitForResult(getConfig().getTimeout());
-
-        if (!logWatch.isInitWithSuccess()) {
-            throw new RuntimeException("mysql start failed with error: " + logWatch.getFailureFound());
-        }
-
-        try {
-            new MysqlConfigurer(getConfig()).configure();
-        } catch (Exception e) {
-            // emit IO exception for {@link AbstractProcess} would try to stop running process gracefully
-            throw new IOException(e);
-        }
-    }
-
     private boolean stopUsingMysqldadmin() {
         boolean retValue = false;
 
-        try {
-            String cmd = Paths.get(getExecutable().getFile().generatedBaseDir().getAbsolutePath(), "bin", "mysqladmin").toString();
-            Process p = Runtime.getRuntime().exec(new String[] {
-                    cmd, "--no-defaults", "--protocol=socket",
-                    String.format("-u%s", MysqldConfig.SystemDefaults.USERNAME),
-                    String.format("--socket=%s", sockFile(getExecutable().executable)),
-                    "shutdown"});
+        Reader stdOut = null;
+        Reader stdErr = null;
+        LogFileProcessor processor = null;
+        String successPattern = null;
 
-            java.util.logging.Logger processLog = java.util.logging.Logger.getLogger(MysqldProcess.class.getName());
-            Processors.connect(new InputStreamReader(p.getInputStream()), Processors.logTo(processLog, Level.INFO));
-            Processors.connect(new InputStreamReader(p.getErrorStream()), Processors.logTo(processLog, Level.INFO));
+        try {
+            Process p;
+
+            if (Platform.detect() == Platform.Windows) {
+                String cmd = Paths.get(getExecutable().getFile().generatedBaseDir().getAbsolutePath(), "bin", "mysqladmin.exe").toString();
+                successPattern = "mysqld.exe: Shutdown complete";
+
+                p = Runtime.getRuntime().exec(new String[] {
+                        cmd, "--no-defaults", "--protocol=tcp",
+                        String.format("-u%s", MysqldConfig.SystemDefaults.USERNAME),
+                        "shutdown"});
+            } else {
+                String cmd = Paths.get(getExecutable().getFile().generatedBaseDir().getAbsolutePath(), "bin", "mysqladmin").toString();
+                successPattern = "mysqld: Shutdown complete";
+
+                p = Runtime.getRuntime().exec(new String[] {
+                        cmd, "--no-defaults", "--protocol=tcp",
+                        String.format("-u%s", MysqldConfig.SystemDefaults.USERNAME),
+                        //String.format("--socket=%s", sockFile(getExecutable().executable)),
+                        "shutdown"});
+            }
+
             retValue = p.waitFor() == 0;
+
+            LogWatchStreamProcessor outputWatch = new LogWatchStreamProcessor(
+                    successPattern,
+                    Sets.newHashSet("[ERROR]"),
+                    StreamToLineProcessor.wrap(unsafeRuntimeConfig.getProcessOutput().getOutput()));
+
+            processor = new LogFileProcessor(new File(this.getExecutable().executable.generatedBaseDir() + "/data/error.log"), outputWatch);
+
+            stdOut = new InputStreamReader(p.getInputStream());
+            stdErr = new InputStreamReader(p.getErrorStream());
+
+            if (retValue) {
+                outputWatch.waitForResult(getConfig().getTimeout());
+
+                if (!outputWatch.isInitWithSuccess()) {
+                    logger.error("mysql shutdown failed. Expected to find in output: 'Shutdown complete', got: " + outputWatch.getFailureFound());
+                    retValue = false;
+                }
+            } else {
+                logger.error("mysql shutdown failed with error code: " + p.waitFor() + " and message: " + CharStreams.toString(stdErr));
+            }
+
         } catch (InterruptedException e) {
             logger.warn("Encountered error why shutting down process.", e);
         } catch (IOException e) {
             logger.warn("Encountered error why shutting down process.", e);
+        } finally {
+            Closeables.closeQuietly(stdOut);
+            Closeables.closeQuietly(stdErr);
+            if (processor != null) processor.shutdown();
         }
 
         return retValue;
@@ -170,8 +237,9 @@ public class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutabl
      */
     private String sockFile(IExtractedFileSet exe) throws IOException {
         String sysTempDir = System.getProperty("java.io.tmpdir");
-        String pidFile = String.format("%s.sock", exe.generatedBaseDir().getName());
-        return new File(sysTempDir, pidFile).getAbsolutePath();
+        String sockFile = String.format("%s.sock", exe.generatedBaseDir().getName());
+        return new File(sysTempDir, sockFile).getAbsolutePath();
     }
-
 }
+
+

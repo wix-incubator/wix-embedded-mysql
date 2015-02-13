@@ -1,5 +1,6 @@
 package com.wix.mysql.config.directories;
 
+import de.flapdoodle.embed.process.distribution.Platform;
 import de.flapdoodle.embed.process.io.directories.IDirectory;
 
 import java.io.File;
@@ -20,7 +21,15 @@ public class TargetGeneratedFixedPath implements IDirectory {
     }
 
     private void generateNeededDirs() {
-        for (String dir: new String[]{ "bin", "scripts", "lib/plugin", "share/english", "share", "support-files" } ) {
+        String[] paths = null;
+
+        if (Platform.detect() == Platform.Windows) {
+            paths = new String[]{ "bin", "share/english", "data/test", "data/mysql", "data/performance_schema" };
+        } else {
+            paths = new String[]{ "bin", "scripts", "lib/plugin", "share/english", "share", "support-files" };
+        }
+
+        for (String dir: paths) {
             new File(baseDir + "/" + dir).mkdirs();
         }
     }

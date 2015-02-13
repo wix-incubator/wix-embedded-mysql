@@ -19,6 +19,7 @@ public class LogFileProcessor extends Thread {
 
     private final Logger log = LoggerFactory.getLogger(getClass().getName());
 
+    private volatile boolean running = true;
     private final static long delaySec = 3000;
 
     private final BlockingQueue<String> lines = new LinkedBlockingDeque<String>();
@@ -37,7 +38,7 @@ public class LogFileProcessor extends Thread {
     public void run() {
         try {
             String res;
-            while ((res = lines.poll(5, TimeUnit.SECONDS)) != null) {
+            while ((res = lines.poll(10, TimeUnit.SECONDS)) != null && running) {
                 log.info(res);
                 processor.process(res);
             }
@@ -47,6 +48,10 @@ public class LogFileProcessor extends Thread {
             processor.onProcessed();
             tailer.stop();
         }
+    }
+
+    public void shutdown() {
+        running = false;
     }
 
     public static class LogTailerListener extends TailerListenerAdapter {
