@@ -5,6 +5,7 @@ import com.google.common.io.CharStreams;
 import com.google.common.io.Closeables;
 import com.wix.mysql.config.MysqldConfig;
 import com.wix.mysql.input.LogFileProcessor;
+import com.wix.mysql.input.OutputWatchStreamProcessor;
 import de.flapdoodle.embed.process.collections.Collections;
 import de.flapdoodle.embed.process.config.IRuntimeConfig;
 import de.flapdoodle.embed.process.distribution.Distribution;
@@ -24,6 +25,7 @@ import java.io.Reader;
 import java.lang.reflect.Field;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author viliusl
@@ -34,7 +36,7 @@ public class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutabl
     private final static Logger logger = LoggerFactory.getLogger(MysqldProcess.class);
 
     private IRuntimeConfig unsafeRuntimeConfig;
-    private LogWatchStreamProcessor logWatch = null;
+    private OutputWatchStreamProcessor logWatch = null;
     private LogFileProcessor logFile = null;
 
     public MysqldProcess(
@@ -50,8 +52,8 @@ public class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutabl
     protected void onBeforeProcessStart(ProcessBuilder processBuilder, MysqldConfig config, IRuntimeConfig runtimeConfig) {
         super.onBeforeProcessStart(processBuilder, config, runtimeConfig);
 
-        logWatch = new LogWatchStreamProcessor(
-                "ready for connections",
+        logWatch = new OutputWatchStreamProcessor(
+                Sets.newHashSet("ready for connections"),
                 Sets.newHashSet("[ERROR]"),
                 StreamToLineProcessor.wrap(runtimeConfig.getProcessOutput().getOutput()));
 
@@ -149,14 +151,14 @@ public class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutabl
         Reader stdOut = null;
         Reader stdErr = null;
         LogFileProcessor processor = null;
-        String successPattern = null;
+        Set<String> successPatterns = Sets.newHashSet("'Can't connect to MySQL server on 'localhost'");
 
         try {
             Process p;
 
             if (Platform.detect() == Platform.Windows) {
                 String cmd = Paths.get(getExecutable().getFile().generatedBaseDir().getAbsolutePath(), "bin", "mysqladmin.exe").toString();
-                successPattern = "mysqld.exe: Shutdown complete";
+                successPatterns.add("mysqld.exe: Shutdown complete");
 
                 p = Runtime.getRuntime().exec(new String[] {
                         cmd, "--no-defaults", "--protocol=tcp",
@@ -164,7 +166,7 @@ public class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutabl
                         "shutdown"});
             } else {
                 String cmd = Paths.get(getExecutable().getFile().generatedBaseDir().getAbsolutePath(), "bin", "mysqladmin").toString();
-                successPattern = "mysqld: Shutdown complete";
+                successPatterns.add("mysqld: Shutdown complete");
 
                 p = Runtime.getRuntime().exec(new String[] {
                         cmd, "--no-defaults", "--protocol=tcp",
@@ -175,8 +177,8 @@ public class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutabl
 
             retValue = p.waitFor() == 0;
 
-            LogWatchStreamProcessor outputWatch = new LogWatchStreamProcessor(
-                    successPattern,
+            OutputWatchStreamProcessor outputWatch = new OutputWatchStreamProcessor(
+                    successPatterns,
                     Sets.newHashSet("[ERROR]"),
                     StreamToLineProcessor.wrap(unsafeRuntimeConfig.getProcessOutput().getOutput()));
 
