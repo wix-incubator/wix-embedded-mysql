@@ -1,17 +1,11 @@
 package com.wix.mysql.config;
 
-import static com.wix.mysql.config.MysqldConfig.*;
-
-import com.wix.mysql.config.MysqldConfig;
-import com.wix.mysql.config.MysqldConfigBuilder;
 import com.wix.mysql.distribution.Version;
-import de.flapdoodle.embed.process.distribution.IVersion;
 import org.junit.Test;
 
+import static com.wix.mysql.config.MysqldConfig.Defaults;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.*;
 
 /**
  * @author viliusl

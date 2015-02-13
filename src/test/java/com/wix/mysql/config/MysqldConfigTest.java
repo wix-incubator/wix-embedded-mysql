@@ -1,10 +1,11 @@
 package com.wix.mysql.config;
 
-import com.wix.mysql.config.MysqldConfig;
 import com.wix.mysql.distribution.Version;
 import de.flapdoodle.embed.process.distribution.IVersion;
 import org.junit.Test;
-import static com.wix.mysql.config.MysqldConfig.*;
+
+import static com.wix.mysql.config.MysqldConfig.Defaults;
+import static com.wix.mysql.config.MysqldConfig.SystemDefaults;
 
 /**
  * @author viliusl
