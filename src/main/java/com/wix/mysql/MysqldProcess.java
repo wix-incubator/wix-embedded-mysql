@@ -203,8 +203,8 @@ public class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutabl
         } catch (IOException e) {
             logger.warn("Encountered error why shutting down process.", e);
         } finally {
-            Closeables.closeQuietly(stdOut);
-            Closeables.closeQuietly(stdErr);
+            closeCloseable(stdOut);
+            closeCloseable(stdErr);
             if (processor != null) processor.shutdown();
         }
 
@@ -241,6 +241,17 @@ public class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutabl
         String sysTempDir = System.getProperty("java.io.tmpdir");
         String sockFile = String.format("%s.sock", exe.generatedBaseDir().getName());
         return new File(sysTempDir, sockFile).getAbsolutePath();
+    }
+
+    //Cannot use higher version of guava than 16 right now due to framework (wix-embedded-mysql) uses this
+    //TODO: make sure 18 version is in FW
+    private static void closeCloseable(Reader reader) {
+        try {
+            if (reader != null) reader.close();
+        } catch (IOException e) {
+
+        }
+
     }
 }
 
