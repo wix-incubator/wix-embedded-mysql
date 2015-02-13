@@ -35,10 +35,11 @@ public class PackagePaths implements IPackageResolver {
         // and discuss with flapdoodle people;
         FileSet.Builder builder = FileSet.builder()
                 .addEntry(Executable, "bin/mysqld.exe")
-                .addEntry(Library,    "bin/resolveip.exe")
-                .addEntry(Library,    "bin/mysqladmin.exe")
-                .addEntry(Library,    "share/english/errmsg.sys")
-                .addEntry(Library,    "data/test/db.opt")
+                .addEntry(Library, "bin/mysql.exe")
+                .addEntry(Library, "bin/resolveip.exe")
+                .addEntry(Library, "bin/mysqladmin.exe")
+                .addEntry(Library, "share/english/errmsg.sys")
+                .addEntry(Library, "data/test/db.opt")
 
                 .addEntry(Library, "data/ib_logfile0")
                 .addEntry(Library, "data/ib_logfile1")
@@ -193,6 +194,7 @@ public class PackagePaths implements IPackageResolver {
     private FileSet buildNixFileSet() {
         return FileSet.builder()
                 .addEntry(Executable, "bin/mysqld")
+                .addEntry(Library,    "bin/mysql")
                 .addEntry(Library,    "bin/resolveip")
                 .addEntry(Library,    "bin/mysqladmin")
                 .addEntry(Library,    "bin/my_print_defaults")
