@@ -142,6 +142,7 @@ public class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutabl
             Process p = Runtime.getRuntime().exec(new String[] {
                     cmd, "--no-defaults", "--protocol=tcp",
                     String.format("-u%s", MysqldConfig.SystemDefaults.USERNAME),
+                    String.format("--port=%s", getConfig().getPort()),
                     "shutdown"});
 
             retValue = p.waitFor() == 0;
@@ -215,7 +216,6 @@ public class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutabl
             throw new RuntimeException(e);
         }
     }
-
 
     /**
      * Helper for getting stable sock file. Saving to local instance variable on service start does not work due
