@@ -164,7 +164,14 @@ public class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutabl
                     retValue = false;
                 }
             } else {
-                logger.error("mysql shutdown failed with error code: " + p.waitFor() + " and message: " + CharStreams.toString(stdErr));
+                String errOutput = CharStreams.toString(stdErr);
+
+                if (errOutput.contains("Can't connect to MySQL server on")) {
+                    logger.warn("mysql was already shutdown - no need to add extra shutdown hook - process does it out of the box.");
+                    retValue = true;
+                } else {
+                    logger.error("mysql shutdown failed with error code: " + p.waitFor() + " and message: " + CharStreams.toString(stdErr));
+                }
             }
 
         } catch (InterruptedException e) {
