@@ -3,8 +3,15 @@ package com.wix.mysql;
 import com.wix.mysql.config.MysqldConfig;
 import com.wix.mysql.config.MysqldConfigBuilder;
 import org.junit.Test;
+import org.springframework.jdbc.core.JdbcTemplate;
 
+import java.util.List;
+import java.util.concurrent.Callable;
+
+import static com.wix.mysql.config.MysqldConfig.SystemDefaults.*;
 import static com.wix.mysql.distribution.Version.v5_6_21;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasItems;
 
 /**
  * @author viliusl
@@ -33,10 +40,28 @@ public class CustomConfigurationRunnerTest extends EmbeddedMySqlTestSupport {
     }
 
     @Test
+    public void runMySqlWithTwoSchemas() throws Exception {
+        final MysqldConfig config = template
+                .withUsername("auser")
+                .withPassword("sa")
+                .withSchemas(new String[]{"schema1", "schema2"})
+                .withPort(9913).build();
+
+        startAndVerify(config, new Callable<Void>() {
+            @Override
+            public Void call() throws Exception {
+                List<String> dbs = new JdbcTemplate(dataSourceFor(config, SCHEMA)).queryForList("SHOW DATABASES;", String.class);
+                assertThat(dbs, hasItems("schema1", "schema2"));
+                return null;
+            }
+        });
+    }
+
+    @Test
     public void runMySqlWithSystemUserAndCustomSchema() throws Exception {
         MysqldConfig config = template
-                .withUsername(MysqldConfig.SystemDefaults.USERNAME)
-                .withPassword(MysqldConfig.SystemDefaults.PASSWORD)
+                .withUsername(USERNAME)
+                .withPassword(PASSWORD)
                 .withSchema(MysqldConfig.Defaults.SCHEMA + "a")
                 .build();
 

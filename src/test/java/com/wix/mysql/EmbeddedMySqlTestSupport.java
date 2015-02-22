@@ -6,6 +6,7 @@ import com.wix.mysql.config.MysqldConfig;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import javax.sql.DataSource;
+import java.util.concurrent.Callable;
 
 import static org.junit.Assert.assertEquals;
 
@@ -21,11 +22,22 @@ public abstract class EmbeddedMySqlTestSupport {
     }
 
     protected void startAndVerifyDatabase(final MysqldConfig config) {
+        startAndVerify(config, new Callable<Void>() {
+            @Override
+            public Void call() throws Exception {
+                for (String schema: config.getSchemas()){
+                    validateConnection(config, schema);
+                }
+                return null;
+            }
+        });
+    }
+
+    protected void startAndVerify(final MysqldConfig config, Callable<Void> verify) {
         MysqldExecutable executable = givenMySqlWithConfig(config);
         try {
             executable.start();
-            long res = new JdbcTemplate(dataSourceFor(config)).queryForObject("select 1;", Long.class);
-            assertEquals(1, res);
+            verify.call();
         } catch (Exception e) {
             throw new RuntimeException(e);
         } finally {
@@ -33,17 +45,22 @@ public abstract class EmbeddedMySqlTestSupport {
         }
     }
 
-    private DataSource dataSourceFor(MysqldConfig config) throws Exception {
+    private void validateConnection(MysqldConfig config, String schema) throws Exception {
+        long res = new JdbcTemplate(dataSourceFor(config, schema)).queryForObject("select 1;", Long.class);
+        assertEquals(1, res);
+    }
+
+    protected DataSource dataSourceFor(MysqldConfig config, String schema) throws Exception {
         ComboPooledDataSource cpds = new ComboPooledDataSource();
         cpds.setDriverClass("com.mysql.jdbc.Driver");
-        cpds.setJdbcUrl(connectionUrlFor(config));
+        cpds.setJdbcUrl(connectionUrlFor(config, schema));
         cpds.setUser(config.getUsername());
         cpds.setPassword(config.getPassword());
         return cpds;
     }
 
-    private String connectionUrlFor(MysqldConfig config) {
-        return String.format("jdbc:mysql://localhost:%s/%s", config.getPort(), config.getSchema());
+    private String connectionUrlFor(MysqldConfig config, String schema) {
+        return String.format("jdbc:mysql://localhost:%s/%s", config.getPort(), schema);
     }
 
 
