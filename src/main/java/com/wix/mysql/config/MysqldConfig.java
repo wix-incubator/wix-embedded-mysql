@@ -1,13 +1,14 @@
 package com.wix.mysql.config;
 
-import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
 import de.flapdoodle.embed.process.config.ExecutableProcessConfig;
 import de.flapdoodle.embed.process.config.ISupportConfig;
 import de.flapdoodle.embed.process.distribution.IVersion;
 
 import java.util.Arrays;
 import java.util.Objects;
+
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Strings.isNullOrEmpty;
 
 /**
  * @author viliusl
@@ -24,6 +25,16 @@ public class MysqldConfig extends ExecutableProcessConfig {
             final IVersion version,
             final String username,
             final String password,
+            final String schema,
+            final Integer port)
+    {
+        this(version, username, password, (schema != null) ? new String[]{schema} : null, port);
+    }
+
+    public MysqldConfig(
+            final IVersion version,
+            final String username,
+            final String password,
             final String[] schemas,
             final Integer port) {
         super(version, new ISupportConfig() {
@@ -33,12 +44,13 @@ public class MysqldConfig extends ExecutableProcessConfig {
                 return "no message";
             }});
 
-        Preconditions.checkArgument(!Strings.isNullOrEmpty(username), "Username cannot be null or empty");
-        Preconditions.checkArgument((schemas != null) && (schemas.length > 0), "Schemas cannot be empty");
+        checkArgument(!isNullOrEmpty(username), "Username cannot be null or empty");
+        checkArgument((schemas != null) && (schemas.length > 0), "Schemas cannot be empty");
         for( String scheme : schemas){
-            Preconditions.checkArgument(!SystemDefaults.SCHEMA.equals(scheme), String.format("Usage of system schema '%s' is forbidden", SystemDefaults.SCHEMA));
+            checkArgument(scheme != null && scheme.trim().length() > 0, "Schema cannot be empty");
+            checkArgument(!SystemDefaults.SCHEMA.equals(scheme), String.format("Usage of system schema '%s' is forbidden", SystemDefaults.SCHEMA));
         }
-        Preconditions.checkArgument(port > 0, "Port must be a positive integer");
+        checkArgument(port > 0, "Port must be a positive integer");
 
         this.username = username;
         this.password = password;
