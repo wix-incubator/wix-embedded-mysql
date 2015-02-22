@@ -33,6 +33,17 @@ public class CustomConfigurationRunnerTest extends EmbeddedMySqlTestSupport {
     }
 
     @Test
+    public void runMySqlWithTwoSchemas() throws Exception {
+        MysqldConfig config = template
+                .withUsername("auser")
+                .withPassword("sa")
+                .withSchemas(new String[]{"schema1", "schema2"})
+                .withPort(9913).build();
+
+        startAndVerifyDatabase(config);
+    }
+
+    @Test
     public void runMySqlWithSystemUserAndCustomSchema() throws Exception {
         MysqldConfig config = template
                 .withUsername(MysqldConfig.SystemDefaults.USERNAME)
