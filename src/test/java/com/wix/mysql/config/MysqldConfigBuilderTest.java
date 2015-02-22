@@ -21,7 +21,7 @@ public class MysqldConfigBuilderTest {
 
         assertThat(config.getUsername(), equalTo(Defaults.USERNAME));
         assertThat(config.getPassword(), equalTo(Defaults.PASSWORD));
-        assertThat(config.getSchema(), equalTo(Defaults.SCHEMA));
+        assertThat(config.getSchemas(), equalTo(new String[]{Defaults.SCHEMA}));
         assertThat(config.getPort(), equalTo(Defaults.PORT));
     }
 
@@ -44,6 +44,13 @@ public class MysqldConfigBuilderTest {
     }
 
     @Test
+    public void customSchemas() {
+        String[] schemas = new String[]{"schema1", "schema2"};
+        MysqldConfig config = template.withSchemas(schemas).build();
+        assertThat(config.getSchemas(), equalTo(schemas));
+    }
+
+    @Test
     public void customPort() {
         MysqldConfig config = template.withPort(Defaults.PORT + 1).build();
         assertThat(config.getPort(), equalTo(Defaults.PORT + 1));
@@ -51,7 +58,7 @@ public class MysqldConfigBuilderTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void failOnNullUsername() {
-        MysqldConfig config = template.withUsername(null).build();
+        template.withUsername(null).build();
     }
 
     @Test

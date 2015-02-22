@@ -42,12 +42,10 @@ public class MysqlConfigurer {
         if (config.shouldCreateUser()) {
             commands.add(String.format("CREATE USER '%s'@'localhost' IDENTIFIED BY '%s';", config.getUsername(), config.getPassword()));
         }
-        commands.add(String.format("create database %s;", config.getSchema()));
-        commands.add(String.format("GRANT ALL ON %s.* TO '%s'@'localhost';", config.getSchema(), config.getUsername()));
-
-//        for (String s: commands) {
-//            new MysqlCommandExecutor(generatedBaseDir, config, runtimeConfig).run(s, SystemDefaults.SCHEMA);
-//        }
+        for (String schema : config.getSchemas()){
+            commands.add(String.format("create database %s;", schema));
+            commands.add(String.format("GRANT ALL ON %s.* TO '%s'@'localhost';", schema, config.getUsername()));
+        }
 
         new MysqlCommandExecutor(generatedBaseDir, config, runtimeConfig).run(
                 Joiner.on(" \n").join(commands),
@@ -97,9 +95,7 @@ public class MysqlConfigurer {
                     throw new CommandFailedException(sqlStatement, schema, p.waitFor(), CharStreams.toString(stdErr));
                 }
 
-            } catch (IOException e) {
-                throw new CommandFailedException(sqlStatement, schema, e.getMessage(), e);
-            } catch (InterruptedException e) {
+            } catch (IOException | InterruptedException e) {
                 throw new CommandFailedException(sqlStatement, schema, e.getMessage(), e);
             } finally {
                 closeCloseables(stdOut, stdErr);
