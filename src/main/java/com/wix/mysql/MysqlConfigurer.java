@@ -40,11 +40,11 @@ public class MysqlConfigurer {
         List<String> commands = Lists.newArrayList();
 
         if (config.shouldCreateUser()) {
-            commands.add(String.format("CREATE USER '%s'@'localhost' IDENTIFIED BY '%s';", config.getUsername(), config.getPassword()));
+            commands.add(String.format("CREATE USER '%s'@'%%' IDENTIFIED BY '%s';", config.getUsername(), config.getPassword()));
         }
         for (String schema : config.getSchemas()){
             commands.add(String.format("create database %s;", schema));
-            commands.add(String.format("GRANT ALL ON %s.* TO '%s'@'localhost';", schema, config.getUsername()));
+            commands.add(String.format("GRANT ALL ON %s.* TO '%s'@'%%';", schema, config.getUsername()));
         }
 
         new MysqlCommandExecutor(generatedBaseDir, config, runtimeConfig).run(
