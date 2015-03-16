@@ -49,7 +49,8 @@ final MysqldConfig config = new MysqldConfigBuilder(v5_6_21)
   .withUsername("auser")
   .withPassword("sa")
   .withSchemas(new String[] {"schema1", "schema2"})
-  .withPort(9913).build();
+  .withPort(9913)
+  .build();
 
 MysqldStarter starter = MysqldStarter.defaultInstance();
 MysqldExecutable executable = starter.prepare(config);
