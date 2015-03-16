@@ -1,0 +1,42 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+  config.vm.box = "ubuntu/precise64"
+  config.vm.box_url = "https://vagrantcloud.com/ubuntu/boxes/precise64"
+
+  config.vm.provider "virtualbox" do |v|
+    v.memory = 1024
+    v.cpus = 1
+  end
+
+  # reuse downloaded mysql distros. m2 repo between machines, runs
+  config.vm.synced_folder "~/.embedmysql", "/home/vagrant/.embedmysql"
+  config.vm.synced_folder "~/.m2/repository", "/home/vagrant/.m2/repository"
+
+  config.vm.provision "chef_solo" do |chef|
+    #chef.log_level = :debug
+    chef.cookbooks_path = ["../../cookbooks/custom", "../../cookbooks/market"]
+    chef.add_recipe("build-essential")
+    chef.add_recipe("apt-update")
+    chef.add_recipe("java")
+    chef.add_recipe("ark")
+    chef.add_recipe("apt-update")
+    chef.add_recipe("maven")
+    chef.add_recipe("libaio1")
+    chef.add_recipe("embed-mysql")
+
+    chef.json.merge!({
+      :java => { :install_flavor => "oracle", :jdk_version => "8", "oracle" => { "accept_oracle_download_terms" => true } },
+      :maven => { :version => "3" },
+      :embed_mysql => { :path => "/home/vagrant/source" }
+    })
+  end
+
+  config.vm.provision "shell" do |s|
+    s.inline = "cd $1 && sudo chown -R vagrant:vagrant * && cd wix-embedded-mysql && mvn clean test -Dtest=SupportedVersionRunnerTest"
+    s.args   = "/home/vagrant/source/"
+    s.privileged = false
+  end
+
+end

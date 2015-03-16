@@ -1,0 +1,6 @@
+name			 "apt-update"
+maintainer       "Vilius Lukosius"
+maintainer_email "vilius@wix.com"
+license          "Apache 2.0"
+description      "runs apt-get update"
+version          "0.1"

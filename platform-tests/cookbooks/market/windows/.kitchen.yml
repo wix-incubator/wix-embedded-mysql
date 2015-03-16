@@ -1,0 +1,41 @@
+---
+driver:
+  forward_agent: yes
+  name: vagrant
+  vm_hostname: false # do not bother trying to change the hostname (sometimes fails)
+  customize:
+    cpus: 2
+    memory: 4096
+
+transport:
+  name: winrm
+
+provisioner:
+  name: chef_zero
+
+platforms:
+  - name: windows-8.1-chef11.10.4
+    driver_config:
+      box: windows-8.1
+      box_url: http://cdn.box-cutter.com/windows/virtualbox4.3.20/eval-win81x64-enterprise-nocm-1.0.2.box
+    provisioner:
+      require_chef_omnibus: 11.10.4
+  - name: windows-8.1-chef11.16.4
+    driver_config:
+      box: windows-8.1
+      box_url: http://cdn.box-cutter.com/windows/virtualbox4.3.20/eval-win81x64-enterprise-nocm-1.0.2.box
+    provisioner:
+      require_chef_omnibus: 11.16.4
+  - name: windows-8.1-chef12
+    driver_config:
+      box: windows-8.1
+      box_url: http://cdn.box-cutter.com/windows/virtualbox4.3.20/eval-win81x64-enterprise-nocm-1.0.2.box
+    provisioner:
+      require_chef_omnibus: 12
+
+suites:
+  - name: default
+    run_list:
+      - recipe[windows::default]
+      - recipe[minimal::default]
+

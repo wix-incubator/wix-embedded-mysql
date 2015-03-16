@@ -1,0 +1,38 @@
+AlignParameters:
+  Enabled: false
+
+Encoding:
+  Enabled: false
+
+LineLength:
+  Max: 200
+  Exclude:
+    - '**/spec/**/*_spec.rb'
+
+MethodLength:
+  Max: 25
+
+CyclomaticComplexity:
+  Max: 7
+
+ParameterLists:
+  Enabled: false
+
+Documentation:
+  Enabled: false
+
+StringLiterals:
+  Enabled: false
+
+SingleSpaceBeforeFirstArg:
+  Enabled: true
+  Exclude:
+    - '**/metadata.rb'
+
+TrivialAccessors:
+  Exclude:
+    - '**/spec/spec_helper.rb'
+
+Style/RegexpLiteral:
+  Exclude:
+    - 'Guardfile'
