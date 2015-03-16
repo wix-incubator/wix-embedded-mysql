@@ -57,12 +57,9 @@ $ ./sushi.py
 
 **Vagrant**
 
-It's always possible to fallback to pure vagrant commands as machines are simple vagrant boxes with chef-solo provisioner.
+It's always possible to fallback to pure vagrant commands as machines are simple vagrant boxes with chef-solo provisioner. But keep in mind that 'sushi' does some additional work - syncs sources, works-around vagrant issues (like sync folder metadata clean-up between runs etc.).
 
 Just make sure you synced sources via './sushi.py sync' before running vagrant machines located in 'machines/' folder.
 
 # IMPROVEMENTS
  - make market cookbook fetch dynamic - via script and not in repo - easier to keep them up-to-date;
- - maybe cache mysql versions to local disk and use shared folders? For *nix it's ok unless probs with permissions, but for win it's somewhat harder and makes solution more fragile although faster;
- - maybe destroy vm before every run? Will be more stable, but way slower.
-
