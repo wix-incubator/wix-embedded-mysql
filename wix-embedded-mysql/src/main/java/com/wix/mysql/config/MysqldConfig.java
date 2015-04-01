@@ -1,11 +1,10 @@
 package com.wix.mysql.config;
 
+import com.google.common.base.MoreObjects;
+import com.google.common.base.Objects;
 import de.flapdoodle.embed.process.config.ExecutableProcessConfig;
 import de.flapdoodle.embed.process.config.ISupportConfig;
 import de.flapdoodle.embed.process.distribution.IVersion;
-
-import java.util.Arrays;
-import java.util.Objects;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Strings.isNullOrEmpty;
@@ -26,9 +25,8 @@ public class MysqldConfig extends ExecutableProcessConfig {
             final String username,
             final String password,
             final String schema,
-            final Integer port)
-    {
-        this(version, username, password, (schema != null) ? new String[]{schema} : null, port);
+            final Integer port) {
+        this(version, username, password, new String[]{ schema }, port);
     }
 
     public MysqldConfig(
@@ -37,18 +35,21 @@ public class MysqldConfig extends ExecutableProcessConfig {
             final String password,
             final String[] schemas,
             final Integer port) {
+
         super(version, new ISupportConfig() {
-            public String getName() {return "mysqld";}
-            public String getSupportUrl() {return "https://github.com/wix/wix-embedded-mysql/issues";}
+            public String getName() { return "mysqld"; }
+            public String getSupportUrl() { return "https://github.com/wix/wix-embedded-mysql/issues"; }
             public String messageOnException(Class<?> context, Exception exception) {
                 return "no message";
-            }});
+            }
+        });
 
         checkArgument(!isNullOrEmpty(username), "Username cannot be null or empty");
         checkArgument((schemas != null) && (schemas.length > 0), "Schemas cannot be empty");
-        for( String scheme : schemas){
-            checkArgument(scheme != null && scheme.trim().length() > 0, "Schema cannot be empty");
-            checkArgument(!SystemDefaults.SCHEMA.equals(scheme), String.format("Usage of system schema '%s' is forbidden", SystemDefaults.SCHEMA));
+        checkArgument(!((username == SystemDefaults.USERNAME) && (password != SystemDefaults.PASSWORD)), "Cannot use custom password for 'root' user'");
+        for( String schema : schemas){
+            checkArgument(!isNullOrEmpty(schema), "Schema cannot be empty");
+            checkArgument(!SystemDefaults.SCHEMA.equals(schema), String.format("Usage of system schema '%s' is forbidden", SystemDefaults.SCHEMA));
         }
         checkArgument(port > 0, "Port must be a positive integer");
 
@@ -77,32 +78,41 @@ public class MysqldConfig extends ExecutableProcessConfig {
     public int getTimeout() { return 30000; }
 
     public boolean shouldCreateUser() {
-        return (!username.equals(SystemDefaults.USERNAME) && !Objects.equals(password, SystemDefaults.PASSWORD));
+        return (!username.equals(SystemDefaults.USERNAME) && !java.util.Objects.equals(password, SystemDefaults.PASSWORD));
+    }
+
+
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("port", port)
+                .add("username", username)
+                .add("password", password)
+                .add("schemas", schemas)
+                .add("version", version)
+                .add("_supportConfig", this.supportConfig())
+                .toString();
     }
 
     @Override
     public boolean equals(Object o) {
-
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
         MysqldConfig that = (MysqldConfig) o;
 
-        if (password != null ? !password.equals(that.password) : that.password != null) return false;
-        if (port != null ? !port.equals(that.port) : that.port != null) return false;
-        if (!Arrays.equals(schemas, that.schemas)) return false;
-        if (username != null ? !username.equals(that.username) : that.username != null) return false;
-
-        return true;
+        return Objects.equal(this.port, that.port) &&
+                Objects.equal(this.username, that.username) &&
+                Objects.equal(this.password, that.password) &&
+                Objects.equal(this.schemas, that.schemas) &&
+                Objects.equal(this.version, that.version) &&
+                Objects.equal(this.supportConfig(), that.supportConfig());
     }
 
     @Override
     public int hashCode() {
-        int result = port != null ? port.hashCode() : 0;
-        result = 31 * result + (username != null ? username.hashCode() : 0);
-        result = 31 * result + (password != null ? password.hashCode() : 0);
-        result = 31 * result + (schemas != null ? Arrays.hashCode(schemas) : 0);
-        return result;
+        return Objects.hashCode(port, username, password, schemas, version, this.supportConfig());
     }
 
     public static class SystemDefaults {
