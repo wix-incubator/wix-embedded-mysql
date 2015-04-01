@@ -239,7 +239,7 @@ public class PackagePaths implements IPackageResolver {
                         v.asInDownloadPath(),
                         bs == B32 ? "32" : "x64");
             default:
-                throw new RuntimeException("Not implemented");
+                throw new RuntimeException("Not implemented for: " + distribution.getPlatform());
         }
     }
 }
