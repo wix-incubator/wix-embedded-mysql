@@ -1,10 +1,11 @@
 package com.wix.mysql.config;
 
-import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
 import de.flapdoodle.embed.process.config.ExecutableProcessConfig;
 import de.flapdoodle.embed.process.config.ISupportConfig;
 import de.flapdoodle.embed.process.distribution.IVersion;
+
+import java.util.Arrays;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Strings.isNullOrEmpty;
@@ -81,18 +82,14 @@ public class MysqldConfig extends ExecutableProcessConfig {
         return (!username.equals(SystemDefaults.USERNAME) && !java.util.Objects.equals(password, SystemDefaults.PASSWORD));
     }
 
-
-
     @Override
     public String toString() {
-        return MoreObjects.toStringHelper(this)
-                .add("port", port)
-                .add("username", username)
-                .add("password", password)
-                .add("schemas", schemas)
-                .add("version", version)
-                .add("_supportConfig", this.supportConfig())
-                .toString();
+        return "MysqldConfig{" +
+                "port=" + port +
+                ", username='" + username + '\'' +
+                ", password='" + password + '\'' +
+                ", schemas=" + Arrays.toString(schemas) +
+                '}';
     }
 
     @Override
