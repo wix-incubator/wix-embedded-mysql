@@ -6,13 +6,15 @@ import com.wix.mysql.distribution.Version._
 import com.wix.mysql.exceptions.UnsupportedPlatformException
 import de.flapdoodle.embed.process.distribution.Platform
 import de.flapdoodle.embed.process.distribution.Platform._
+import org.specs2.execute.{AsResult, Result}
 import org.specs2.mutable.SpecificationWithJUnit
+import org.specs2.specification.AroundExample
 
 /**
  * @author viliusl
  * @since 27/03/15
  */
-class VersionTest extends SpecificationWithJUnit {
+class VersionTest extends SpecificationWithJUnit with AroundExample {
   sequential
 
   "platform detection should detect" >> {
@@ -56,5 +58,11 @@ class VersionTest extends SpecificationWithJUnit {
     case Solaris => setProperty("os.name", "SunOS")
     case FreeBSD => setProperty("os.name", "FreeBSD")
     case _ => throw new UnsupportedPlatformException("Unrecognized platform, currently not supported")
+  }
+
+  def around[R: AsResult](r: => R): Result = {
+    val current = getProperty("os.name")
+    try AsResult(r)
+    finally setProperty("os.name", current)
   }
 }
