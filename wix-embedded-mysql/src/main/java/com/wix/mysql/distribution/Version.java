@@ -32,7 +32,7 @@ public enum Version implements IVersion {
     }
 
     Version(String majorVersion, String minorVersion) {
-        this(majorVersion, minorVersion, Platform.Linux, Platform.Windows, Platform.OS_X, Platform.FreeBSD);
+        this(majorVersion, minorVersion, Platform.Linux, Platform.Windows, Platform.OS_X);
     }
 
     public boolean supportsCurrentPlatform() {
