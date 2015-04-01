@@ -19,7 +19,7 @@ public enum Version implements IVersion {
     v5_6_23("5.6", "23"),
     v5_6_22("5.6", "22"),
     v5_6_21("5.6", "21"),
-    v5_5_40("5.5", "40", Platform.Linux, Platform.OS_X, Platform.FreeBSD);
+    v5_5_40("5.5", "40", Platform.Linux, Platform.OS_X);
 
     private final String majorVersion;
     private final String minorVersion;
