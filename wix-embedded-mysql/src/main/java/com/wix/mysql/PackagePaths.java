@@ -234,10 +234,6 @@ public class PackagePaths implements IPackageResolver {
                 return format("%s-%s.tar.gz",
                         v.asInDownloadPath(),
                         bs == B32 ? "i686" : "x86_64");
-            case FreeBSD:
-                return format("%s-%s.tar.gz",
-                        v.asInDownloadPath(),
-                        bs == B32 ? "i686" : "x86_64");
             case Windows:
                 return format("%s-win%s.zip",
                         v.asInDownloadPath(),
