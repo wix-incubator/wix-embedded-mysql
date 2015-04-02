@@ -34,7 +34,7 @@ Vagrant.configure("2") do |config|
   end
 
   config.vm.provision "shell" do |s|
-    s.inline = "cd $1 && sudo chown -R vagrant:vagrant * && cd wix-embedded-mysql && mvn clean test -Dtest=SupportedVersionRunnerTest"
+    s.inline = "cd $1 && sudo chown -R vagrant:vagrant * && cd wix-embedded-mysql && mvn clean test -Dtest=SupportedVersionsTest"
     s.args   = "/home/vagrant/source/"
     s.privileged = false
   end
