@@ -1,13 +1,19 @@
 package com.wix.mysql
 
-import java.util.logging.{Level, Logger, LogManager}
+import ch.qos.logback.classic.Level.INFO
+import ch.qos.logback.classic.{Logger, LoggerContext}
+import ch.qos.logback.core.read.ListAppender
 
+import ch.qos.logback.classic.spi.ILoggingEvent
 import com.mchange.v2.c3p0.ComboPooledDataSource
 import com.wix.mysql.IntegrationTest._
 import com.wix.mysql.config.MysqldConfig
+import org.slf4j.LoggerFactory
 import org.slf4j.bridge.SLF4JBridgeHandler
 import org.specs2.mutable.{Before, SpecificationWithJUnit}
 import org.springframework.jdbc.core.JdbcTemplate
+
+import scala.collection.JavaConversions._
 
 /**
  * @author viliusl
@@ -29,7 +35,7 @@ class IntegrationTest extends SpecificationWithJUnit with Before {
     try {
       executable.start()
       verify
-    } finally executable.stop()
+    } finally executable.stop
   }
 
   def validateConnection(config: MysqldConfig, schema: String) =
@@ -47,10 +53,30 @@ class IntegrationTest extends SpecificationWithJUnit with Before {
 
   def connectionUrlFor(config: MysqldConfig, schema: String) = s"jdbc:mysql://localhost:${config.getPort}/$schema"
 
+  def aLogFor(app: String): Iterable[String] = {
+    val appender: ListAppender[ILoggingEvent] = new ListAppender[ILoggingEvent]
+    val context: LoggerContext = LoggerFactory.getILoggerFactory.asInstanceOf[LoggerContext]
+
+    val logger: Logger = context.getLogger(app)
+
+    logger.setAdditive(false)
+    logger.setLevel(INFO)
+    logger.detachAppender(appender.getName)
+    logger.addAppender(appender)
+
+    appender.start
+
+    new Iterable[String] {
+      def iterator = appender.list map ( _.getMessage ) iterator
+    }
+  }
+
 }
 
 object IntegrationTest {
   lazy val init = {
+    import java.util.logging.{Level, Logger, LogManager}
+
     LogManager.getLogManager.reset
     SLF4JBridgeHandler.install
     Logger.getLogger("global").setLevel(Level.FINEST)
