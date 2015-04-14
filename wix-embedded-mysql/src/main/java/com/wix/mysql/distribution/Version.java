@@ -16,16 +16,18 @@ import static java.lang.String.format;
  */
 public enum Version implements IVersion {
 
-    v5_6_23("5.6", "23"),
-    v5_6_22("5.6", "22"),
+    v5_5_40("5.5", "40", Platform.Linux, Platform.OS_X),
     v5_6_21("5.6", "21"),
-    v5_5_40("5.5", "40", Platform.Linux, Platform.OS_X);
+    v5_6_22("5.6", "22"),
+    v5_6_23("5.6", "23"),
+    v5_6_24("5.6", "24"),
+    v5_6_latest(v5_6_24);
 
     private final String majorVersion;
     private final String minorVersion;
     private final List<Platform> supportedPlatforms;
 
-    private Version(String majorVersion, String minorVersion, Platform... supportedPlatforms) {
+    Version(String majorVersion, String minorVersion, Platform... supportedPlatforms) {
         this.majorVersion = majorVersion;
         this.minorVersion = minorVersion;
         this.supportedPlatforms = Arrays.asList(supportedPlatforms);
@@ -33,6 +35,12 @@ public enum Version implements IVersion {
 
     Version(String majorVersion, String minorVersion) {
         this(majorVersion, minorVersion, Platform.Linux, Platform.Windows, Platform.OS_X);
+    }
+
+    Version(Version other) {
+        this.majorVersion = other.majorVersion;
+        this.minorVersion = other.minorVersion;
+        this.supportedPlatforms = other.supportedPlatforms;
     }
 
     public boolean supportsCurrentPlatform() {
@@ -62,6 +70,7 @@ public enum Version implements IVersion {
 
     private String osVersion() {
         if (majorVersion.equals("5.6"))
+            //TODO: 5.6 has support for 10.8 as well. Maybe we should be smarter about it?
             return "10.9";
         if (majorVersion.equals("5.5"))
             return "10.6";
