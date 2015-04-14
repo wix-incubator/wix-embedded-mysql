@@ -8,13 +8,13 @@ import de.flapdoodle.embed.process.distribution.Platform
 import de.flapdoodle.embed.process.distribution.Platform._
 import org.specs2.execute.{AsResult, Result}
 import org.specs2.mutable.SpecificationWithJUnit
-import org.specs2.specification.AroundExample
+import org.specs2.specification.{AroundEach, AroundExample}
 
 /**
  * @author viliusl
  * @since 27/03/15
  */
-class VersionTest extends SpecificationWithJUnit with AroundExample {
+class VersionTest extends SpecificationWithJUnit with AroundEach {
   sequential
 
   "platform detection should detect" >> {
