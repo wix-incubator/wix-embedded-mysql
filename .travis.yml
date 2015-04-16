@@ -1,0 +1,18 @@
+---
+language: java
+install: true
+script: $TARGET
+jdk:
+- openjdk7
+- oraclejdk7
+- oraclejdk8
+
+env:
+  matrix:
+    - TARGET='mvn test'
+    - TARGET='mvn install -DskipTests=true'
+
+notifications:
+  email:
+    - noamal@gmail.com
+    - vilius@wix.com
