@@ -1,49 +1,43 @@
-# About
+# Wix Embedded MySql
 
-Embedded mysql implementation using https://github.com/flapdoodle-oss/de.flapdoodle.embed.process library intended for usage in tests.
+Wix Embedded MySql library provides an easy to use MySql for tests.
+
+## Why?
+
+- its easy, much easier as installing right version by hand
+- you can change version per test
+- Support multiple platforms: Windows, Linux and OSX
+
 
 # How it works
 
- - Based on platform where tests are being executed and target mysql version proper vanilla mysql package (tgz, zip) is downloaded from http://dev.mysql.com/get/Downloads/. This is a one-time action, where subsequent invocations use pre-downloaded/cached package.
+ - After detecting current platform and requested version, Wix Embedded MySql will download the correct version from [MySql Repo](http://dev.mysql.com/get/Downloads/). Note that this is a **one-time** action, where subsequent invocations use pre-downloaded cached package.
  - Upon execution needed files are being extracted into **target** folder, database created, service started and post-configuration (user, schema, etc.) performed.
  - On jvm shutdown mysqld process is stopped and temporary files cleaned-up.
 
 #Usage
 
-Add dependency to your pom.xml:
-
-```xml
-    <dependency>
-        <groupId>com.wixpress.mysql</groupId>
-        <artifactId>wix-embedded-mysql</artifactId>
-        <version>1.0.0-SNAPSHOT</version>
-        <scope>test</scope>
-    </dependency>        
-```
-
-also library depends on **mysql-connector-java** artifact to be provided by project using it.
-
 Basic usage example:
 
 ```java
-MysqldConfig config = new MysqldConfigBuilder(com.wix.mysql.distribution.Version.v5_5_40).build();
+import static com.wix.mysql.distribution.Version.v5_5_40;
+
+MysqldConfig config = new MysqldConfigBuilder(v5_5_40).build();
 
 MysqldStarter starter = MysqldStarter.defaultInstance();
 MysqldExecutable executable = starter.prepare(config);
  
-try {
-  executable.start();
-  //do work
-} finally {
-  executable.stop();
-}
+executable.start();
+
+//do work
+
+// you do not have to explicitly stop mysql as it registers to a shutdown hook for that. 
 ```
 
 Providing custom schemas, credentials, port:
 
 ```java
 import static com.wix.mysql.distribution.Version.v5_6_21;
-...
 
 final MysqldConfig config = new MysqldConfigBuilder(v5_6_21)
   .withUsername("auser")
@@ -54,20 +48,17 @@ final MysqldConfig config = new MysqldConfigBuilder(v5_6_21)
 
 MysqldStarter starter = MysqldStarter.defaultInstance();
 MysqldExecutable executable = starter.prepare(config);
-
-// you do not have to explicitly stop mysql as it registers to a shutdown hook for that. 
 executable.start();
-
 ```
 
-As you case see there are no custom user/pass/schema provided for the builder and defaults are taken from:
+As you can see there are no custom user/pass/schema provided for the builder and defaults are taken from:
 
 ```java
     com.wix.mysql.config.MysqldConfig.Defaults
 ```
 
-You can of course override defaults by providing custom values for the builder. Just be aware of:
- - You of course cannot provide null/empty user/schema;
+You can of course override defaults by providing custom values for the builder with the following guidelines:
+ - You of course cannot provide null/empty user or schema;
  - You cannot use schema defined in 'com.wix.mysql.config.MysqldConfig.SystemDefaults';
  - You can use system credentials, but you cannot use system user and custom password.
 
@@ -78,8 +69,24 @@ In case you need additional database or users created you can use system credent
 ```java
 com.wix.mysql.config.MysqldConfig.SystemDefaults
 ```
-
 and use them.
+
+### Maven
+
+Add dependency to your pom.xml:
+
+```xml
+    <dependency>
+        <groupId>com.wixpress.mysql</groupId>
+        <artifactId>wix-embedded-mysql</artifactId>
+        <version>1.0.0</version>
+        <scope>test</scope>
+    </dependency>        
+```
+
+
+# Dependencies
+Build on top of embed Process Util [de.flapdoodle.embed.process](https://github.com/flapdoodle-oss/de.flapdoodle.embed.process)
 
 # Tested on
  - latest osx;
