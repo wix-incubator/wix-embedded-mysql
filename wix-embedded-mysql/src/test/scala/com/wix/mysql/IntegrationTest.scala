@@ -1,16 +1,16 @@
 package com.wix.mysql
 
 import ch.qos.logback.classic.Level.INFO
+import ch.qos.logback.classic.spi.ILoggingEvent
 import ch.qos.logback.classic.{Logger, LoggerContext}
 import ch.qos.logback.core.read.ListAppender
-
-import ch.qos.logback.classic.spi.ILoggingEvent
 import com.mchange.v2.c3p0.ComboPooledDataSource
 import com.wix.mysql.IntegrationTest._
 import com.wix.mysql.config.MysqldConfig
 import org.slf4j.LoggerFactory
 import org.slf4j.bridge.SLF4JBridgeHandler
-import org.specs2.mutable.{Before, SpecificationWithJUnit}
+import org.specs2.mutable.SpecWithJUnit
+import org.specs2.specification.BeforeAll
 import org.springframework.jdbc.core.JdbcTemplate
 
 import scala.collection.JavaConversions._
@@ -19,10 +19,10 @@ import scala.collection.JavaConversions._
  * @author viliusl
  * @since 27/03/15
  */
-class IntegrationTest extends SpecificationWithJUnit with Before {
+class IntegrationTest extends SpecWithJUnit with BeforeAll {
   sequential
 
-  def before: Any = init
+  override def beforeAll: Unit = init
 
   def givenMySqlWithConfig(config: MysqldConfig) = MysqldStarter.defaultInstance.prepare(config)
 
@@ -75,7 +75,7 @@ class IntegrationTest extends SpecificationWithJUnit with Before {
 
 object IntegrationTest {
   lazy val init = {
-    import java.util.logging.{Level, Logger, LogManager}
+    import java.util.logging.{Level, LogManager, Logger}
 
     LogManager.getLogManager.reset
     SLF4JBridgeHandler.install

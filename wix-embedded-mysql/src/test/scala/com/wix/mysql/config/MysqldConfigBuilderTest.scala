@@ -3,13 +3,14 @@ package com.wix.mysql.config
 import com.wix.mysql.config.MysqldConfig.Defaults._
 import com.wix.mysql.distribution.Version
 import de.flapdoodle.embed.process.distribution.IVersion
-import org.specs2.mutable.SpecificationWithJUnit
+import org.specs2.matcher._
+import org.specs2.mutable.SpecWithJUnit
 
 /**
  * @author viliusl
  * @since 26/03/15
  */
-class MysqldConfigBuilderTest extends SpecificationWithJUnit {
+class MysqldConfigBuilderTest extends SpecWithJUnit with MatchersImplicits {
 
   def template = new MysqldConfigBuilder(Version.v5_6_21)
 
