@@ -119,7 +119,7 @@ public class MysqldConfig extends ExecutableProcessConfig {
     }
 
     public static class Defaults {
-        public final static Integer PORT = 3306;
+        public final static Integer PORT = 3310;
         public final static String USERNAME = "auser";
         public final static String PASSWORD = "sa";
         public final static String SCHEMA = "test_db";

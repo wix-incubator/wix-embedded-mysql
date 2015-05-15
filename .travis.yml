@@ -7,6 +7,10 @@ jdk:
 - oraclejdk7
 - oraclejdk8
 
+before_install:
+  - sudo apt-get update -qq
+  - sudo apt-get install -y libaio1
+
 env:
   matrix:
     - TARGET='mvn test'

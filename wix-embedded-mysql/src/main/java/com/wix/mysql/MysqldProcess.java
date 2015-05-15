@@ -94,7 +94,7 @@ public class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutabl
                 String.format("--basedir=%s", baseDir),
                 String.format("--datadir=%s/data", baseDir),
                 String.format("--plugin-dir=%s/lib/plugin", baseDir),
-                String.format("--pid-file=%s.pid", pidFile(exe.executable())),
+                String.format("--socket=%s", sockFile(exe)),
                 String.format("--lc-messages-dir=%s/share", baseDir),
                 String.format("--port=%s", config.getPort()),
                 String.format("--log-error=%s/data/error.log", baseDir));
