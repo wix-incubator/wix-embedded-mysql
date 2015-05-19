@@ -95,3 +95,6 @@ Build on top of embed Process Util [de.flapdoodle.embed.process](https://github.
 
 # Known problems
  - some linux distros does not have libaio1.so which is a requirement by latest version of mysql. Proper error is emitted if it's missing;
+
+#License
+Use of this source code is governed by a BSD-style license which you can find [here](/LICENSE.md).
