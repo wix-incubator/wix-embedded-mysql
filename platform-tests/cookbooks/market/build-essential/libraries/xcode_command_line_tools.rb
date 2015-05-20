@@ -42,7 +42,7 @@ from Software Update, but there is a high probability that it will fail...
 
 If you have tested and verified OSX #{node['platform_version']} and you are sick
 of seeing this warning in your Chef Client runs, please submit a Pull Request to
-https://github.com/opscode-cookbooks/build-essential and add this version of OSX
+https://github.com/chef-cookbooks/build-essential and add this version of OSX
 to provider list.
 EOH
                     Provider::XcodeCommandLineToolsFromSoftwareUpdate
@@ -182,7 +182,7 @@ class Chef
               # in Apple's SUS catalog
               touch /tmp/.com.apple.dt.CommandLineTools.installondemand.in-progress
               # find the CLI Tools update
-              PROD=$(softwareupdate -l | grep "Command Line" | head -n 1 | awk -F"*" '{print $2}' | sed -e 's/^ *//' | tr -d '\n')
+              PROD=$(softwareupdate -l | grep "\*.*Command Line" | head -n 1 | awk -F"*" '{print $2}' | sed -e 's/^ *//' | tr -d '\n')
               # install it
               softwareupdate -i "$PROD" -v
             EOH

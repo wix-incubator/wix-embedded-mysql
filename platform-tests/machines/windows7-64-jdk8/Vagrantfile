@@ -30,7 +30,7 @@ Vagrant.configure("2") do |config|
       :winrm => { :limit_mb => 1024 },
       :embed_mysql => { :path => "c:\\source" },
       :chocolatey => { :upgrade => true },
-      :java_windows => { :package_name => "jdk7"}
+      :java_windows => { :package_name => "jdk8"}
     })
   end
 
