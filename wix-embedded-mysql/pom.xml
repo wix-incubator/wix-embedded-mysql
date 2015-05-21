@@ -151,12 +151,11 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.18.1</version>
                 <configuration>
-                    <systemProperties>
-                        <property>
-                            <name>java.util.logging.config.file</name>
-                            <value>src/test/resources/logging.properties</value>
-                        </property>
-                    </systemProperties>
+                    <systemPropertyVariables>
+                        <java.util.logging.config.file>src/test/resources/logging.properties</java.util.logging.config.file>
+                        <!-- appveyor ci has old version of jna (3.5) which clashes with one shipped with a library (4.0) -->
+                        <jna.nosys>true</jna.nosys>
+                    </systemPropertyVariables>
                 </configuration>
             </plugin>
 

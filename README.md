@@ -1,4 +1,4 @@
-# Wix Embedded MySql [![Build Status](https://img.shields.io/travis/wix/wix-embedded-mysql.svg?label=linux%20build)](https://travis-ci.org/wix/wix-embedded-mysql)
+# Wix Embedded MySql [![Build Status (Travis: Linux)](https://img.shields.io/travis/wix/wix-embedded-mysql.svg?label=linux%20build)](https://travis-ci.org/wix/wix-embedded-mysql) [![Build Status (AppVeyor: Windows)](https://img.shields.io/appveyor/ci/viliusl/wix-embedded-mysql-ppwc6.svg?label=windows%20build)](https://ci.appveyor.com/project/viliusl/wix-embedded-mysql-ppwc6)
 
 Wix Embedded MySql library provides an easy to use MySql for tests.
 
