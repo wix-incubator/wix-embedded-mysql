@@ -25,7 +25,8 @@ public class MysqldExecutable extends Executable<MysqldConfig, MysqldProcess> {
 
     private final Logger log = LoggerFactory.getLogger(getClass().getName());
 
-    public final IExtractedFileSet executable;
+    private final IExtractedFileSet executable;
+    private final IRuntimeConfig runtimeConfig;
 
     public MysqldExecutable(
             final Distribution distribution,
@@ -34,6 +35,7 @@ public class MysqldExecutable extends Executable<MysqldConfig, MysqldProcess> {
             final IExtractedFileSet executable) {
         super(distribution, config, runtimeConfig, executable);
         this.executable = executable;
+        this.runtimeConfig = runtimeConfig;
     }
 
     @Override
@@ -94,5 +96,6 @@ public class MysqldExecutable extends Executable<MysqldConfig, MysqldProcess> {
         }
     }
 
-
+    protected File getBaseDir() { return this.executable.generatedBaseDir(); }
+    protected IRuntimeConfig getRuntimeConfig() { return this.runtimeConfig; }
 }

@@ -18,7 +18,7 @@ class CustomConfigurationTest extends IntegrationTest {
     val template = new MysqldConfigBuilder(v5_6_21)
   }
 
-  "embedded mysql should run with" >> {
+  "embedded mysql should apply with" >> {
 
     "defaults" in new Context {
       val config = template.build

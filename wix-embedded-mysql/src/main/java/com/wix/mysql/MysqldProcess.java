@@ -57,7 +57,7 @@ public class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutabl
                 StreamToLineProcessor.wrap(runtimeConfig.getProcessOutput().getOutput()));
 
         logFile = new LogFileProcessor(
-                new File(this.getExecutable().executable.generatedBaseDir() + "/data/error.log"),
+                new File(this.getExecutable().getBaseDir() + "/data/error.log"),
                 logWatch);
     }
 
@@ -70,7 +70,7 @@ public class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutabl
                 throw new RuntimeException("mysql start failed with error: " + logWatch.getFailureFound());
             }
 
-            new MysqlConfigurer(getConfig(), runtimeConfig, getExecutable().executable.generatedBaseDir()).configure();
+            new MysqlConfigurer(getConfig(), getExecutable()).configure();
 
         } catch (Exception e) {
             // emit IO exception for {@link AbstractProcess} would try to stop running process gracefully
@@ -154,7 +154,7 @@ public class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutabl
                     Sets.newHashSet("[ERROR]"),
                     StreamToLineProcessor.wrap(getRuntimeConfig().getProcessOutput().getOutput()));
 
-            processor = new LogFileProcessor(new File(this.getExecutable().executable.generatedBaseDir() + "/data/error.log"), outputWatch);
+            processor = new LogFileProcessor(new File(this.getExecutable().getBaseDir() + "/data/error.log"), outputWatch);
 
             stdOut = new InputStreamReader(p.getInputStream());
             stdErr = new InputStreamReader(p.getErrorStream());
@@ -196,7 +196,7 @@ public class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutabl
      */
     private MysqldExecutable getExecutable() {
         try {
-            Field f = AbstractProcess.class.getDeclaredField("executable");
+            Field f =  AbstractProcess.class.getDeclaredField("executable");
             f.setAccessible(true);
             return (MysqldExecutable)f.get(this);
         } catch (Exception e) {
@@ -223,7 +223,7 @@ public class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutabl
      * Helper for getting stable sock file. Saving to local instance variable on service start does not work due
      * to the way flapdoodle process library works - it does all init in {@link AbstractProcess} and instance of
      * {@link MysqldProcess} is not yet present, so vars are not initialized.
-     * This algo gives stable sock file based on single run profile, but can leave trash sock files in tmp dir.
+     * This algo gives stable sock file based on single apply profile, but can leave trash sock files in tmp dir.
      *
      * Notes:
      * .sock file needs to be in system temp dir and not in ex. target/...

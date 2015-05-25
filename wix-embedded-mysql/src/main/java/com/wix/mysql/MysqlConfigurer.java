@@ -29,13 +29,11 @@ import static de.flapdoodle.embed.process.distribution.Platform.Windows;
 public class MysqlConfigurer {
 
     private final MysqldConfig config;
-    private final IRuntimeConfig runtimeConfig;
-    private final File generatedBaseDir;
+    private final MysqldExecutable executable;
 
-    public MysqlConfigurer(MysqldConfig config, IRuntimeConfig runtimeConfig, File generatedBaseDir) {
+    public MysqlConfigurer(final MysqldConfig config, final MysqldExecutable executable) {
         this.config = config;
-        this.runtimeConfig = runtimeConfig;
-        this.generatedBaseDir = generatedBaseDir;
+        this.executable = executable;
     }
 
     public void configure() {
@@ -49,59 +47,6 @@ public class MysqlConfigurer {
             commands.add(String.format("GRANT ALL ON %s.* TO '%s'@'%%';", schema, config.getUsername()));
         }
 
-        new MysqlCommandExecutor(generatedBaseDir, config, runtimeConfig).run(
-                Joiner.on(" \n").join(commands),
-                SystemDefaults.SCHEMA);
+        new Mysql(config, executable).apply(Joiner.on(" \n").join(commands));
     }
-
-    private static class MysqlCommandExecutor {
-
-        private final File baseDir;
-        private final MysqldConfig config;
-        private final IRuntimeConfig runtimeConfig;
-
-        public MysqlCommandExecutor(
-                final File baseDir,
-                final MysqldConfig config,
-                final IRuntimeConfig runtimeConfig) {
-
-            this.baseDir = baseDir;
-            this.config = config;
-            this.runtimeConfig = runtimeConfig;
-        }
-
-        public void run(String sqlStatement, String schema) {
-            Reader stdOut = null;
-            Reader stdErr = null;
-
-            String statement = String.format((Platform.detect() == Windows) ? "\"%s\"" : "%s", sqlStatement);
-
-            try {
-                Process p = Runtime.getRuntime().exec(new String[] {
-                        Paths.get(baseDir.getAbsolutePath(), "bin", "mysql").toString(),
-                        "--protocol=tcp",
-                        String.format("--user=%s", MysqldConfig.SystemDefaults.USERNAME),
-                        String.format("--port=%s", config.getPort()),
-                        "-e",
-                        statement,
-                        schema});
-
-                stdOut = new InputStreamReader(p.getInputStream());
-                stdErr = new InputStreamReader(p.getErrorStream());
-
-                Processors.connect(stdOut, runtimeConfig.getProcessOutput().getOutput());
-                Processors.connect(stdErr, runtimeConfig.getProcessOutput().getOutput());
-
-                if (p.waitFor() != 0) {
-                    throw new CommandFailedException(sqlStatement, schema, p.waitFor(), CharStreams.toString(stdErr));
-                }
-
-            } catch (IOException | InterruptedException e) {
-                throw new CommandFailedException(sqlStatement, schema, e.getMessage(), e);
-            } finally {
-                closeCloseables(stdOut, stdErr);
-            }
-        }
-    }
-
 }
