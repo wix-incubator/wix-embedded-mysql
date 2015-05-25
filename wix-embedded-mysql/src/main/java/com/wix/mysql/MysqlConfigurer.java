@@ -2,25 +2,9 @@ package com.wix.mysql;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
-import com.google.common.io.CharStreams;
 import com.wix.mysql.config.MysqldConfig;
-import com.wix.mysql.exceptions.CommandFailedException;
-import de.flapdoodle.embed.process.config.IRuntimeConfig;
-import de.flapdoodle.embed.process.distribution.Platform;
-import de.flapdoodle.embed.process.io.Processors;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.nio.file.Paths;
 import java.util.List;
-
-import static com.wix.mysql.config.MysqldConfig.SystemDefaults;
-import static com.wix.mysql.utils.Utils.closeCloseables;
-import static de.flapdoodle.embed.process.distribution.Platform.Windows;
 
 /**
  * @author viliusl
@@ -47,6 +31,6 @@ public class MysqlConfigurer {
             commands.add(String.format("GRANT ALL ON %s.* TO '%s'@'%%';", schema, config.getUsername()));
         }
 
-        new Mysql(config, executable).apply(Joiner.on(" \n").join(commands));
+        new MysqlClient(config, executable).apply(Joiner.on(" \n").join(commands));
     }
 }

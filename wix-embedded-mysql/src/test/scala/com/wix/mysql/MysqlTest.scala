@@ -16,7 +16,7 @@ class MysqlTest extends IntegrationTest {
     val executable: MysqldExecutable = givenMySqlWithConfig(config)
     try {
       val process = executable.start()
-      val mysql = new Mysql(config, executable)
+      val mysql = new MysqlClient(config, executable)
 
       mysql.apply("sele qwe from zz;") must throwA[CommandFailedException].like {
         case e: CommandFailedException => e.getMessage must contain(

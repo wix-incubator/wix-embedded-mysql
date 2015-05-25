@@ -16,12 +16,12 @@ import static de.flapdoodle.embed.process.distribution.Platform.Windows;
  * @author viliusl
  * @since 25/05/15
  */
-class Mysql {
+class MysqlClient {
 
     private final MysqldConfig config;
     private final MysqldExecutable executable;
 
-    public Mysql(
+    public MysqlClient(
             final MysqldConfig config,
             final MysqldExecutable executable) {
 
