@@ -76,7 +76,7 @@ public class MysqldConfig extends ExecutableProcessConfig {
 
     public String[] getSchemas() { return schemas; }
     public int getPort() { return port; }
-    public int getTimeout() { return 30000; }
+    public int getTimeout() { return 60000; }
 
     public boolean shouldCreateUser() {
         return (!username.equals(SystemDefaults.USERNAME) && !java.util.Objects.equals(password, SystemDefaults.PASSWORD));
