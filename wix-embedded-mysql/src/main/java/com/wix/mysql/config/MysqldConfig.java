@@ -1,6 +1,7 @@
 package com.wix.mysql.config;
 
 import com.google.common.base.Objects;
+import com.wix.mysql.distribution.Version;
 import de.flapdoodle.embed.process.config.ExecutableProcessConfig;
 import de.flapdoodle.embed.process.config.ISupportConfig;
 import de.flapdoodle.embed.process.distribution.IVersion;
@@ -124,5 +125,7 @@ public class MysqldConfig extends ExecutableProcessConfig {
         public final static String PASSWORD = "sa";
         public final static String SCHEMA = "test_db";
     }
+
+    public static MysqldConfigBuilder Builder(Version version) { return new MysqldConfigBuilder(version); }
 
 }
