@@ -15,6 +15,7 @@ public class MysqldConfigBuilder {
     private String password = Defaults.PASSWORD;
     private String[] schemas = new String[]{Defaults.SCHEMA};
     private int port = Defaults.PORT;
+    private Charset charset = Charset.defaults();
 
     public MysqldConfigBuilder(IVersion version) { this.version = version; }
 
@@ -23,6 +24,7 @@ public class MysqldConfigBuilder {
     public MysqldConfigBuilder withSchema(String schemaName) { this.schemas = new String[]{schemaName}; return this; }
     public MysqldConfigBuilder withSchemas(String[] schemas) { this.schemas = schemas; return this; }
     public MysqldConfigBuilder withPort(int port) { this.port = port; return this; }
+    public MysqldConfigBuilder withCharset(Charset charset) { this.charset = charset; return this; }
 
-    public MysqldConfig build() { return new MysqldConfig(version, username, password, schemas, port); }
+    public MysqldConfig build() { return new MysqldConfig(version, username, password, schemas, port, charset); }
 }

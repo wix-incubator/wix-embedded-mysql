@@ -21,6 +21,7 @@ public class MysqldConfig extends ExecutableProcessConfig {
     private final String username;
     private final String password;
     private final String[] schemas;
+    private final Charset charset;
 
     public MysqldConfig(
             final IVersion version,
@@ -37,7 +38,22 @@ public class MysqldConfig extends ExecutableProcessConfig {
             final String password,
             final String[] schemas,
             final Integer port) {
+        this(version, username, password, schemas, port, Charset.defaults());
+    }
 
+    public MysqldConfig(
+            final IVersion version,
+            final Integer port) {
+        this(version, SystemDefaults.USERNAME, SystemDefaults.PASSWORD, new String[]{SystemDefaults.SCHEMA}, port, Charset.defaults());
+    }
+
+    public MysqldConfig(
+            IVersion version,
+            String username,
+            String password,
+            String[] schemas,
+            int port,
+            Charset charset) {
         super(version, new ISupportConfig() {
             public String getName() { return "mysqld"; }
             public String getSupportUrl() { return "https://github.com/wix/wix-embedded-mysql/issues"; }
@@ -59,16 +75,13 @@ public class MysqldConfig extends ExecutableProcessConfig {
         this.password = password;
         this.schemas = schemas;
         this.port = port;
-    }
-
-    public MysqldConfig(
-            final IVersion version,
-            final Integer port) {
-        this(version, SystemDefaults.USERNAME, SystemDefaults.PASSWORD, new String[]{SystemDefaults.SCHEMA}, port);
+        this.charset = charset;
     }
 
     public String getUsername() { return username; }
     public String getPassword() { return password; }
+    public Version getVersion() { return (Version)version; }
+    public Charset getCharset() { return charset; }
 
     /**
      * @deprecated use {@link #getSchemas()} instead
@@ -90,6 +103,7 @@ public class MysqldConfig extends ExecutableProcessConfig {
                 ", username='" + username + '\'' +
                 ", password='" + password + '\'' +
                 ", schemas=" + Arrays.toString(schemas) +
+                ", charset=" + charset +
                 '}';
     }
 
@@ -105,13 +119,15 @@ public class MysqldConfig extends ExecutableProcessConfig {
                 Objects.equal(this.password, that.password) &&
                 Objects.equal(this.schemas, that.schemas) &&
                 Objects.equal(this.version, that.version) &&
+                Objects.equal(this.charset, that.charset) &&
                 Objects.equal(this.supportConfig(), that.supportConfig());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(port, username, password, schemas, version, this.supportConfig());
+        return Objects.hashCode(port, username, password, schemas, version, charset, this.supportConfig());
     }
+
 
     public static class SystemDefaults {
         public final static String USERNAME = "root";
@@ -126,6 +142,6 @@ public class MysqldConfig extends ExecutableProcessConfig {
         public final static String SCHEMA = "test_db";
     }
 
-    public static MysqldConfigBuilder Builder(Version version) { return new MysqldConfigBuilder(version); }
-
+    public static MysqldConfigBuilder Builder(final Version version) { return new MysqldConfigBuilder(version); }
+    public static MysqldConfig defaults(final Version version) {return new MysqldConfigBuilder(version).build(); }
 }
