@@ -3,7 +3,7 @@ package com.wix.mysql.v3
 import java.io.File
 import javax.sql.DataSource
 
-import com.wix.mysql.config.{MysqldConfigBuilder, Charset, MysqldConfig}
+import com.wix.mysql.config.{Charset, MysqldConfig}
 import com.wix.mysql.distribution.Version
 import com.wix.mysql.distribution.Version._
 import org.specs2.mutable.SpecWithJUnit
@@ -30,9 +30,11 @@ class MysqldTest extends SpecWithJUnit {
         .queryForObject("select 1;", classOf[java.lang.Long]) mustEqual 1
 
       mysqld.stop()
+
+      success
     }
 
-    "basic - with user" in {
+    "basic - with custom user" in {
       val schemaConfig = SchemaConfig.Builder("aschema")
         .withScripts(ClassPathScriptResolver.file("db/init.sql"))
         .build()
@@ -46,6 +48,8 @@ class MysqldTest extends SpecWithJUnit {
         .queryForObject("select 1;", classOf[java.lang.Long]) mustEqual 1
 
       mysqld.stop()
+
+      success
     }
 
     "basic with custom port" in {
@@ -61,11 +65,12 @@ class MysqldTest extends SpecWithJUnit {
         .queryForObject("select 1;", classOf[java.lang.Long]) mustEqual 1
 
       mysqld.stop()
+
+      success
     }
 
     "with MysqldConfig" in {
       val config = MysqldConfig.Builder(v5_6_latest).build()
-
       val schemaConfig = SchemaConfig.Builder("aschema")
         .withScripts(ClassPathScriptResolver.file("db/init.sql"))
         .build()
@@ -78,6 +83,8 @@ class MysqldTest extends SpecWithJUnit {
         .queryForObject("select 1;", classOf[java.lang.Long]) mustEqual 1
 
       mysqld.stop()
+
+      success
     }
 
 
@@ -93,51 +100,51 @@ class MysqldTest extends SpecWithJUnit {
         .queryForObject("select 1;", classOf[java.lang.Long]) mustEqual 1
 
       mysqld.stop()
+
+      success
     }
   }
 
-  class SchemaConfig {
+}
+
+class SchemaConfig {
+}
+
+object SchemaConfig {
+  def defaults(name: String): SchemaConfig = new Builder("name").build()
+  def Builder(name: String): Builder = new Builder(name)
+
+  class Builder(name: String) {
+    def withCommands(commands: String*): Builder = ???
+    def withCharset(charset: Charset): Builder = ???
+    def withScripts(files: Seq[File]): Builder = ???
+    def withScripts(file: File): Builder = ???
+    def build() = new SchemaConfig()
   }
 
-  object SchemaConfig {
-    def defaults(name: String): SchemaConfig = new Builder("name").build()
-    def Builder(name: String): Builder = new Builder(name)
+}
 
-    class Builder(name: String) {
-      def withCommands(commands: String*): Builder = ???
-      def withCharset(charset: Charset): Builder = ???
-      def withScripts(files: Seq[File]): Builder = ???
-      def build() = new SchemaConfig()
-    }
+trait EmbeddedMysql {
+  def addSchema(schemaConfig: SchemaConfig): EmbeddedMysql = ???
+  def apply(schemaConfig: SchemaConfig, files: Seq[File]): EmbeddedMysql = ???
+  def apply(schemaConfig: SchemaConfig, file: File): EmbeddedMysql = ???
+  def dataSourceFor(schemaConfig: SchemaConfig): DataSource = ???
+  def getMysqldConfig(): MysqldConfig = ???
+  def getUsername(): String = ???
+  def getPassword(): String = ???
+  def getJdcConnectionUrl(): String = ???
+  def stop(): Unit = ???
+}
+
+object EmbeddedMysql {
+  def Builder(version: Version): Builder = new Builder(MysqldConfig.Builder(version).build)
+  def Builder(version: Version, port: Int): Builder = new Builder(MysqldConfig.Builder(version).withPort(port).build)
+  def Builder(config: MysqldConfig): Builder = new Builder(config)
+
+  class Builder(config: MysqldConfig) {
+    def withUser(username: String, password: String): Builder = ???
+    def addSchema(schemaConfig: SchemaConfig): Builder = ???
+    def start(): EmbeddedMysql = ???
   }
 
-  object ClassPathScriptResolver {
-    def file(s: String): Seq[File] = ???
-    def pattern(pattern: String): Seq[File] = ???
-  }
-
-  trait EmbeddedMysql {
-    def addSchema(schemaConfig: SchemaConfig): EmbeddedMysql = ???
-    def apply(schemaConfig: SchemaConfig, files: Seq[File]): EmbeddedMysql = ???
-
-    def dataSourceFor(schemaConfig: SchemaConfig): DataSource = ???
-    def getMysqldConfig(): MysqldConfig
-    def getUsername(): String
-    def getPassword(): String
-    def getJdcConnectionUrl(): String
-
-    def stop(): Unit = ???
-  }
-
-  object EmbeddedMysql {
-    def Builder(version: Version): Builder = new Builder(MysqldConfig.Builder(version).build)
-    def Builder(version: Version, port: Int): Builder = new Builder(MysqldConfig.Builder(version).withPort(port).build)
-    def Builder(config: MysqldConfig): Builder = new Builder(config)
-
-    class Builder(config: MysqldConfig) {
-      def withUser(username: String, password: String): Builder = ???
-      def addSchema(schemaConfig: SchemaConfig): Builder = ???
-      def start(): EmbeddedMysql = ???
-    }
-  }
 }
