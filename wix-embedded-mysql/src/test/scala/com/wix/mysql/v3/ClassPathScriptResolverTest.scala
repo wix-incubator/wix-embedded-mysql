@@ -2,7 +2,8 @@ package com.wix.mysql.v3
 
 import java.io.File
 
-import com.wix.mysql.v3.ClassPathScriptResolver.ScriptResolutionException
+import com.wix.mysql.ClassPathScriptResolver
+import com.wix.mysql.ClassPathScriptResolver.ScriptResolutionException
 import org.specs2.mutable.SpecWithJUnit
 
 /**
@@ -41,32 +42,4 @@ class ClassPathScriptResolverTest extends SpecWithJUnit {
   }
 
   def aFile(name: String) = new File(getClass.getResource(name).toURI)
-}
-
-/**
- * Helper for locating schema init scripts in a classpath
- */
-object ClassPathScriptResolver {
-
-  /**
-   * Locates a single file in a classpath
-   */
-  def file(path: String): File = {
-    val normalizedPath =  if (path.startsWith("/")) path else s"/$path"
-
-    val resource = getClass.getResource(normalizedPath)
-    if (resource == null)
-      throw new ScriptResolutionException(normalizedPath)
-    new File(resource.toURI)
-  }
-
-  /**
-   * Locates files matching pattern, ordered using natural aphanumeric order
-   *
-   * Example: db/\*.sql
-   */
-  def files(pattern: String): Seq[File] = ???
-
-  class ScriptResolutionException(path: String)
-    extends RuntimeException(s"No script(s) found for path '$path'")
 }

@@ -3,7 +3,8 @@ package com.wix.mysql.v3
 import java.io.File
 import javax.sql.DataSource
 
-import com.wix.mysql.config.{Charset, MysqldConfig}
+import com.wix.mysql.ClassPathScriptResolver
+import com.wix.mysql.config.{MysqldConfig, SchemaConfig}
 import com.wix.mysql.distribution.Version
 import com.wix.mysql.distribution.Version._
 import org.specs2.mutable.SpecWithJUnit
@@ -103,23 +104,6 @@ class MysqldTest extends SpecWithJUnit {
 
       success
     }
-  }
-
-}
-
-class SchemaConfig {
-}
-
-object SchemaConfig {
-  def defaults(name: String): SchemaConfig = new Builder("name").build()
-  def Builder(name: String): Builder = new Builder(name)
-
-  class Builder(name: String) {
-    def withCommands(commands: String*): Builder = ???
-    def withCharset(charset: Charset): Builder = ???
-    def withScripts(files: Seq[File]): Builder = ???
-    def withScripts(file: File): Builder = ???
-    def build() = new SchemaConfig()
   }
 
 }
