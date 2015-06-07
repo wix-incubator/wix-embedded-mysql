@@ -1,8 +1,7 @@
-package com.wix.mysql.v3
+package com.wix.mysql
 
 import java.io.File
 
-import com.wix.mysql.ClassPathScriptResolver
 import com.wix.mysql.ClassPathScriptResolver.ScriptResolutionException
 import org.specs2.mutable.SpecWithJUnit
 

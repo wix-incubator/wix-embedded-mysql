@@ -32,7 +32,7 @@ import static de.flapdoodle.embed.process.distribution.Platform.Windows;
  * @author viliusl
  * @since 27/09/14
  */
-public class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutable, MysqldProcess> {
+class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutable, MysqldProcess> {
 
     private final static Logger logger = LoggerFactory.getLogger(MysqldProcess.class);
 
@@ -69,9 +69,6 @@ public class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutabl
             if (!logWatch.isInitWithSuccess()) {
                 throw new RuntimeException("mysql start failed with error: " + logWatch.getFailureFound());
             }
-
-            new MysqlConfigurer(getConfig(), getExecutable()).configure();
-
         } catch (Exception e) {
             // emit IO exception for {@link AbstractProcess} would try to stop running process gracefully
             throw new IOException(e);

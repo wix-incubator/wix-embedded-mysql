@@ -1,15 +1,9 @@
-package com.wix.mysql.v3
-
-import java.io.File
-import java.util.regex.Pattern
-import javax.sql.DataSource
+package com.wix.mysql
 
 import com.wix.mysql.config.{Charset, MysqldConfig}
 import com.wix.mysql.distribution.Version
 import com.wix.mysql.distribution.Version._
 import org.specs2.mutable.SpecWithJUnit
-import org.springframework.jdbc.core.JdbcTemplate
-import sun.security.util.Password
 
 /**
  * @author viliusl

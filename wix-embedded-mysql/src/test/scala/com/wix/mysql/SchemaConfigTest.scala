@@ -1,9 +1,10 @@
-package com.wix.mysql.v3
+package com.wix.mysql
 
 import java.io.File
 
 import com.wix.mysql.config.{Charset, SchemaConfig}
 import org.specs2.mutable.SpecWithJUnit
+
 import scala.collection.convert.decorateAsScala._
 
 /**
