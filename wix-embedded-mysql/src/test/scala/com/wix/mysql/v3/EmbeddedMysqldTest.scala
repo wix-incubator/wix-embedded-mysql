@@ -1,15 +1,20 @@
 package com.wix.mysql.v3
 
 import java.io.File
+import java.lang
 import javax.sql.DataSource
 
 import com.wix.mysql.{EmbeddedMysql, ClassPathScriptResolver}
 import com.wix.mysql.config.{MysqldConfig, SchemaConfig}
 import com.wix.mysql.distribution.Version
 import com.wix.mysql.distribution.Version._
+import org.specs2.execute.{Result, AsResult}
+import org.specs2.matcher.MatchResult
 import org.specs2.mutable.SpecWithJUnit
-import org.specs2.specification.Scope
+import org.specs2.specification.{ForEach, Scope}
 import org.springframework.jdbc.core.JdbcTemplate
+
+import scala.util.Try
 
 /**
  * @author viliusl
@@ -19,7 +24,12 @@ class EmbeddedMysqldTest extends SpecWithJUnit {
   sequential
 
   trait Context extends Scope {
-    var mysqld: EmbeddedMysql = null
+    var mysqld: EmbeddedMysql = _
+
+    def verifySchema(schemaConfig: SchemaConfig): MatchResult[Any] = {
+      new JdbcTemplate(mysqld.dataSourceFor(schemaConfig))
+        .queryForObject("select col1 from t1;", classOf[lang.Long]) mustEqual 10
+    }
   }
 
   "MysqldConfig" should {
@@ -36,12 +46,9 @@ class EmbeddedMysqldTest extends SpecWithJUnit {
           .addSchema(schemaConfig)
           .start()
 
-        new JdbcTemplate(mysqld.dataSourceFor(schemaConfig))
-          .queryForObject("select col1 from t1;", classOf[java.lang.Long]) mustEqual 10
+        verifySchema(schemaConfig)
 
-      } finally {
-        if (mysqld != null) mysqld.stop()
-      }
+      } finally Try { mysqld.stop() }
     }
 
     "basic - with custom user" in new Context {
@@ -55,64 +62,55 @@ class EmbeddedMysqldTest extends SpecWithJUnit {
           .addSchema(schemaConfig)
           .start()
 
-        new JdbcTemplate(mysqld.dataSourceFor(schemaConfig))
-          .queryForObject("select col1 from t1;", classOf[java.lang.Long]) mustEqual 10
+        verifySchema(schemaConfig)
 
-      } finally {
-        if (mysqld != null) mysqld.stop()
-      }
+      } finally Try { mysqld.stop() }
     }
 
-//    "basic with custom port" in {
-//      val schemaConfig = SchemaConfig.Builder("aschema")
-//        .withScripts(ClassPathScriptResolver.file("db/init.sql"))
-//        .build()
-//
-//      val mysqld = EmbeddedMysql.Builder(v5_6_latest, 3310)
-//        .addSchema(schemaConfig)
-//        .start()
-//
-//      new JdbcTemplate(mysqld.dataSourceFor(schemaConfig))
-//        .queryForObject("select 1;", classOf[java.lang.Long]) mustEqual 1
-//
-//      mysqld.stop()
-//
-//      success
-//    }
-//
-//    "with MysqldConfig" in {
-//      val config = MysqldConfig.Builder(v5_6_latest).build()
-//      val schemaConfig = SchemaConfig.Builder("aschema")
-//        .withScripts(ClassPathScriptResolver.file("db/init.sql"))
-//        .build()
-//
-//      val mysqld = EmbeddedMysql.Builder(config)
-//        .addSchema(schemaConfig)
-//        .start()
-//
-//      new JdbcTemplate(mysqld.dataSourceFor(schemaConfig))
-//        .queryForObject("select 1;", classOf[java.lang.Long]) mustEqual 1
-//
-//      mysqld.stop()
-//
-//      success
-//    }
-//
-//
-//    "with basic schema and script post-executeCommands" in {
-//      val schemaConfig = SchemaConfig.defaults("aschema")
-//
-//      val mysqld = EmbeddedMysql.Builder(v5_6_latest).start()
-//
-//      mysqld.addSchema(schemaConfig)
-//      mysqld.executeCommands(schemaConfig, ClassPathScriptResolver.file("db/init.sql"))
-//
-//      new JdbcTemplate(mysqld.dataSourceFor(schemaConfig))
-//        .queryForObject("select 1;", classOf[java.lang.Long]) mustEqual 1
-//
-//      mysqld.stop()
-//
-//      success
-//    }
+    "basic with custom port" in new Context {
+      try {
+        val schemaConfig = SchemaConfig.Builder("aschema")
+          .withScripts(ClassPathScriptResolver.file("db/001_init.sql"))
+          .build()
+
+        mysqld = EmbeddedMysql.Builder(v5_6_latest, 1111)
+          .addSchema(schemaConfig)
+          .start()
+
+        verifySchema(schemaConfig)
+
+      } finally Try { mysqld.stop() }
+    }
+
+    "with MysqldConfig" in new Context {
+      try {
+        val config = MysqldConfig.Builder(v5_6_latest).build()
+        val schemaConfig = SchemaConfig.Builder("aschema")
+          .withScripts(ClassPathScriptResolver.file("db/001_init.sql"))
+          .build()
+
+        mysqld = EmbeddedMysql.Builder(config)
+          .addSchema(schemaConfig)
+          .start()
+
+        verifySchema(schemaConfig)
+
+      } finally Try { mysqld.stop() }
+    }
+
+    "add schema after start" in new Context {
+      try {
+        mysqld = EmbeddedMysql.Builder(v5_6_latest).start()
+
+        val schemaConfig = SchemaConfig.defaults("aschema")
+
+        mysqld.addSchema(schemaConfig)
+        mysqld.apply(schemaConfig, ClassPathScriptResolver.file("db/001_init.sql"))
+
+        verifySchema(schemaConfig)
+
+      } finally Try { mysqld.stop() }
+    }
   }
+
 }
