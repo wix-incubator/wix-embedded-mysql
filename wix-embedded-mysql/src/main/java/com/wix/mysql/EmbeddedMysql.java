@@ -10,9 +10,9 @@ import de.flapdoodle.embed.process.distribution.Distribution;
 import org.apache.commons.dbcp2.BasicDataSource;
 
 import javax.sql.DataSource;
-import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static java.lang.String.format;
 
@@ -24,8 +24,9 @@ public class EmbeddedMysql {
     private final MysqldConfig config;
     private final String username;
     private final String password;
-    private final IRuntimeConfig runtimeConfig;
     private final MysqldExecutable executable;
+    private final MysqldProcess process;
+    private AtomicBoolean isRunning = new AtomicBoolean(true);
 
     protected EmbeddedMysql(
             final MysqldConfig config,
@@ -34,13 +35,13 @@ public class EmbeddedMysql {
         this.config = config;
         this.username = username;
         this.password = password;
-        this.runtimeConfig = new RuntimeConfigBuilder().defaults().build();
+        IRuntimeConfig runtimeConfig = new RuntimeConfigBuilder().defaults().build();
         this.executable = new MysqldStarter(runtimeConfig).prepare(config);
 
         try {
-            executable.start(Distribution.detectFor(config.getVersion()), config, runtimeConfig);
-            //TODO: uncomment once existing code is out
-            //getClient().apply(format("CREATE USER '%s'@'%%' IDENTIFIED BY '%s';", username, password));
+            this.process = executable.start(Distribution.detectFor(config.getVersion()), config, runtimeConfig);
+            if (username != "auser")
+            getClient().executeCommands(format("CREATE USER '%s'@'%%' IDENTIFIED BY '%s';", username, password));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -50,16 +51,18 @@ public class EmbeddedMysql {
         return new MysqlClient(config, executable);
     }
 
-    public EmbeddedMysql addSchema(final SchemaConfig config) {
-        getClient().apply(
-                format("CREATE DATABASE %s CHARACTER SET = %s COLLATE = %s;",
-                        config.getName(), config.getCharset().getCharset(), config.getCharset().getCollate()),
-                format("GRANT ALL ON %s.* TO '%s'@'%%';", config.getName(), username));
-        return this;
+    private MysqlClient getClient(final SchemaConfig schema) {
+        return new MysqlClient(config, executable, schema.getName());
     }
 
-    public EmbeddedMysql apply(final SchemaConfig config, File... files) {
-        //TODO: implement
+    public EmbeddedMysql addSchema(final SchemaConfig schema) {
+        getClient().executeCommands(
+                format("CREATE DATABASE %s CHARACTER SET = %s COLLATE = %s;",
+                        schema.getName(), config.getCharset().getCharset(), config.getCharset().getCollate()),
+                format("GRANT ALL ON %s.* TO '%s'@'%%';", schema.getName(), username));
+
+        getClient(schema).executeScripts(schema.getScripts());
+
         return this;
     }
 
@@ -77,8 +80,11 @@ public class EmbeddedMysql {
         return format("jdbc:mysql://localhost:%s/%s", this.config.getPort(), schema.getName());
     }
 
-    public void stop() {
-        //todo: implement
+    public synchronized void stop() {
+        if (isRunning.getAndSet(false)) {
+            process.stop();
+            executable.stop();
+        }
     }
 
     public static Builder Builder(final MysqldConfig config) {

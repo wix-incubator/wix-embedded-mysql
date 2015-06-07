@@ -27,10 +27,10 @@ public class MysqlConfigurer {
             commands.add(String.format("CREATE USER '%s'@'%%' IDENTIFIED BY '%s';", config.getUsername(), config.getPassword()));
         }
         for (String schema : config.getSchemas()) {
-            commands.add(String.format("create database %s;", schema));
+            commands.add(String.format("CREATE DATABASE %s;", schema));
             commands.add(String.format("GRANT ALL ON %s.* TO '%s'@'%%';", schema, config.getUsername()));
         }
 
-        new MysqlClient(config, executable).apply(Joiner.on(" \n").join(commands));
+        new MysqlClient(config, executable).executeCommands(commands);
     }
 }

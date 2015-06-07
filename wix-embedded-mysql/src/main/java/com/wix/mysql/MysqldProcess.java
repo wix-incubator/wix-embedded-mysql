@@ -223,7 +223,7 @@ public class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutabl
      * Helper for getting stable sock file. Saving to local instance variable on service start does not work due
      * to the way flapdoodle process library works - it does all init in {@link AbstractProcess} and instance of
      * {@link MysqldProcess} is not yet present, so vars are not initialized.
-     * This algo gives stable sock file based on single apply profile, but can leave trash sock files in tmp dir.
+     * This algo gives stable sock file based on single executeCommands profile, but can leave trash sock files in tmp dir.
      *
      * Notes:
      * .sock file needs to be in system temp dir and not in ex. target/...
