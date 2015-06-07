@@ -10,6 +10,7 @@ import de.flapdoodle.embed.process.distribution.Distribution;
 import org.apache.commons.dbcp2.BasicDataSource;
 
 import javax.sql.DataSource;
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -63,6 +64,11 @@ public class EmbeddedMysql {
 
         getClient(schema).executeScripts(schema.getScripts());
 
+        return this;
+    }
+
+    public EmbeddedMysql apply(final SchemaConfig schema, File... files) {
+        getClient(schema).executeScripts(files);
         return this;
     }
 
