@@ -36,6 +36,7 @@ class EmbeddedMysqldTest extends SpecWithJUnit {
 
     //TODO: verify that charset provided is actual or db
     //TODO: verify that charset provided for instance is actual
+    //TODO: multiple schemas
     "basic" in new Context {
       try {
         val schemaConfig = SchemaConfig.Builder("aschema")
