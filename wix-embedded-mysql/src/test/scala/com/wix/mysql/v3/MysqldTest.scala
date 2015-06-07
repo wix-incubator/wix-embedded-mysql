@@ -105,7 +105,6 @@ class MysqldTest extends SpecWithJUnit {
       success
     }
   }
-
 }
 
 trait EmbeddedMysql {
@@ -130,5 +129,4 @@ object EmbeddedMysql {
     def addSchema(schemaConfig: SchemaConfig): Builder = ???
     def start(): EmbeddedMysql = ???
   }
-
 }
