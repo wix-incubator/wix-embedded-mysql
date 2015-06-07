@@ -3,11 +3,12 @@ package com.wix.mysql.v3
 import java.io.File
 import javax.sql.DataSource
 
-import com.wix.mysql.ClassPathScriptResolver
+import com.wix.mysql.{EmbeddedMysql, ClassPathScriptResolver}
 import com.wix.mysql.config.{MysqldConfig, SchemaConfig}
 import com.wix.mysql.distribution.Version
 import com.wix.mysql.distribution.Version._
 import org.specs2.mutable.SpecWithJUnit
+import org.specs2.specification.Scope
 import org.springframework.jdbc.core.JdbcTemplate
 
 /**
@@ -15,24 +16,30 @@ import org.springframework.jdbc.core.JdbcTemplate
  * @since 28/05/15
  */
 class MysqldTest extends SpecWithJUnit {
+  sequential
+
+  trait Context extends Scope {
+    var mysqld: EmbeddedMysql = null
+  }
 
   "MysqldConfig" should {
 
-    "basic" in {
-      val schemaConfig = SchemaConfig.Builder("aschema")
-        .withScripts(ClassPathScriptResolver.file("db/init.sql"))
-        .build()
+    "basic" in new Context {
+      try {
+        val schemaConfig = SchemaConfig.Builder("aschema")
+          .withScripts(ClassPathScriptResolver.file("db/001_init.sql"))
+          .build()
 
-      val mysqld = EmbeddedMysql.Builder(v5_6_latest)
-        .addSchema(schemaConfig)
-        .start()
+        mysqld = EmbeddedMysql.Builder(v5_6_latest)
+          .addSchema(schemaConfig)
+          .start()
 
-      new JdbcTemplate(mysqld.dataSourceFor(schemaConfig))
-        .queryForObject("select 1;", classOf[java.lang.Long]) mustEqual 1
+        new JdbcTemplate(mysqld.dataSourceFor(schemaConfig))
+          .queryForObject("select 1;", classOf[java.lang.Long]) mustEqual 1
 
-      mysqld.stop()
-
-      success
+      } catch {
+        case e => println(e); e.printStackTrace
+      } finally mysqld.stop()
     }
 
     "basic - with custom user" in {
@@ -104,29 +111,5 @@ class MysqldTest extends SpecWithJUnit {
 
       success
     }
-  }
-}
-
-trait EmbeddedMysql {
-  def addSchema(schemaConfig: SchemaConfig): EmbeddedMysql = ???
-  def apply(schemaConfig: SchemaConfig, files: Seq[File]): EmbeddedMysql = ???
-  def apply(schemaConfig: SchemaConfig, file: File): EmbeddedMysql = ???
-  def dataSourceFor(schemaConfig: SchemaConfig): DataSource = ???
-  def getMysqldConfig(): MysqldConfig = ???
-  def getUsername(): String = ???
-  def getPassword(): String = ???
-  def getJdcConnectionUrl(): String = ???
-  def stop(): Unit = ???
-}
-
-object EmbeddedMysql {
-  def Builder(version: Version): Builder = new Builder(MysqldConfig.Builder(version).build)
-  def Builder(version: Version, port: Int): Builder = new Builder(MysqldConfig.Builder(version).withPort(port).build)
-  def Builder(config: MysqldConfig): Builder = new Builder(config)
-
-  class Builder(config: MysqldConfig) {
-    def withUser(username: String, password: String): Builder = ???
-    def addSchema(schemaConfig: SchemaConfig): Builder = ???
-    def start(): EmbeddedMysql = ???
   }
 }
