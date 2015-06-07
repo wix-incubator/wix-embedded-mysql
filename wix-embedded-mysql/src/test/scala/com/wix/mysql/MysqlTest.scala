@@ -18,7 +18,7 @@ class MysqlTest extends IntegrationTest {
       val process = executable.start()
       val mysql = new MysqlClient(config, executable)
 
-      mysql.apply("sele qwe from zz;") must throwA[CommandFailedException].like {
+      mysql.executeCommands("sele qwe from zz;") must throwA[CommandFailedException].like {
         case e: CommandFailedException => e.getMessage must contain(
           "output 'ERROR 1064 (42000) at line 1: You have an error in your SQL syntax;")
       }
