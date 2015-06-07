@@ -4,8 +4,8 @@ import ch.qos.logback.classic.Level.INFO
 import ch.qos.logback.classic.spi.ILoggingEvent
 import ch.qos.logback.classic.{Logger, LoggerContext}
 import ch.qos.logback.core.read.ListAppender
-import com.mchange.v2.c3p0.ComboPooledDataSource
 import com.wix.mysql.config.MysqldConfig
+import org.apache.commons.dbcp2.BasicDataSource
 import org.slf4j.LoggerFactory
 import org.specs2.mutable.SpecWithJUnit
 import org.springframework.jdbc.core.JdbcTemplate
@@ -38,12 +38,12 @@ class IntegrationTest extends SpecWithJUnit {
       .queryForObject("select 1;", classOf[java.lang.Long]) mustEqual 1
 
   def dataSourceFor(config: MysqldConfig, schema: String) = {
-    val cpds: ComboPooledDataSource = new ComboPooledDataSource
-    cpds.setDriverClass("com.mysql.jdbc.Driver")
-    cpds.setJdbcUrl(connectionUrlFor(config, schema))
-    cpds.setUser(config.getUsername)
-    cpds.setPassword(config.getPassword)
-    cpds
+    val dataSource: BasicDataSource = new BasicDataSource
+    dataSource.setDriverClassName("com.mysql.jdbc.Driver")
+    dataSource.setUrl(connectionUrlFor(config, schema))
+    dataSource.setUsername(config.getUsername)
+    dataSource.setPassword(config.getPassword)
+    dataSource
   }
 
   def connectionUrlFor(config: MysqldConfig, schema: String) = s"jdbc:mysql://localhost:${config.getPort}/$schema"

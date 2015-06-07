@@ -1,5 +1,6 @@
 package com.wix.mysql;
 
+import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import com.wix.mysql.config.MysqldConfig;
 import com.wix.mysql.config.MysqldConfig.SystemDefaults;
@@ -21,16 +22,17 @@ class MysqlClient {
     private final MysqldConfig config;
     private final MysqldExecutable executable;
 
-    public MysqlClient(
-            final MysqldConfig config,
-            final MysqldExecutable executable) {
-
+    public MysqlClient(final MysqldConfig config, final MysqldExecutable executable) {
         this.config = config;
         this.executable = executable;
     }
 
-    public void apply(String sqlStatement) {
-        String statement = String.format((Platform.detect() == Windows) ? "\"%s\"" : "%s", sqlStatement);
+    public void apply(final String... sqls) {
+        apply(Joiner.on("\n").join(sqls));
+    }
+
+    public void apply(String sql) {
+        String statement = String.format((Platform.detect() == Windows) ? "\"%s\"" : "%s", sql);
 
         try {
             Process p = Runtime.getRuntime().exec(new String[]{
@@ -47,14 +49,14 @@ class MysqlClient {
                 String err = IOUtils.toString(p.getErrorStream());
 
                 if (Strings.isNullOrEmpty(out))
-                    throw new CommandFailedException(sqlStatement, SystemDefaults.SCHEMA, p.waitFor(), err);
+                    throw new CommandFailedException(sql, SystemDefaults.SCHEMA, p.waitFor(), err);
                 else
-                    throw new CommandFailedException(sqlStatement, SystemDefaults.SCHEMA, p.waitFor(), out);
+                    throw new CommandFailedException(sql, SystemDefaults.SCHEMA, p.waitFor(), out);
 
             }
 
         } catch (IOException | InterruptedException e) {
-            throw new CommandFailedException(sqlStatement, SystemDefaults.SCHEMA, e.getMessage(), e);
+            throw new CommandFailedException(sql, SystemDefaults.SCHEMA, e.getMessage(), e);
         }
     }
 }

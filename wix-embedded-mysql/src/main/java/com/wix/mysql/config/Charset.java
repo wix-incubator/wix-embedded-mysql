@@ -5,9 +5,9 @@ package com.wix.mysql.config;
  * @since 06/06/15
  */
 public class Charset {
-    public static final Charset UTF8MB4 = new Charset("UTF8mb4", "some-collate");
-    public static final Charset UTF8 = new Charset("UTF8", "some-collate");
-    public static final Charset LATIN1 = new Charset("latin1", "some-latin-1");
+    public static final Charset UTF8MB4 = new Charset("utf8mb4", "utf8mb4_unicode_ci");
+    public static final Charset UTF8 = new Charset("utf8", "utf8_general_ci");
+    public static final Charset LATIN1 = new Charset("latin1", "latin1_swedish_ci");
 
     private final String charset;
     private final String collate;
