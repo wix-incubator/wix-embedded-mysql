@@ -41,7 +41,6 @@ public class EmbeddedMysql {
 
         try {
             this.process = executable.start(Distribution.detectFor(config.getVersion()), config, runtimeConfig);
-            if (username != "auser")
             getClient().executeCommands(format("CREATE USER '%s'@'%%' IDENTIFIED BY '%s';", username, password));
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -113,14 +112,6 @@ public class EmbeddedMysql {
 
         public Builder(final MysqldConfig config) {
             this.config = config;
-        }
-
-        public Builder(final Version version) {
-            this(MysqldConfig.Builder(version).build());
-        }
-
-        public Builder(final Version version, final int port) {
-            this(MysqldConfig.Builder(version).withPort(port).build());
         }
 
         public Builder withUser(final String username, final String password) {

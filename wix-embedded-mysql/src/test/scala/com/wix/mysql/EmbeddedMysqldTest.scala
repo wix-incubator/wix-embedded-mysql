@@ -1,17 +1,12 @@
-package com.wix.mysql.v3
+package com.wix.mysql
 
-import java.io.File
 import java.lang
-import javax.sql.DataSource
 
-import com.wix.mysql.{EmbeddedMysql, ClassPathScriptResolver}
 import com.wix.mysql.config.{MysqldConfig, SchemaConfig}
-import com.wix.mysql.distribution.Version
 import com.wix.mysql.distribution.Version._
-import org.specs2.execute.{Result, AsResult}
 import org.specs2.matcher.MatchResult
 import org.specs2.mutable.SpecWithJUnit
-import org.specs2.specification.{ForEach, Scope}
+import org.specs2.specification.Scope
 import org.springframework.jdbc.core.JdbcTemplate
 
 import scala.util.Try
