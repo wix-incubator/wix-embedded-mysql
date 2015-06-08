@@ -1,8 +1,8 @@
 package com.wix.mysql.input;
 
+import com.google.common.collect.Sets;
 import de.flapdoodle.embed.process.io.IStreamProcessor;
 
-import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -11,7 +11,6 @@ import java.util.Set;
  */
 public class OutputWatchStreamProcessor implements IStreamProcessor {
 
-    //private final Reader _reader;
     private final StringBuilder output = new StringBuilder();
     private final Set<String> successes;
     private final Set<String> failures;
@@ -23,13 +22,13 @@ public class OutputWatchStreamProcessor implements IStreamProcessor {
 
     public OutputWatchStreamProcessor(Set<String> successes, Set<String> failures, IStreamProcessor destination) {
         this.successes = successes;
-        this.failures = new HashSet<String>(failures);
+        this.failures = Sets.newHashSet(failures);
         this.destination = destination;
     }
 
     public boolean isSuccess(String output) {
         for (String success: successes) {
-            if (output.indexOf(success) != -1)
+            if (output.contains(success))
                 return true;
         }
 
@@ -40,10 +39,9 @@ public class OutputWatchStreamProcessor implements IStreamProcessor {
     public void process(String block) {
         destination.process(block);
 
-        CharSequence line = block;
-        output.append(line);
+        output.append(block);
 
-        if (isSuccess(line.toString())) {
+        if (isSuccess(block)) {
             gotResult(true,null);
         } else {
             for (String failure : failures) {
@@ -81,10 +79,4 @@ public class OutputWatchStreamProcessor implements IStreamProcessor {
     public String getFailureFound() {
         return failureFound;
     }
-
-    public String getOutput() {
-        return output.toString();
-    }
-
-
 }
