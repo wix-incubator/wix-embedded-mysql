@@ -47,12 +47,6 @@ class MysqlClient {
         }
     }
 
-    public void executeCommands(final List<String> sqls) {
-        for (String sql: sqls) {
-            execute(sql);
-        }
-    }
-
     public void executeCommands(final String... sqls) {
         for (String sql: sqls) {
             execute(sql);
@@ -79,7 +73,6 @@ class MysqlClient {
                     throw new CommandFailedException(command, schemaName, p.waitFor(), err);
                 else
                     throw new CommandFailedException(command, schemaName, p.waitFor(), out);
-
             }
 
         } catch (IOException | InterruptedException e) {

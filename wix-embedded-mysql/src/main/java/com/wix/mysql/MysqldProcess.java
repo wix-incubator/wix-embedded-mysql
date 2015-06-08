@@ -174,9 +174,7 @@ class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutable, Mysq
                 }
             }
 
-        } catch (InterruptedException e) {
-            logger.warn("Encountered error why shutting down process.", e);
-        } catch (IOException e) {
+        } catch (InterruptedException | IOException e) {
             logger.warn("Encountered error why shutting down process.", e);
         } finally {
             closeCloseables(stdOut, stdErr);
