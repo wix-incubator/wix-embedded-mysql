@@ -5,6 +5,8 @@ import de.flapdoodle.embed.process.config.ExecutableProcessConfig;
 import de.flapdoodle.embed.process.config.ISupportConfig;
 import de.flapdoodle.embed.process.distribution.IVersion;
 
+import java.net.InetAddress;
+import java.net.InterfaceAddress;
 import java.util.Arrays;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -20,6 +22,7 @@ public class MysqldConfig extends ExecutableProcessConfig {
     private final String username;
     private final String password;
     private final String[] schemas;
+    private final InetAddress bindAddress;
 
     public MysqldConfig(
             final IVersion version,
@@ -36,6 +39,16 @@ public class MysqldConfig extends ExecutableProcessConfig {
             final String password,
             final String[] schemas,
             final Integer port) {
+        this(version, username, password, schemas, port, Defaults.BIND_ADDRESS);
+    }
+
+    public MysqldConfig(
+            final IVersion version,
+            final String username,
+            final String password,
+            final String[] schemas,
+            final Integer port,
+            final InetAddress bindAddress) {
 
         super(version, new ISupportConfig() {
             public String getName() { return "mysqld"; }
@@ -58,6 +71,7 @@ public class MysqldConfig extends ExecutableProcessConfig {
         this.password = password;
         this.schemas = schemas;
         this.port = port;
+        this.bindAddress = bindAddress;
     }
 
     public MysqldConfig(
@@ -123,6 +137,7 @@ public class MysqldConfig extends ExecutableProcessConfig {
         public final static String USERNAME = "auser";
         public final static String PASSWORD = "sa";
         public final static String SCHEMA = "test_db";
+        public final static InetAddress BIND_ADDRESS = InetAddress.getLoopbackAddress();
     }
 
 }
