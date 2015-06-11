@@ -82,6 +82,7 @@ public class MysqldConfig extends ExecutableProcessConfig {
 
     public String getUsername() { return username; }
     public String getPassword() { return password; }
+    public InetAddress getBindAddress() { return bindAddress; }
 
     /**
      * @deprecated use {@link #getSchemas()} instead

@@ -46,7 +46,7 @@ class IntegrationTest extends SpecWithJUnit {
     cpds
   }
 
-  def connectionUrlFor(config: MysqldConfig, schema: String) = s"jdbc:mysql://127.0.0.1:${config.getPort}/$schema"
+  def connectionUrlFor(config: MysqldConfig, schema: String) = s"jdbc:mysql://${config.getBindAddress.getHostAddress}:${config.getPort}/$schema"
 
   def aLogFor(app: String): Iterable[String] = {
     val appender: ListAppender[ILoggingEvent] = new ListAppender[ILoggingEvent]

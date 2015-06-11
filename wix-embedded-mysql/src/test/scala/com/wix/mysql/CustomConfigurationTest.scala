@@ -1,5 +1,7 @@
 package com.wix.mysql
 
+import java.net.InetAddress
+
 import com.wix.mysql.config.MysqldConfig.SystemDefaults._
 import com.wix.mysql.config.{MysqldConfig, MysqldConfigBuilder}
 import com.wix.mysql.distribution.Version._
@@ -29,6 +31,12 @@ class CustomConfigurationTest extends IntegrationTest {
       val config = template.withUsername("auser").withPassword("sa").withSchema("some_schema").withPort(9913).build
       startAndVerifyDatabase(config)
     }
+
+    "custom bind address" in new Context {
+      val config = template.withBindAddress(InetAddress.getLocalHost).build
+      startAndVerifyDatabase(config)
+    }
+
 
     "two schemas" in new Context {
       val config = template.withUsername("auser").withPassword("sa").withSchemas(Array("schema1", "schema2")).withPort(9913).build

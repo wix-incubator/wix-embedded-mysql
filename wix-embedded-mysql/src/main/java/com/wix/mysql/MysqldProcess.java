@@ -92,7 +92,7 @@ public class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutabl
                 "--skip-name-resolve",
                 "--log-output=NONE",
                 "--skip-name-resolve",
-                format("--bind-address=127.0.0.1"),
+                format("--bind-address=%s", config.getBindAddress().getHostAddress()),
                 format("--basedir=%s", baseDir),
                 format("--datadir=%s/data", baseDir),
                 format("--plugin-dir=%s/lib/plugin", baseDir),
