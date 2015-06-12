@@ -1,25 +1,29 @@
 package com.wix.mysql.config;
 
-import com.google.common.io.Files;
+
 import com.wix.mysql.config.directories.TargetGeneratedFixedPath;
 import com.wix.mysql.config.extract.NopNaming;
 import de.flapdoodle.embed.process.config.store.FileSet;
 import de.flapdoodle.embed.process.config.store.IDownloadConfig;
-import de.flapdoodle.embed.process.config.store.IPackageResolver;
 import de.flapdoodle.embed.process.distribution.Distribution;
-import de.flapdoodle.embed.process.extract.*;
+import de.flapdoodle.embed.process.extract.IExtractedFileSet;
+import de.flapdoodle.embed.process.extract.ITempNaming;
+import de.flapdoodle.embed.process.extract.ImmutableExtractedFileSet;
 import de.flapdoodle.embed.process.io.directories.IDirectory;
-import de.flapdoodle.embed.process.store.*;
-import org.apache.commons.io.filefilter.DirectoryFileFilter;
+import de.flapdoodle.embed.process.store.ArtifactStore;
+import de.flapdoodle.embed.process.store.Downloader;
+import de.flapdoodle.embed.process.store.IArtifactStore;
+import de.flapdoodle.embed.process.store.IDownloader;
 import org.rauschig.jarchivelib.ArchiveFormat;
 import org.rauschig.jarchivelib.ArchiverFactory;
 import org.rauschig.jarchivelib.CompressionType;
-import static de.flapdoodle.embed.process.config.store.FileType.Executable;
-import static de.flapdoodle.embed.process.config.store.FileType.Library;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.io.IOException;
+import java.nio.file.Files;
+
+import static de.flapdoodle.embed.process.config.store.FileType.Executable;
+import static de.flapdoodle.embed.process.config.store.FileType.Library;
 
 
 /**
@@ -99,7 +103,7 @@ public class ArtifactStoreBuilder extends de.flapdoodle.embed.process.store.Arti
             for (FileSet.Entry entry : filesToExtract.entries()) {
                 File source = new File(sourceFolder, entry.destination());
                 File target = new File(destinationFolder, entry.destination());
-                Files.copy(source, target);
+                Files.copy(source.toPath(), target.toPath());
                 target.setExecutable(true);
                 if (entry.type() == Executable) {
                     builder.executable(target);
@@ -108,32 +112,7 @@ public class ArtifactStoreBuilder extends de.flapdoodle.embed.process.store.Arti
                 }
             }
 
-//            IPackageResolver packageResolver = this.downloadConfig.getPackageResolver();
-//            FilesToExtract toExtract = new FilesToExtract(this.tempDirFactory, this.executableNaming, packageResolver.getFileSet(distribution));
-//            toExtract.generatedBaseDir();
-
-
-
-//            IPackageResolver packageResolver = this._downloadConfig.getPackageResolver();
-//            File artifact = LocalArtifactStore.getArtifact(this._downloadConfig, distribution);
-//            IExtractor extractor = Extractors.getExtractor(packageResolver.getArchiveType(distribution));
-//            IExtractedFileSet extracted = extractor.extract(this._downloadConfig, artifact, new FilesToExtract(this._tempDirFactory, this._executableNaming, packageResolver.getFileSet(distribution)));
-
-
-//            return super.extractFileSet(distribution);
-
             return builder.build();
-        }
-
-        private File getExtractedFolderPath(File downloadedFile) {
-            String fileName = downloadedFile.getName();
-            String parentFolder = downloadedFile.getParent();
-
-            if (fileName.endsWith(".zip")) {
-                return new File(parentFolder, fileName.replace(".zip", ""));
-            } else {
-                return new File(parentFolder, fileName.replace(".tar.gz", ""));
-            }
         }
 
         private File preExtract(File downloadedFile) throws IOException {
