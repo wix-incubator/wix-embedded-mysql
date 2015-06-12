@@ -4,8 +4,7 @@ import ch.qos.logback.classic.Level.INFO
 import ch.qos.logback.classic.spi.ILoggingEvent
 import ch.qos.logback.classic.{Logger, LoggerContext}
 import ch.qos.logback.core.read.ListAppender
-import com.mchange.v2.c3p0.ComboPooledDataSource
-import com.wix.mysql.config.MysqldConfig
+import com.wix.mysql.config.{MysqldConfig, SchemaConfig}
 import org.slf4j.LoggerFactory
 import org.specs2.mutable.SpecWithJUnit
 import org.springframework.jdbc.core.JdbcTemplate
@@ -21,32 +20,26 @@ class IntegrationTest extends SpecWithJUnit {
 
   def givenMySqlWithConfig(config: MysqldConfig) = MysqldStarter.defaultInstance.prepare(config)
 
-  def startAndVerifyDatabase(config: MysqldConfig) = startAndVerify(config) {
-      config.getSchemas foreach (validateConnection(config, _))
-    }
+  def startAndVerifyDatabase(config: MysqldConfig, schema: SchemaConfig) = startAndVerify(config, schema) { mysqld =>
+    validateConnection(mysqld, schema)
+  }
 
-  def startAndVerify(config: MysqldConfig)(verify: => Unit) = {
-    val executable: MysqldExecutable = givenMySqlWithConfig(config)
+  def startAndVerifyDatabase(config: MysqldConfig, schema: SchemaConfig*) = startAndVerify(config, schema:_*) { mysqld =>
+    schema foreach { s => validateConnection(mysqld, s)}
+  }
+
+  def startAndVerify(config: MysqldConfig, schema: SchemaConfig*)(verify: EmbeddedMysql => Unit) = {
+    var mysqld: EmbeddedMysql = null
     try {
-      executable.start()
+      mysqld = EmbeddedMysql.Builder(config).start()
+      schema foreach { s => mysqld.addSchema(s) }
       verify
-    } finally executable.stop
+    } finally mysqld.stop
   }
 
-  def validateConnection(config: MysqldConfig, schema: String) =
-    new JdbcTemplate(dataSourceFor(config, schema))
+  def validateConnection(mysqld: EmbeddedMysql, schema: SchemaConfig) =
+    new JdbcTemplate(mysqld.dataSourceFor(schema))
       .queryForObject("select 1;", classOf[java.lang.Long]) mustEqual 1
-
-  def dataSourceFor(config: MysqldConfig, schema: String) = {
-    val cpds: ComboPooledDataSource = new ComboPooledDataSource
-    cpds.setDriverClass("com.mysql.jdbc.Driver")
-    cpds.setJdbcUrl(connectionUrlFor(config, schema))
-    cpds.setUser(config.getUsername)
-    cpds.setPassword(config.getPassword)
-    cpds
-  }
-
-  def connectionUrlFor(config: MysqldConfig, schema: String) = s"jdbc:mysql://localhost:${config.getPort}/$schema"
 
   def aLogFor(app: String): Iterable[String] = {
     val appender: ListAppender[ILoggingEvent] = new ListAppender[ILoggingEvent]

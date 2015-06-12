@@ -44,7 +44,7 @@
         <logback.version>1.0.6</logback.version>
         <scala.library.version>2.11</scala.library.version>
         <scala.version>2.11.6</scala.version>
-        <specs2.version>3.6</specs2.version>
+        <specs2.version>3.6.1</specs2.version>
     </properties>
 
     <dependencies>
@@ -68,12 +68,12 @@
             <scope>test</scope>
         </dependency>
 
-        <dependency>
-            <groupId>com.mchange</groupId>
-            <artifactId>c3p0</artifactId>
-            <version>${c3p0.version}</version>
-            <scope>test</scope>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>com.mchange</groupId>-->
+            <!--<artifactId>c3p0</artifactId>-->
+            <!--<version>${c3p0.version}</version>-->
+            <!--<scope>test</scope>-->
+        <!--</dependency>-->
 
         <dependency>
             <groupId>org.springframework</groupId>
@@ -86,7 +86,12 @@
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
             <version>${mysql.connector.version}</version>
-            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-dbcp2</artifactId>
+            <version>2.1</version>
         </dependency>
 
         <dependency>
@@ -102,6 +107,14 @@
             <version>${specs2.version}</version>
             <scope>test</scope>
         </dependency>
+
+        <dependency>
+            <groupId>org.specs2</groupId>
+            <artifactId>specs2-matcher-extra_${scala.library.version}</artifactId>
+            <version>${specs2.version}</version>
+            <scope>test</scope>
+        </dependency>
+
 
         <dependency>
             <groupId>org.specs2</groupId>

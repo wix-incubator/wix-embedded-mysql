@@ -32,7 +32,7 @@ import static de.flapdoodle.embed.process.distribution.Platform.Windows;
  * @author viliusl
  * @since 27/09/14
  */
-public class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutable, MysqldProcess> {
+class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutable, MysqldProcess> {
 
     private final static Logger logger = LoggerFactory.getLogger(MysqldProcess.class);
 
@@ -69,9 +69,6 @@ public class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutabl
             if (!logWatch.isInitWithSuccess()) {
                 throw new RuntimeException("mysql start failed with error: " + logWatch.getFailureFound());
             }
-
-            new MysqlConfigurer(getConfig(), getExecutable()).configure();
-
         } catch (Exception e) {
             // emit IO exception for {@link AbstractProcess} would try to stop running process gracefully
             throw new IOException(e);
@@ -177,9 +174,7 @@ public class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutabl
                 }
             }
 
-        } catch (InterruptedException e) {
-            logger.warn("Encountered error why shutting down process.", e);
-        } catch (IOException e) {
+        } catch (InterruptedException | IOException e) {
             logger.warn("Encountered error why shutting down process.", e);
         } finally {
             closeCloseables(stdOut, stdErr);
@@ -223,7 +218,7 @@ public class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutabl
      * Helper for getting stable sock file. Saving to local instance variable on service start does not work due
      * to the way flapdoodle process library works - it does all init in {@link AbstractProcess} and instance of
      * {@link MysqldProcess} is not yet present, so vars are not initialized.
-     * This algo gives stable sock file based on single apply profile, but can leave trash sock files in tmp dir.
+     * This algo gives stable sock file based on single executeCommands profile, but can leave trash sock files in tmp dir.
      *
      * Notes:
      * .sock file needs to be in system temp dir and not in ex. target/...
