@@ -54,8 +54,7 @@ public class ArtifactStoreBuilder extends de.flapdoodle.embed.process.store.Arti
 
     @Override
     public IArtifactStore build() {
-        Object artifactStore = new MyArtifactStore(downloadConfig, tempDir, executableNaming, downloader);
-        return (IArtifactStore)artifactStore;
+        return new MyArtifactStore(downloadConfig, tempDir, executableNaming, downloader);
     }
 
     public static class MyArtifactStore extends ArtifactStore {
@@ -69,6 +68,7 @@ public class ArtifactStoreBuilder extends de.flapdoodle.embed.process.store.Arti
             this.tempDirFactory = tempDirFactory;
         }
 
+        //TODO: move to proper place, here just to prove the point
         FileSet filesToExtract = FileSet.builder()
         .addEntry(Executable, "bin/mysqld")
         .addEntry(Library,    "bin/mysql")
@@ -86,11 +86,6 @@ public class ArtifactStoreBuilder extends de.flapdoodle.embed.process.store.Arti
         .addEntry(Library,    "support-files/my-default.cnf")
         .build();
 
-
-        @Override
-        public boolean checkDistribution(Distribution distribution) throws IOException {
-            return super.checkDistribution(distribution);
-        }
 
         @Override
         public IExtractedFileSet extractFileSet(Distribution distribution) throws IOException {
