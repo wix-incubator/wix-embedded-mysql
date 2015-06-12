@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 
 import static de.flapdoodle.embed.process.config.store.FileType.Executable;
-import static de.flapdoodle.embed.process.config.store.FileType.Library;
 
 
 /**
@@ -54,56 +53,43 @@ public class ArtifactStoreBuilder extends de.flapdoodle.embed.process.store.Arti
 
     @Override
     public IArtifactStore build() {
-        return new MyArtifactStore(downloadConfig, tempDir, executableNaming, downloader);
+        return new PreExtractingArtifactStore(downloadConfig, tempDir, executableNaming, downloader);
     }
 
-    public static class MyArtifactStore extends ArtifactStore {
+    public static class PreExtractingArtifactStore extends ArtifactStore {
 
         private IDownloadConfig downloadConfig;
         private IDirectory tempDirFactory;
 
-        public MyArtifactStore(IDownloadConfig downloadConfig, IDirectory tempDirFactory, ITempNaming executableNaming, IDownloader downloader) {
+        public PreExtractingArtifactStore(IDownloadConfig downloadConfig, IDirectory tempDirFactory, ITempNaming executableNaming, IDownloader downloader) {
             super(downloadConfig, tempDirFactory, executableNaming, downloader);
             this.downloadConfig = downloadConfig;
             this.tempDirFactory = tempDirFactory;
         }
-
-        //TODO: move to proper place, here just to prove the point
-        FileSet filesToExtract = FileSet.builder()
-        .addEntry(Executable, "bin/mysqld")
-        .addEntry(Library,    "bin/mysql")
-        .addEntry(Library,    "bin/resolveip")
-        .addEntry(Library,    "bin/mysqladmin")
-        .addEntry(Library,    "bin/my_print_defaults")
-        .addEntry(Library,    "scripts/mysql_install_db")
-        .addEntry(Library,    "lib/plugin/innodb_engine.so")
-        //.addEntry(Library,    "lib/plugin/auth_socket.so")//only linux
-        .addEntry(Library,    "share/english/errmsg.sys")
-        .addEntry(Library,    "share/fill_help_tables.sql")
-        .addEntry(Library,    "share/mysql_security_commands.sql")
-        .addEntry(Library,    "share/mysql_system_tables.sql")
-        .addEntry(Library,    "share/mysql_system_tables_data.sql")
-        .addEntry(Library,    "support-files/my-default.cnf")
-        .build();
-
 
         @Override
         public IExtractedFileSet extractFileSet(Distribution distribution) throws IOException {
             File archive = getArtifact(downloadConfig, distribution);
             File sourceFolder = preExtract(archive);
             File destinationFolder = tempDirFactory.asFile();
-            destinationFolder.mkdir();
             ImmutableExtractedFileSet.Builder builder = ImmutableExtractedFileSet.builder(destinationFolder);
 
-            for (FileSet.Entry entry : filesToExtract.entries()) {
+
+            for (FileSet.Entry entry : downloadConfig.getPackageResolver().getFileSet(distribution).entries()) {
                 File source = new File(sourceFolder, entry.destination());
                 File target = new File(destinationFolder, entry.destination());
-                Files.copy(source.toPath(), target.toPath());
-                target.setExecutable(true);
-                if (entry.type() == Executable) {
-                    builder.executable(target);
+
+                if (entry.destination().equals(".*FOLDER")) {
+                    target.mkdirs();
+                    Files.copy(source.toPath(), target.toPath());
                 } else {
-                    builder.file(entry.type(), target);
+                    target.getParentFile().mkdirs();
+                    Files.copy(source.toPath(), target.toPath());
+                    target.setExecutable(true);
+                }
+
+                if ((entry.type() == Executable)) {
+                    builder.executable(target);
                 }
             }
 
@@ -124,19 +110,19 @@ public class ArtifactStoreBuilder extends de.flapdoodle.embed.process.store.Arti
             return extractedFolder.listFiles()[0];
         }
 
-        private static File getArtifact(IDownloadConfig runtime, Distribution distribution) {
+        private File getArtifact(IDownloadConfig runtime, Distribution distribution) {
             File dir = createOrGetBaseDir(runtime);
             File artifactFile = new File(dir, runtime.getPackageResolver().getPath(distribution));
             return artifactFile.exists() && artifactFile.isFile()?artifactFile:null;
         }
 
-        private static File createOrGetBaseDir(IDownloadConfig runtime) {
+        private File createOrGetBaseDir(IDownloadConfig runtime) {
             File dir = runtime.getArtifactStorePath().asFile();
             createOrCheckDir(dir);
             return dir;
         }
 
-        private static void createOrCheckDir(File dir) {
+        private void createOrCheckDir(File dir) {
             if(!dir.exists() && !dir.mkdirs()) {
                 throw new IllegalArgumentException("Could NOT create Directory " + dir);
             } else if(!dir.isDirectory()) {
