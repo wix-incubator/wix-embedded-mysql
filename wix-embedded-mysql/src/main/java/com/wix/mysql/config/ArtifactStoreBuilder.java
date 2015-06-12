@@ -2,10 +2,7 @@ package com.wix.mysql.config;
 
 import com.wix.mysql.config.directories.TargetGeneratedFixedPath;
 import com.wix.mysql.config.extract.NopNaming;
-import de.flapdoodle.embed.process.config.store.IDownloadConfig;
-import de.flapdoodle.embed.process.extract.ITempNaming;
-import de.flapdoodle.embed.process.io.directories.IDirectory;
-import de.flapdoodle.embed.process.store.*;
+import de.flapdoodle.embed.process.store.Downloader;
 
 
 /**
@@ -27,17 +24,5 @@ public class ArtifactStoreBuilder extends de.flapdoodle.embed.process.store.Arti
          */
         useCache(false);
         return this;
-    }
-
-    @Override
-    public IArtifactStore build() {
-        return super.build();
-//        Object artifactStore = new ArtifactStore(
-//                (IDownloadConfig)this.get(DOWNLOAD_CONFIG),
-//                (IDirectory)this.get(TEMP_DIR_FACTORY),
-//                (ITempNaming)this.get(EXECUTABLE_NAMING),
-//                (IDownloader)this.get(DOWNLOADER));
-//        return (IArtifactStore)artifactStore;
-
     }
 }
