@@ -1,5 +1,8 @@
 package com.wix.mysql.config
 
+import java.net.InetAddress
+
+import com.wix.mysql.config.MysqldConfig.Defaults
 import com.wix.mysql.config.MysqldConfig.Defaults._
 import com.wix.mysql.distribution.Version
 import de.flapdoodle.embed.process.distribution.IVersion
@@ -21,12 +24,22 @@ class MysqldConfigBuilderTest extends SpecWithJUnit with MatchersImplicits {
         matchUser(USERNAME) and
         matchPassword(PASSWORD) and
         matchSchemas(SCHEMA) and
-        matchPort(PORT)
+        matchPort(PORT) and
+        matchBindAddress(Defaults.BIND_ADDRESS)
+
     }
 
     "custom values" in {
-      template.withUsername(USERNAME + "a").withPassword(PASSWORD + "a").withSchema(SCHEMA + "a").withPort(PORT + 1).build must
-        matchUser(USERNAME + "a") and matchPassword(PASSWORD + "a") and matchSchemas(SCHEMA + "a") and matchPort(PORT + 1)
+      template.withUsername(USERNAME + "a")
+        .withPassword(PASSWORD + "a")
+        .withSchema(SCHEMA + "a")
+        .withPort(PORT + 1)
+        .withBindAddress(InetAddress.getLocalHost).build must
+        matchUser(USERNAME + "a") and
+        matchPassword(PASSWORD + "a") and
+        matchSchemas(SCHEMA + "a") and
+        matchPort(PORT + 1) and
+        matchBindAddress(InetAddress.getLocalHost)
     }
 
     "custom schemas" in {
@@ -51,4 +64,5 @@ class MysqldConfigBuilderTest extends SpecWithJUnit with MatchersImplicits {
   def matchPassword(password: String) = be_===(password) ^^ { (_: MysqldConfig).getPassword aka "password" }
   def matchSchemas(schemas: String*) = containTheSameElementsAs(schemas) ^^ { (_: MysqldConfig).getSchemas.toSeq aka "schemas" }
   def matchPort(port: Int) = be_===(port) ^^ { (_: MysqldConfig).getPort aka "port" }
+  def matchBindAddress(bindAddress: InetAddress) = be_===(bindAddress) ^^ { (_: MysqldConfig).getBindAddress aka "port" }
 }
