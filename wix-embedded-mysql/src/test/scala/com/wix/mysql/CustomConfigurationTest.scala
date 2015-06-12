@@ -20,6 +20,19 @@ class CustomConfigurationTest extends IntegrationTest {
 
   "embedded mysql should apply with" >> {
 
+    "measure start-up" in new Context {
+      val config = template.build
+
+      val before = System.currentTimeMillis()
+
+      val executable: MysqldExecutable = givenMySqlWithConfig(config)
+      try {
+        executable.start()
+        println(System.currentTimeMillis() - before + " ms")
+      } finally executable.stop
+
+    }
+
     "defaults" in new Context {
       val config = template.build
       startAndVerifyDatabase(config)
