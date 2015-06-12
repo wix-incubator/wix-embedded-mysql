@@ -44,7 +44,7 @@
         <logback.version>1.0.6</logback.version>
         <scala.library.version>2.11</scala.library.version>
         <scala.version>2.11.6</scala.version>
-        <specs2.version>3.6</specs2.version>
+        <specs2.version>3.6.1</specs2.version>
     </properties>
 
     <dependencies>
@@ -107,6 +107,14 @@
             <version>${specs2.version}</version>
             <scope>test</scope>
         </dependency>
+
+        <dependency>
+            <groupId>org.specs2</groupId>
+            <artifactId>specs2-matcher-extra_${scala.library.version}</artifactId>
+            <version>${specs2.version}</version>
+            <scope>test</scope>
+        </dependency>
+
 
         <dependency>
             <groupId>org.specs2</groupId>

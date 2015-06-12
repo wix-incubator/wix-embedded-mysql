@@ -3,21 +3,22 @@ package com.wix.mysql
 import java.io.File
 
 import com.wix.mysql.ClassPathScriptResolver.ScriptResolutionException
+import org.specs2.matcher.FileMatchers
 import org.specs2.mutable.SpecWithJUnit
 
 /**
  * @author viliusl
  * @since 06/06/15
  */
-class ClassPathScriptResolverTest extends SpecWithJUnit {
+class ClassPathScriptResolverTest extends SpecWithJUnit with FileMatchers {
 
   "ClassPathScriptResolver.file" should {
     "resolve a single file" in {
-      ClassPathScriptResolver.file("/db/001_init.sql").exists must beTrue
+      ClassPathScriptResolver.file("/db/001_init.sql") must exist
     }
 
     "resolve a single file without preceding '/'" in {
-      ClassPathScriptResolver.file("db/001_init.sql").exists must beTrue
+      ClassPathScriptResolver.file("db/001_init.sql") must exist
     }
 
     "throw a ScriptNotFound exception for a non-existsent script" in {
