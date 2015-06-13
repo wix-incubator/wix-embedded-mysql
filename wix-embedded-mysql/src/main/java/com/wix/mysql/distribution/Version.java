@@ -46,6 +46,7 @@ public enum Version implements IVersion {
     public boolean supportsCurrentPlatform() {
         return supportedPlatforms.contains(currentPlatform());
     }
+    public String majorVersion() { return majorVersion; }
 
     @Override
     public String asInDownloadPath() {

@@ -14,6 +14,7 @@ import de.flapdoodle.embed.process.store.ArtifactStore;
 import de.flapdoodle.embed.process.store.Downloader;
 import de.flapdoodle.embed.process.store.IArtifactStore;
 import de.flapdoodle.embed.process.store.IDownloader;
+import org.apache.commons.io.FileUtils;
 import org.rauschig.jarchivelib.ArchiveFormat;
 import org.rauschig.jarchivelib.ArchiverFactory;
 import org.rauschig.jarchivelib.CompressionType;
@@ -21,6 +22,7 @@ import org.rauschig.jarchivelib.CompressionType;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 
 import static de.flapdoodle.embed.process.config.store.FileType.Executable;
 
@@ -79,12 +81,11 @@ public class ArtifactStoreBuilder extends de.flapdoodle.embed.process.store.Arti
                 File source = new File(sourceFolder, entry.destination());
                 File target = new File(destinationFolder, entry.destination());
 
-                if (entry.destination().equals(".*FOLDER")) {
-                    target.mkdirs();
-                    Files.copy(source.toPath(), target.toPath());
+                if (entry.matchingPattern().pattern().equals("FOLDER")) {
+                    FileUtils.copyDirectory(source, target);
                 } else {
                     target.getParentFile().mkdirs();
-                    Files.copy(source.toPath(), target.toPath());
+                    FileUtils.copyFile(source, target);
                     target.setExecutable(true);
                 }
 
@@ -107,7 +108,13 @@ public class ArtifactStoreBuilder extends de.flapdoodle.embed.process.store.Arti
                 }
             }
 
-            return extractedFolder.listFiles()[0];
+            File[] folders = extractedFolder.listFiles();
+
+            if (folders.length == 1) {
+                return extractedFolder.listFiles()[0];
+            } else {
+                return extractedFolder;
+            }
         }
 
         private File getArtifact(IDownloadConfig runtime, Distribution distribution) {

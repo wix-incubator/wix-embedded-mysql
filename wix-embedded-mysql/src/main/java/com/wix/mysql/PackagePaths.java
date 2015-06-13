@@ -1,6 +1,8 @@
 package com.wix.mysql;
 
+import com.wix.mysql.distribution.Version;
 import de.flapdoodle.embed.process.config.store.FileSet;
+import de.flapdoodle.embed.process.config.store.FileType;
 import de.flapdoodle.embed.process.config.store.IPackageResolver;
 import de.flapdoodle.embed.process.distribution.ArchiveType;
 import de.flapdoodle.embed.process.distribution.BitSize;
@@ -21,38 +23,68 @@ import static java.lang.String.format;
 public class PackagePaths implements IPackageResolver {
     @Override
     public FileSet getFileSet(Distribution distribution) {
+        Version version = (Version)distribution.getVersion();
         switch (distribution.getPlatform()) {
             case Windows:
                 return buildWindowsFileSet();
             case OS_X:
-                return buildOSXFileSet();
+                return buildOSXFileSet(version);
             default:
-                return buildNixFileSet();
+                return buildNixFileSet((Version)distribution.getVersion());
         }
     }
 
-    private FileSet buildOSXFileSet() {
-        return aFileSetBuilder("bin/mysqld", "bin/mysql", "bin/resolveip", "bin/mysqladmin", "bin/my_print_defaults",
-                "scripts/mysql_install_db", "lib/plugin/innodb_engine.so", "share/english/errmsg.sys",
-                "share/fill_help_tables.sql", "share/mysql_security_commands.sql", "share/mysql_system_tables.sql",
-                "share/mysql_system_tables_data.sql", "support-files/my-default.cnf")
-                .build();
+    private FileSet buildOSXFileSet(Version version) {
+        FileSet.Builder builder = aFileSetBuilder(
+                "bin/mysqld",
+                "bin/mysql",
+                "bin/resolveip",
+                "bin/mysqladmin",
+                "bin/my_print_defaults",
+                "scripts/mysql_install_db",
+                "share/english/errmsg.sys",
+                "share/fill_help_tables.sql",
+                "share/mysql_system_tables.sql",
+                "share/mysql_system_tables_data.sql");
+
+        if (version.majorVersion() == "5.6") {
+            builder.addEntry(FileType.Library, "support-files/my-default.cnf")
+                .addEntry(FileType.Library, "share/mysql_security_commands.sql");
+        }
+
+        return builder.build();
     }
 
     private FileSet buildWindowsFileSet() {
-        //TODO: data folder added as somewhat hack.
-        return aFileSetBuilder("bin/mysqld.exe", "bin/mysql.exe", "bin/resolveip.exe", "bin/mysqladmin.exe",
+        return aFileSetBuilder(
+                "bin/mysqld.exe",
+                "bin/mysql.exe",
+                "bin/resolveip.exe",
+                "bin/mysqladmin.exe",
                 "share/english/errmsg.sys")
-                .addEntry(Library, "data", "FOLDER")
+                .addEntry(Library, "data", "FOLDER")//TODO: data folder added as somewhat hack.
                 .build();
     }
 
-    private FileSet buildNixFileSet() {
-        return aFileSetBuilder("bin/mysqld", "bin/mysql", "bin/resolveip", "bin/mysqladmin", "bin/my_print_defaults",
-                "scripts/mysql_install_db", "lib/plugin/innodb_engine.so", "lib/plugin/auth_socket.so", "share/english/errmsg.sys",
-                "share/fill_help_tables.sql", "share/mysql_security_commands.sql", "share/mysql_system_tables.sql",
-                "share/mysql_system_tables_data.sql", "support-files/my-default.cnf")
-                .build();
+    private FileSet buildNixFileSet(Version version) {
+        FileSet.Builder builder = aFileSetBuilder(
+                "bin/mysqld",
+                "bin/mysql",
+                "bin/resolveip",
+                "bin/mysqladmin",
+                "bin/my_print_defaults",
+                "scripts/mysql_install_db",
+                "share/english/errmsg.sys",
+                "share/fill_help_tables.sql",
+                "share/mysql_system_tables.sql",
+                "share/mysql_system_tables_data.sql");
+
+        if (version.majorVersion() == "5.6") {
+            builder.addEntry(FileType.Library, "support-files/my-default.cnf")
+                    .addEntry(FileType.Library, "share/mysql_security_commands.sql");
+        }
+
+        return builder.build();
     }
 
 
