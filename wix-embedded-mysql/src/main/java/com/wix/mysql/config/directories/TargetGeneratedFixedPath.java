@@ -1,37 +1,27 @@
 package com.wix.mysql.config.directories;
 
-import de.flapdoodle.embed.process.distribution.Platform;
 import de.flapdoodle.embed.process.io.directories.IDirectory;
 
 import java.io.File;
 import java.util.UUID;
+
+import static java.lang.String.format;
 
 public class TargetGeneratedFixedPath implements IDirectory {
 
     private final String baseDir;
 
     public TargetGeneratedFixedPath(String prefix) {
-        this.baseDir = String.format("target/%s-%s", prefix, UUID.randomUUID().toString());
+        this.baseDir = format("target/%s-%s", prefix, UUID.randomUUID().toString());
     }
 
     @Override
     public File asFile() {
-        generateNeededDirs();
-        return new File(baseDir).getAbsoluteFile();
-    }
-
-    private void generateNeededDirs() {
-        String[] paths = null;
-
-        if (Platform.detect() == Platform.Windows) {
-            paths = new String[]{ "bin", "share/english", "data/test", "data/mysql", "data/performance_schema" };
-        } else {
-            paths = new String[]{ "bin", "scripts", "lib/plugin", "share/english", "share", "support-files" };
+        File ret = new File(baseDir).getAbsoluteFile();
+        if (!ret.exists()) {
+            ret.mkdir();
         }
-
-        for (String dir: paths) {
-            new File(baseDir + "/" + dir).mkdirs();
-        }
+        return ret;
     }
 
     @Override
@@ -39,4 +29,3 @@ public class TargetGeneratedFixedPath implements IDirectory {
         return true;
     }
 }
-
