@@ -7,9 +7,7 @@ import com.wix.mysql.config.SchemaConfig;
 import com.wix.mysql.distribution.Version;
 import de.flapdoodle.embed.process.config.IRuntimeConfig;
 import de.flapdoodle.embed.process.distribution.Distribution;
-import org.apache.commons.dbcp2.BasicDataSource;
 
-import javax.sql.DataSource;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -22,67 +20,48 @@ import static java.lang.String.format;
  * @since 07/06/15
  */
 public class EmbeddedMysql {
-    private final MysqldConfig config;
-    private final String username;
-    private final String password;
-    private final MysqldExecutable executable;
-    private final MysqldProcess process;
+    protected final MysqldConfig config;
+    protected final MysqldExecutable executable;
+    protected final MysqldProcess process;
     private AtomicBoolean isRunning = new AtomicBoolean(true);
 
-    protected EmbeddedMysql(
-            final MysqldConfig config,
-            final String username,
-            final String password) {
+    protected EmbeddedMysql(final MysqldConfig config) {
         this.config = config;
-        this.username = username;
-        this.password = password;
         IRuntimeConfig runtimeConfig = new RuntimeConfigBuilder().defaults().build();
         this.executable = new MysqldStarter(runtimeConfig).prepare(config);
 
         try {
             this.process = executable.start(Distribution.detectFor(config.getVersion()), config, runtimeConfig);
-            getClient().executeCommands(format("CREATE USER '%s'@'%%' IDENTIFIED BY '%s';", username, password));
+            getClient().executeCommands(
+                    format("CREATE USER '%s'@'%%' IDENTIFIED BY '%s';", config.getUsername(), config.getPassword()));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
+    public MysqldConfig getConfig() { return this.config; }
+
     private MysqlClient getClient() {
         return new MysqlClient(config, executable);
     }
 
-    private MysqlClient getClient(final SchemaConfig schema) {
-        return new MysqlClient(config, executable, schema.getName());
+    private MysqlClient getClient(final String schemaName) {
+        return new MysqlClient(config, executable, schemaName);
+    }
+
+    public EmbeddedMysql addSchema(final String schemaName, final File... scripts) {
+        return addSchema(SchemaConfig.Builder(schemaName).withScripts(scripts).build());
     }
 
     public EmbeddedMysql addSchema(final SchemaConfig schema) {
         getClient().executeCommands(
                 format("CREATE DATABASE %s CHARACTER SET = %s COLLATE = %s;",
                         schema.getName(), config.getCharset().getCharset(), config.getCharset().getCollate()),
-                format("GRANT ALL ON %s.* TO '%s'@'%%';", schema.getName(), username));
+                format("GRANT ALL ON %s.* TO '%s'@'%%';", schema.getName(), config.getUsername()));
 
-        getClient(schema).executeScripts(schema.getScripts());
+        getClient(schema.getName()).executeScripts(schema.getScripts());
 
         return this;
-    }
-
-    public EmbeddedMysql apply(final SchemaConfig schema, File... files) {
-        getClient(schema).executeScripts(files);
-        return this;
-    }
-
-    public DataSource dataSourceFor(final SchemaConfig schema) {
-        //TODO: reuse, create a provider
-        BasicDataSource dataSource = new BasicDataSource();
-        dataSource.setDriverClassName("com.mysql.jdbc.Driver");
-        dataSource.setUrl(getJdbcConnectionUrl(schema));
-        dataSource.setUsername(username);
-        dataSource.setPassword(password);
-        return dataSource;
-    }
-
-    public String getJdbcConnectionUrl(final SchemaConfig schema) {
-        return format("jdbc:mysql://localhost:%s/%s", this.config.getPort(), schema.getName());
     }
 
     public synchronized void stop() {
@@ -92,32 +71,24 @@ public class EmbeddedMysql {
         }
     }
 
-    public static Builder Builder(final MysqldConfig config) {
-        return new Builder(config);
-    }
-
     public static Builder Builder(final Version version) {
         return new Builder(MysqldConfig.Builder(version).build());
     }
 
-    public static Builder Builder(final Version version, final int port) {
-        return new Builder(MysqldConfig.Builder(version).withPort(port).build());
+    public static Builder Builder(final MysqldConfig config) {
+        return new Builder(config);
     }
 
     public static class Builder {
         private final MysqldConfig config;
-        private String username = "auser";
-        private String password = "sa";
         private List<SchemaConfig> schemas = Lists.newArrayList();
 
         public Builder(final MysqldConfig config) {
             this.config = config;
         }
 
-        public Builder withUser(final String username, final String password) {
-            //TODO: make sure does not clash with system user/password
-            this.username = username;
-            this.password = password;
+        public Builder addSchema(final String name, final File... scripts) {
+            this.schemas.add(SchemaConfig.Builder(name).withScripts(scripts).build());
             return this;
         }
 
@@ -127,7 +98,7 @@ public class EmbeddedMysql {
         }
 
         public EmbeddedMysql start() {
-            EmbeddedMysql instance = new EmbeddedMysql(config, username, password);
+            EmbeddedMysql instance = new EmbeddedMysql(config);
 
             for (SchemaConfig schema: schemas) {
                 instance.addSchema(schema);

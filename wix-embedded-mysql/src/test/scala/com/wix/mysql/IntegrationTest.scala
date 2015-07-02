@@ -18,27 +18,25 @@ import scala.collection.JavaConversions._
 class IntegrationTest extends SpecWithJUnit {
   sequential
 
-  def givenMySqlWithConfig(config: MysqldConfig) = MysqldStarter.defaultInstance.prepare(config)
+  val log = LoggerFactory.getLogger(this.getClass)
 
-  def startAndVerifyDatabase(config: MysqldConfig, schema: SchemaConfig) = startAndVerify(config, schema) { mysqld =>
-    validateConnection(mysqld, schema)
+  def startAndVerifyDatabase(config: MysqldConfig, schema: SchemaConfig) = startAndVerify(config, schema) {
+    validateConnection(config, schema)
   }
 
-  def startAndVerifyDatabase(config: MysqldConfig, schema: SchemaConfig*) = startAndVerify(config, schema:_*) { mysqld =>
-    schema foreach { s => validateConnection(mysqld, s)}
-  }
-
-  def startAndVerify(config: MysqldConfig, schema: SchemaConfig*)(verify: EmbeddedMysql => Unit) = {
+  def startAndVerify(config: MysqldConfig, schema: SchemaConfig*)(verify: => Unit) = {
     var mysqld: EmbeddedMysql = null
     try {
-      mysqld = EmbeddedMysql.Builder(config).start()
+      mysqld = EmbeddedMysql.Builder(config).start
       schema foreach { s => mysqld.addSchema(s) }
       verify
-    } finally mysqld.stop
+    } catch {
+      case e => log.error("failed in start/verification", e)
+    } finally mysqld.stop()
   }
 
-  def validateConnection(mysqld: EmbeddedMysql, schema: SchemaConfig) =
-    new JdbcTemplate(mysqld.dataSourceFor(schema))
+  def validateConnection(config: MysqldConfig, schema: SchemaConfig) =
+    new JdbcTemplate(Datasource.`with`(config, schema))
       .queryForObject("select 1;", classOf[java.lang.Long]) mustEqual 1
 
   def aLogFor(app: String): Iterable[String] = {
@@ -52,7 +50,7 @@ class IntegrationTest extends SpecWithJUnit {
     logger.detachAppender(appender.getName)
     logger.addAppender(appender)
 
-    appender.start
+    appender.start()
 
     new Iterable[String] {
       def iterator = appender.list map ( _.getMessage ) iterator

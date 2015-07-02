@@ -1,6 +1,6 @@
 package com.wix.mysql
 
-import com.wix.mysql.ClassPathScriptResolver.file
+import com.wix.mysql.ScriptResolver.classPathFile
 import com.wix.mysql.config.{SchemaConfig, MysqldConfig}
 import com.wix.mysql.distribution.Version
 import org.specs2.matcher.Scope
@@ -13,7 +13,7 @@ import org.specs2.specification.core.Fragment
 class SupportedVersionsTest extends IntegrationTest {
 
   trait Context extends Scope {
-    val schema = SchemaConfig.Builder("aschema").withScripts(file("db/001_init.sql")).build()
+    val schema = SchemaConfig.Builder("aschema").withScripts(classPathFile("db/001_init.sql")).build
     val log = aLogFor("root")
   }
 

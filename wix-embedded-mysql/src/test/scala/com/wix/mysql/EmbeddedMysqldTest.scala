@@ -2,6 +2,8 @@ package com.wix.mysql
 
 import java.lang
 
+import com.wix.mysql.ScriptResolver.classPathFile
+import com.wix.mysql.config.Charset.LATIN1
 import com.wix.mysql.config.{MysqldConfig, SchemaConfig}
 import com.wix.mysql.distribution.Version._
 import org.specs2.matcher.MatchResult
@@ -21,92 +23,98 @@ class EmbeddedMysqldTest extends SpecWithJUnit {
   trait Context extends Scope {
     var mysqld: EmbeddedMysql = _
 
-    def verifySchema(schemaConfig: SchemaConfig): MatchResult[Any] = {
-      new JdbcTemplate(mysqld.dataSourceFor(schemaConfig))
+    def verifySchema(mysqldConfig: MysqldConfig, schemaConfig: SchemaConfig): MatchResult[Any] = {
+      new JdbcTemplate(Datasource.`with`(mysqldConfig, schemaConfig))
+        .queryForObject("select col1 from t1;", classOf[lang.Long]) mustEqual 10
+    }
+
+    def verifySchema(mysqldConfig: MysqldConfig, schemaName: String): MatchResult[Any] = {
+      new JdbcTemplate(Datasource.`with`(mysqldConfig, schemaName))
         .queryForObject("select col1 from t1;", classOf[lang.Long]) mustEqual 10
     }
   }
 
-  "MysqldConfig" should {
+  "EmbeddedMysql can be run with " >> {
 
-    //TODO: verify that charset provided is actual or db
-    //TODO: verify that charset provided for instance is actual
-    //TODO: multiple schemas
-    "basic" in new Context {
+    "default configuration and a single schema provided via instance builder" in new Context {
       try {
-        val schemaConfig = SchemaConfig.Builder("aschema")
-          .withScripts(ClassPathScriptResolver.file("db/001_init.sql"))
-          .build()
-
         mysqld = EmbeddedMysql.Builder(v5_6_latest)
-          .addSchema(schemaConfig)
-          .start()
+          .addSchema("aschema", classPathFile("db/001_init.sql"))
+          .start
 
-        verifySchema(schemaConfig)
-
-      } finally Try { mysqld.stop() }
-    }
-
-    "basic - with custom user" in new Context {
-      try {
-        val schemaConfig = SchemaConfig.Builder("aschema")
-          .withScripts(ClassPathScriptResolver.file("db/001_init.sql"))
-          .build()
-
-        mysqld = EmbeddedMysql.Builder(v5_6_latest)
-          .withUser("second", "za")
-          .addSchema(schemaConfig)
-          .start()
-
-        verifySchema(schemaConfig)
+        verifySchema(mysqld.getConfig, "aschema")
 
       } finally Try { mysqld.stop() }
     }
 
-    "basic with custom port" in new Context {
+    "default configuration with custom version and a single schema provided via instance builder" in new Context {
       try {
-        val schemaConfig = SchemaConfig.Builder("aschema")
-          .withScripts(ClassPathScriptResolver.file("db/001_init.sql"))
-          .build()
+        mysqld = EmbeddedMysql.Builder(v5_5_40)
+          .addSchema("aschema", classPathFile("db/001_init.sql"))
+          .start
 
-        mysqld = EmbeddedMysql.Builder(v5_6_latest, 1111)
-          .addSchema(schemaConfig)
-          .start()
-
-        verifySchema(schemaConfig)
+        verifySchema(mysqld.getConfig, "aschema")
 
       } finally Try { mysqld.stop() }
     }
 
-    "with MysqldConfig" in new Context {
+    "MysqldConfig and a single schema provided via instance builder" in new Context {
       try {
-        val config = MysqldConfig.Builder(v5_6_latest).build()
-        val schemaConfig = SchemaConfig.Builder("aschema")
-          .withScripts(ClassPathScriptResolver.file("db/001_init.sql"))
+        val config = MysqldConfig.Builder(v5_6_latest)
+          .withPort(1120)
+          .withCharset(LATIN1)
+          .withUser("someuser", "somepassword")
           .build()
 
         mysqld = EmbeddedMysql.Builder(config)
-          .addSchema(schemaConfig)
-          .start()
+          .addSchema("aschema", classPathFile("db/001_init.sql"))
+          .start
 
-        verifySchema(schemaConfig)
+        verifySchema(mysqld.getConfig, "aschema")
 
       } finally Try { mysqld.stop() }
     }
 
-    "add schema after start" in new Context {
+    "schema config" in new Context {
+      try {
+        val schema = SchemaConfig.Builder("aschema")
+          .withScripts(classPathFile("db/001_init.sql"))
+          .build
+
+        mysqld = EmbeddedMysql.Builder(v5_5_40)
+          .addSchema(schema)
+          .start
+
+        verifySchema(mysqld.getConfig, schema)
+
+      } finally Try { mysqld.stop() }
+    }
+
+    "multiple schemas" in new Context {
+      try {
+        mysqld = EmbeddedMysql.Builder(v5_5_40)
+          .addSchema("aschema", classPathFile("db/001_init.sql"))
+          .addSchema("aschema2", classPathFile("db/001_init.sql"))
+          .start
+
+        verifySchema(mysqld.getConfig, "aschema")
+        verifySchema(mysqld.getConfig, "aschema2")
+
+      } finally Try { mysqld.stop() }
+    }
+
+    "schema added after EmbeddedMysql start-up" in new Context {
       try {
         mysqld = EmbeddedMysql.Builder(v5_6_latest).start()
+        mysqld.addSchema("aschema", classPathFile("db/001_init.sql"))
 
-        val schemaConfig = SchemaConfig.defaults("aschema")
-
-        mysqld.addSchema(schemaConfig)
-        mysqld.apply(schemaConfig, ClassPathScriptResolver.file("db/001_init.sql"))
-
-        verifySchema(schemaConfig)
+        verifySchema(mysqld.getConfig, "aschema")
 
       } finally Try { mysqld.stop() }
     }
-  }
 
+//    //TODO: verify that charset provided is actual or db
+//    //TODO: verify that charset provided for instance is actual
+//    //TODO: multiple schemas
+ }
 }

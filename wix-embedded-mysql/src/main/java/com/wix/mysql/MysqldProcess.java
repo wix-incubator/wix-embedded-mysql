@@ -215,13 +215,13 @@ class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutable, Mysq
     }
 
     /**
-     * Helper for getting stable sock file. Saving to local instance variable on service start does not work due
+     * Helper for getting stable sock classPathFile. Saving to local instance variable on service start does not work due
      * to the way flapdoodle process library works - it does all init in {@link AbstractProcess} and instance of
      * {@link MysqldProcess} is not yet present, so vars are not initialized.
-     * This algo gives stable sock file based on single executeCommands profile, but can leave trash sock files in tmp dir.
+     * This algo gives stable sock classPathFile based on single executeCommands profile, but can leave trash sock classPathFiles in tmp dir.
      *
      * Notes:
-     * .sock file needs to be in system temp dir and not in ex. target/...
+     * .sock classPathFile needs to be in system temp dir and not in ex. target/...
      * This is due to possible problems with existing mysql installation and apparmor profiles
      * in linuxes.
      */
