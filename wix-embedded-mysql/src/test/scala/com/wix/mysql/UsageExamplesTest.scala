@@ -18,7 +18,7 @@ import scala.util.Try
  * @author viliusl
  * @since 28/05/15
  */
-class EmbeddedMysqldTest extends SpecWithJUnit {
+class UsageExamplesTest extends SpecWithJUnit {
   sequential
 
   trait Context extends Scope {

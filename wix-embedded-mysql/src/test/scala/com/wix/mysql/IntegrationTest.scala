@@ -10,6 +10,7 @@ import org.specs2.mutable.SpecWithJUnit
 import org.springframework.jdbc.core.JdbcTemplate
 
 import scala.collection.JavaConversions._
+import scala.util.control.NonFatal
 
 /**
  * @author viliusl
@@ -31,7 +32,7 @@ class IntegrationTest extends SpecWithJUnit {
       schema foreach { s => mysqld.addSchema(s) }
       verify
     } catch {
-      case e => log.error("failed in start/verification", e)
+      case NonFatal(e) => log.error("failed in start/verification", e); throw e
     } finally mysqld.stop()
   }
 
