@@ -14,7 +14,7 @@ class MysqlTest extends IntegrationTest {
   "mysql should emit exception info with message from 'mysql' command output'" in {
     var mysqld: EmbeddedMysql = null
     try {
-      mysqld = EmbeddedMysql.Builder(Version.v5_6_latest).start()
+      mysqld = EmbeddedMysql.anEmbeddedMysql(Version.v5_6_latest).start()
       val mysql = new MysqlClient(mysqld.getConfig, mysqld.executable)
 
       mysql.executeCommands("sele qwe from zz;") must throwA[CommandFailedException].like {

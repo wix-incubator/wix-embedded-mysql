@@ -27,7 +27,7 @@ class IntegrationTest extends SpecWithJUnit {
   def startAndVerify(config: MysqldConfig, schema: SchemaConfig*)(verify: => Unit) = {
     var mysqld: EmbeddedMysql = null
     try {
-      mysqld = EmbeddedMysql.Builder(config).start
+      mysqld = EmbeddedMysql.anEmbeddedMysql(config).start
       schema foreach { s => mysqld.addSchema(s) }
       verify
     } catch {

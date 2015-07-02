@@ -71,11 +71,11 @@ public class EmbeddedMysql {
         }
     }
 
-    public static Builder Builder(final Version version) {
+    public static Builder anEmbeddedMysql(final Version version) {
         return new Builder(MysqldConfig.Builder(version).build());
     }
 
-    public static Builder Builder(final MysqldConfig config) {
+    public static Builder anEmbeddedMysql(final MysqldConfig config) {
         return new Builder(config);
     }
 
