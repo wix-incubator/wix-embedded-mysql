@@ -31,7 +31,7 @@ class SchemaConfigTest extends SpecWithJUnit {
     }
 
     "build with custom charset" in {
-      val charset = Charset.of("charset", "collate")
+      val charset = Charset.aCharset("charset", "collate")
 
       val schemaConfig = SchemaConfig.Builder("aschema")
         .withCharset(charset)

@@ -27,6 +27,7 @@ import java.util.Set;
 
 import static com.wix.mysql.utils.Utils.closeCloseables;
 import static de.flapdoodle.embed.process.distribution.Platform.Windows;
+import static java.lang.String.format;
 
 /**
  * @author viliusl
@@ -88,13 +89,15 @@ class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutable, Mysq
                 "--skip-name-resolve",
                 "--log-output=NONE",
                 "--skip-name-resolve",
-                String.format("--basedir=%s", baseDir),
-                String.format("--datadir=%s/data", baseDir),
-                String.format("--plugin-dir=%s/lib/plugin", baseDir),
-                String.format("--socket=%s", sockFile(exe)),
-                String.format("--lc-messages-dir=%s/share", baseDir),
-                String.format("--port=%s", config.getPort()),
-                String.format("--log-error=%s/data/error.log", baseDir));
+                format("--basedir=%s", baseDir),
+                format("--datadir=%s/data", baseDir),
+                format("--plugin-dir=%s/lib/plugin", baseDir),
+                format("--socket=%s", sockFile(exe)),
+                format("--lc-messages-dir=%s/share", baseDir),
+                format("--port=%s", config.getPort()),
+                format("--log-error=%s/data/error.log", baseDir),
+                format("--character-set-server=%s", config.getCharset().getCharset()),
+                format("--collation-server=%s", config.getCharset().getCollate()));
     }
 
     @Override
@@ -140,8 +143,8 @@ class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutable, Mysq
 
             Process p = Runtime.getRuntime().exec(new String[] {
                     cmd, "--no-defaults", "--protocol=tcp",
-                    String.format("-u%s", MysqldConfig.SystemDefaults.USERNAME),
-                    String.format("--port=%s", getConfig().getPort()),
+                    format("-u%s", MysqldConfig.SystemDefaults.USERNAME),
+                    format("--port=%s", getConfig().getPort()),
                     "shutdown"});
 
             retValue = p.waitFor() == 0;
@@ -227,7 +230,7 @@ class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutable, Mysq
      */
     private String sockFile(IExtractedFileSet exe) throws IOException {
         String sysTempDir = System.getProperty("java.io.tmpdir");
-        String sockFile = String.format("%s.sock", exe.generatedBaseDir().getName());
+        String sockFile = format("%s.sock", exe.generatedBaseDir().getName());
         return new File(sysTempDir, sockFile).getAbsolutePath();
     }
 }

@@ -19,7 +19,7 @@ class SupportedVersionsTest extends IntegrationTest {
 
   Fragment.foreach( Version.values filter(_.supportsCurrentPlatform) ) { version =>
     s"${version} should work on ${System.getProperty("os.name")}" in new Context {
-      startAndVerifyDatabase(MysqldConfig.Builder(version).build, schema)
+      startAndVerifyDatabase(MysqldConfig.aMysqldConfig(version).build, schema)
       log must not(contain("Something bad happened."))
     }
   }

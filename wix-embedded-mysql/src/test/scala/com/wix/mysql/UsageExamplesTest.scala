@@ -61,7 +61,7 @@ class UsageExamplesTest extends SpecWithJUnit {
 
     "MysqldConfig and a single schema provided via instance builder" in new Context {
       try {
-        val config = MysqldConfig.Builder(v5_6_latest)
+        val config = MysqldConfig.aMysqldConfig(v5_6_latest)
           .withPort(1120)
           .withCharset(LATIN1)
           .withUser("someuser", "somepassword")

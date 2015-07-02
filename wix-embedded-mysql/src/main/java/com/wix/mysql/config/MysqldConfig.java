@@ -41,7 +41,7 @@ public class MysqldConfig extends ExecutableProcessConfig {
     public String getUsername() { return user.name; }
     public String getPassword() { return user.password; }
 
-    public static Builder Builder(final Version version) { return new Builder(version); }
+    public static Builder aMysqldConfig(final Version version) { return new Builder(version); }
 
     public static class Builder {
         private IVersion version;

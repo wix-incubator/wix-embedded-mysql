@@ -14,7 +14,7 @@ class MysqldConfigTest extends SpecWithJUnit {
   "MysqldConfig" should {
 
     "build with defaults" in {
-      val mysqldConfig = MysqldConfig.Builder(v5_6_latest).build()
+      val mysqldConfig = MysqldConfig.aMysqldConfig(v5_6_latest).build()
 
       mysqldConfig.getPort mustEqual 3310
       mysqldConfig.getVersion mustEqual Version.v5_6_latest
@@ -24,7 +24,7 @@ class MysqldConfigTest extends SpecWithJUnit {
     }
 
     "accept custom port, user, charset" in {
-      val mysqldConfig = MysqldConfig.Builder(v5_6_latest)
+      val mysqldConfig = MysqldConfig.aMysqldConfig(v5_6_latest)
         .withPort(1111)
         .withCharset(Charset.LATIN1)
         .withUser("otheruser", "otherpassword")
