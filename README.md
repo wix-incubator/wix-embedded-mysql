@@ -17,59 +17,57 @@ Wix Embedded MySql library provides an easy to use MySql for tests.
 
 #Usage
 
-Basic usage example:
+## Basic usage example
 
-```java
-import static com.wix.mysql.distribution.Version.v5_5_40;
+```scala
+import com.wix.mysql.EmbeddedMysql.anEmbeddedMysql
+import com.wix.mysql.ScriptResolver.classPathFile
+import com.wix.mysql.distribution.Version.v5_6_latest
 
-MysqldConfig config = new MysqldConfigBuilder(v5_5_40).build();
+val mysqld = anEmbeddedMysql(v5_6_latest)
+    .addSchema("aschema", classPathFile("db/001_init.sql"))
+    .start
 
-MysqldStarter starter = MysqldStarter.defaultInstance();
-MysqldExecutable executable = starter.prepare(config);
- 
-executable.start();
-
-//do work
-
-// you do not have to explicitly stop mysql as it registers to a shutdown hook for that. 
+//do stuff
+      
+mysqld.stop // you do not have to explicitly stop mysql as it registers to a shutdown hook for that. 
 ```
 
-Providing custom schemas, credentials, port:
+## Providing custom schemas, credentials, port
 
-```java
-import static com.wix.mysql.distribution.Version.v5_6_21;
+```scala
+import com.wix.mysql.EmbeddedMysql.anEmbeddedMysql
+import com.wix.mysql.ScriptResolver.classPathFiles
+import com.wix.mysql.config.Charset.LATIN1
+import com.wix.mysql.config.{SchemaConfig, MysqldConfig}
+import com.wix.mysql.config.MysqldConfig.aMysqldConfig
+import com.wix.mysql.config.SchemaConfig.aSchemaConfig
+import com.wix.mysql.distribution.Version.v5_6_latest
 
-final MysqldConfig config = new MysqldConfigBuilder(v5_6_21)
-  .withUsername("auser")
-  .withPassword("sa")
-  .withSchemas(new String[] {"schema1", "schema2"})
-  .withPort(9913)
-  .build();
+val config: MysqldConfig = aMysqldConfig(v5_6_latest)
+  .withPort(1120)
+  .withCharset(LATIN1)
+  .withUser("someuser", "somepassword")
+  .build
 
-MysqldStarter starter = MysqldStarter.defaultInstance();
-MysqldExecutable executable = starter.prepare(config);
-executable.start();
-```
+val schema: SchemaConfig = aSchemaConfig("aschema")
+  .withScripts(classPathFiles("db/*.sql"))
+  .build
 
-As you can see there are no custom user/pass/schema provided for the builder and defaults are taken from:
+val mysqld: EmbeddedMysql = anEmbeddedMysql(config)
+  .addSchema(schema)
+  .start
 
-```java
-    com.wix.mysql.config.MysqldConfig.Defaults
+// do stuff
+
+mysqld.stop
+
 ```
 
 You can of course override defaults by providing custom values for the builder with the following guidelines:
  - You of course cannot provide null/empty user or schema;
  - You cannot use schema defined in 'com.wix.mysql.config.MysqldConfig.SystemDefaults';
  - You can use system credentials, but you cannot use system user and custom password.
-
-# Accessing Mysql system user/schema
-
-In case you need additional database or users created you can use system credentials defined in:
-
-```java
-com.wix.mysql.config.MysqldConfig.SystemDefaults
-```
-and use them.
 
 ### Maven
 
@@ -79,7 +77,7 @@ Add dependency to your pom.xml:
     <dependency>
         <groupId>com.wixpress.mysql</groupId>
         <artifactId>wix-embedded-mysql</artifactId>
-        <version>1.0.0</version>
+        <version>1.1.0</version>
         <scope>test</scope>
     </dependency>        
 ```
