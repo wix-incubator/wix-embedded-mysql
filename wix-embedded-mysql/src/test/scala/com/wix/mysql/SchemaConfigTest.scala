@@ -14,14 +14,6 @@ import scala.collection.convert.wrapAll._
 class SchemaConfigTest extends SpecWithJUnit {
 
   "SchemaConfig" should {
-    "provide defaults" in {
-      val schemaConfig = SchemaConfig.defaults("aschema")
-
-      schemaConfig.getName mustEqual "aschema"
-      schemaConfig.getCharset mustEqual Charset.defaults
-      schemaConfig.getScripts must beEmpty
-    }
-
     "build with defaults" in {
       val schemaConfig = SchemaConfig.aSchemaConfig("aschema").build
 
