@@ -92,6 +92,11 @@ public class EmbeddedMysql {
             return this;
         }
 
+        public Builder addSchema(final String name, final List<File> scripts) {
+            this.schemas.add(SchemaConfig.aSchemaConfig(name).withScripts(scripts).build());
+            return this;
+        }
+
         public Builder addSchema(final SchemaConfig config) {
             this.schemas.add(config);
             return this;

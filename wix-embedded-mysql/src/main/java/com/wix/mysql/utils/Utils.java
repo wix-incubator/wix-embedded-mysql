@@ -16,7 +16,7 @@ public class Utils {
         for (Reader reader: readers) {
             try {
                 if (reader != null) reader.close();
-            } catch (IOException e) {}
+            } catch (IOException ignored) {}
         }
     }
 }

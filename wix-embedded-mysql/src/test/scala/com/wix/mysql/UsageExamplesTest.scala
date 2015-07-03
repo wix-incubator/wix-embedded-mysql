@@ -3,35 +3,24 @@ package com.wix.mysql
 import java.lang
 
 import com.wix.mysql.EmbeddedMysql.anEmbeddedMysql
-import com.wix.mysql.ScriptResolver.classPathFile
+import com.wix.mysql.ScriptResolver.{classPathFiles, classPathFile}
 import com.wix.mysql.config.Charset.LATIN1
 import com.wix.mysql.config.MysqldConfig.aMysqldConfig
 import com.wix.mysql.config.SchemaConfig.aSchemaConfig
 import com.wix.mysql.distribution.Version._
-import org.specs2.mutable.SpecWithJUnit
 import org.specs2.specification.AfterEach
-import org.springframework.jdbc.core.JdbcTemplate
-
-import scala.reflect.{ClassTag, classTag}
 
 /**
  * @author viliusl
  * @since 28/05/15
  */
-class UsageExamplesTest extends SpecWithJUnit with AfterEach {
-  sequential
+class UsageExamplesTest extends IntegrationTest {
 
-  var mysqld: EmbeddedMysql = _
-
-  override protected def after: Any = if (mysqld != null) mysqld.stop()
-
-  def aSelect[T: ClassTag](onSchema: String, sql: String): T =
-    new JdbcTemplate(Datasource.aDataSource(mysqld.getConfig, aSchemaConfig(onSchema).build))
-      .queryForObject("select col1 from t1;", classTag[T].runtimeClass.asInstanceOf[Class[T]])
-
-  def verifySchema(schema: String, withScript: String) = {
-    withScript match {
-      case "db/001_init.sql" => aSelect[lang.Long](onSchema = "aschema", sql = "select col1 from t1;") mustEqual 10
+  def verifySchema(schema: String, withChangeSet: String) = {
+    def ds = aDataSource(mysqld.getConfig, schema)
+    withChangeSet match {
+      case "db/001_init.sql" => aSelect[lang.Long](ds, sql = "select col1 from t1;") mustEqual 10
+      case "db/*.sql" => aSelect[lang.Long](ds, sql = "select col1 from t3;") mustEqual 30
     }
   }
 
@@ -42,7 +31,7 @@ class UsageExamplesTest extends SpecWithJUnit with AfterEach {
         .addSchema("aschema", classPathFile("db/001_init.sql"))
         .start
 
-      verifySchema("aschema", withScript = "db/001_init.sql")
+      verifySchema("aschema", withChangeSet = "db/001_init.sql")
     }
 
     "default configuration with custom version and a single schema provided via instance builder" in {
@@ -50,7 +39,7 @@ class UsageExamplesTest extends SpecWithJUnit with AfterEach {
         .addSchema("aschema", classPathFile("db/001_init.sql"))
         .start
 
-      verifySchema("aschema", withScript = "db/001_init.sql")
+      verifySchema("aschema", withChangeSet = "db/001_init.sql")
     }
 
     "MysqldConfig and a single schema provided via instance builder" in {
@@ -58,13 +47,13 @@ class UsageExamplesTest extends SpecWithJUnit with AfterEach {
         .withPort(1120)
         .withCharset(LATIN1)
         .withUser("someuser", "somepassword")
-        .build()
+        .build
 
       mysqld = anEmbeddedMysql(config)
-        .addSchema("aschema", classPathFile("db/001_init.sql"))
+        .addSchema("aschema", classPathFiles("db/*.sql"))
         .start
 
-      verifySchema("aschema", withScript = "db/001_init.sql")
+      verifySchema("aschema", withChangeSet = "db/*.sql")
     }
 
     "schema config" in {
@@ -76,24 +65,24 @@ class UsageExamplesTest extends SpecWithJUnit with AfterEach {
         .addSchema(schema)
         .start
 
-      verifySchema("aschema", withScript = "db/001_init.sql")
+      verifySchema("aschema", withChangeSet = "db/001_init.sql")
     }
 
     "multiple schemas" in {
       mysqld = anEmbeddedMysql(v5_5_40)
         .addSchema("aschema", classPathFile("db/001_init.sql"))
-        .addSchema("aschema2", classPathFile("db/001_init.sql"))
+        .addSchema("aschema2", classPathFiles("db/*.sql"))
         .start
 
-      verifySchema("aschema", withScript = "db/001_init.sql")
-      verifySchema("aschema2", withScript = "db/001_init.sql")
+      verifySchema("aschema", withChangeSet = "db/001_init.sql")
+      verifySchema("aschema2", withChangeSet = "db/*.sql")
     }
 
     "schema added after EmbeddedMysql start-up" in {
       mysqld = anEmbeddedMysql(v5_6_latest).start()
       mysqld.addSchema("aschema", classPathFile("db/001_init.sql"))
 
-      verifySchema("aschema", withScript = "db/001_init.sql")
+      verifySchema("aschema", withChangeSet = "db/001_init.sql")
     }
   }
 }

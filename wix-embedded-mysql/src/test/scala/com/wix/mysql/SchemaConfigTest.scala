@@ -5,7 +5,7 @@ import java.io.File
 import com.wix.mysql.config.{Charset, SchemaConfig}
 import org.specs2.mutable.SpecWithJUnit
 
-import scala.collection.convert.decorateAsScala._
+import scala.collection.convert.wrapAll._
 
 /**
  * @author viliusl
@@ -19,7 +19,7 @@ class SchemaConfigTest extends SpecWithJUnit {
 
       schemaConfig.getName mustEqual "aschema"
       schemaConfig.getCharset mustEqual Charset.defaults
-      schemaConfig.getScripts.asScala must beEmpty
+      schemaConfig.getScripts must beEmpty
     }
 
     "build with defaults" in {
@@ -27,7 +27,7 @@ class SchemaConfigTest extends SpecWithJUnit {
 
       schemaConfig.getName mustEqual "aschema"
       schemaConfig.getCharset mustEqual Charset.defaults
-      schemaConfig.getScripts.asScala must beEmpty
+      schemaConfig.getScripts must beEmpty
     }
 
     "build with custom charset" in {
@@ -44,10 +44,10 @@ class SchemaConfigTest extends SpecWithJUnit {
       val files = Seq(new File("/some"), new File("/some/other"))
 
       val schemaConfig = SchemaConfig.aSchemaConfig("aschema")
-        .withScripts(files:_*)
-        .build()
+        .withScripts(files)
+        .build
 
-      schemaConfig.getScripts.asScala mustEqual files
+      schemaConfig.getScripts.toSeq mustEqual files
     }
   }
 }

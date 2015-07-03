@@ -53,7 +53,11 @@ public class SchemaConfig {
         }
 
         public Builder withScripts(final File... scripts) {
-            this.scripts = Arrays.asList(scripts);
+            return withScripts(Arrays.asList(scripts));
+        }
+
+        public Builder withScripts(final List<File> scripts) {
+            this.scripts = scripts;
             return this;
         }
 

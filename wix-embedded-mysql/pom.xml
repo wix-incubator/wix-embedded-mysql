@@ -35,7 +35,6 @@
         <encoding>UTF-8</encoding>
 
         <flapdoodle.process.version>1.41.2</flapdoodle.process.version>
-        <c3p0.version>0.9.2-pre5</c3p0.version>
         <spring.jdbc.version>4.1.1.RELEASE</spring.jdbc.version>
         <mysql.connector.version>5.1.31</mysql.connector.version>
         <google.guava.version>16.0.1</google.guava.version>
@@ -43,7 +42,7 @@
         <logback.version>1.0.6</logback.version>
         <scala.library.version>2.11</scala.library.version>
         <scala.version>2.11.6</scala.version>
-        <specs2.version>3.6</specs2.version>
+        <specs2.version>3.6.2</specs2.version>
     </properties>
 
     <dependencies>
@@ -67,13 +66,6 @@
             <scope>test</scope>
         </dependency>
 
-        <!--<dependency>-->
-            <!--<groupId>com.mchange</groupId>-->
-            <!--<artifactId>c3p0</artifactId>-->
-            <!--<version>${c3p0.version}</version>-->
-            <!--<scope>test</scope>-->
-        <!--</dependency>-->
-
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-jdbc</artifactId>
@@ -85,6 +77,7 @@
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
             <version>${mysql.connector.version}</version>
+            <scope>test</scope>
         </dependency>
 
         <dependency>
