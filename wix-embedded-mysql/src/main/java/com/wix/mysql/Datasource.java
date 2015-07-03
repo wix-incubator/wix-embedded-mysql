@@ -15,7 +15,7 @@ import static java.lang.String.format;
 public class Datasource {
 
     //TODO: reuse, create a provider
-    public static DataSource with(final MysqldConfig config, final SchemaConfig schema) {
+    public static DataSource aDataSource(final MysqldConfig config, final SchemaConfig schema) {
         BasicDataSource dataSource = new BasicDataSource();
         dataSource.setDriverClassName("com.mysql.jdbc.Driver");
         dataSource.setUrl(getJdbcConnectionUrl(config, schema.getName()));
@@ -25,7 +25,7 @@ public class Datasource {
     }
 
     //TODO: reuse
-    public static DataSource with(final MysqldConfig config, final String schemaName) {
+    public static DataSource aDataSource(final MysqldConfig config, final String schemaName) {
         BasicDataSource dataSource = new BasicDataSource();
         dataSource.setDriverClassName("com.mysql.jdbc.Driver");
         dataSource.setUrl(getJdbcConnectionUrl(config, schemaName));

@@ -25,7 +25,7 @@ class UsageExamplesTest extends SpecWithJUnit {
     var mysqld: EmbeddedMysql = _
 
     def aSelect[T: ClassTag](onSchema: String, sql: String): T =
-      new JdbcTemplate(Datasource.`with`(mysqld.getConfig, SchemaConfig.Builder(onSchema).build))
+      new JdbcTemplate(Datasource.aDataSource(mysqld.getConfig, SchemaConfig.aSchemaConfig(onSchema).build))
         .queryForObject("select col1 from t1;", classTag[T].runtimeClass.asInstanceOf[Class[T]])
 
     def verifySchema(schema: String, withScript: String) = {
@@ -78,7 +78,7 @@ class UsageExamplesTest extends SpecWithJUnit {
 
     "schema config" in new Context {
       try {
-        val schema = SchemaConfig.Builder("aschema")
+        val schema = SchemaConfig.aSchemaConfig("aschema")
           .withScripts(classPathFile("db/001_init.sql"))
           .build
 

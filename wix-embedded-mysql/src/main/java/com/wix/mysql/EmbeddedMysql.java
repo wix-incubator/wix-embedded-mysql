@@ -50,13 +50,13 @@ public class EmbeddedMysql {
     }
 
     public EmbeddedMysql addSchema(final String schemaName, final File... scripts) {
-        return addSchema(SchemaConfig.Builder(schemaName).withScripts(scripts).build());
+        return addSchema(SchemaConfig.aSchemaConfig(schemaName).withScripts(scripts).build());
     }
 
     public EmbeddedMysql addSchema(final SchemaConfig schema) {
         getClient().executeCommands(
                 format("CREATE DATABASE %s CHARACTER SET = %s COLLATE = %s;",
-                        schema.getName(), config.getCharset().getCharset(), config.getCharset().getCollate()),
+                        schema.getName(), schema.getCharset().getCharset(), schema.getCharset().getCollate()),
                 format("GRANT ALL ON %s.* TO '%s'@'%%';", schema.getName(), config.getUsername()));
 
         getClient(schema.getName()).executeScripts(schema.getScripts());
@@ -88,7 +88,7 @@ public class EmbeddedMysql {
         }
 
         public Builder addSchema(final String name, final File... scripts) {
-            this.schemas.add(SchemaConfig.Builder(name).withScripts(scripts).build());
+            this.schemas.add(SchemaConfig.aSchemaConfig(name).withScripts(scripts).build());
             return this;
         }
 

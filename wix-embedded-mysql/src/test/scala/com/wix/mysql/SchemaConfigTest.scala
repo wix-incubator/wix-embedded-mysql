@@ -23,7 +23,7 @@ class SchemaConfigTest extends SpecWithJUnit {
     }
 
     "build with defaults" in {
-      val schemaConfig = SchemaConfig.Builder("aschema").build
+      val schemaConfig = SchemaConfig.aSchemaConfig("aschema").build
 
       schemaConfig.getName mustEqual "aschema"
       schemaConfig.getCharset mustEqual Charset.defaults
@@ -33,7 +33,7 @@ class SchemaConfigTest extends SpecWithJUnit {
     "build with custom charset" in {
       val charset = Charset.aCharset("charset", "collate")
 
-      val schemaConfig = SchemaConfig.Builder("aschema")
+      val schemaConfig = SchemaConfig.aSchemaConfig("aschema")
         .withCharset(charset)
         .build
 
@@ -43,7 +43,7 @@ class SchemaConfigTest extends SpecWithJUnit {
     "build with Files" in {
       val files = Seq(new File("/some"), new File("/some/other"))
 
-      val schemaConfig = SchemaConfig.Builder("aschema")
+      val schemaConfig = SchemaConfig.aSchemaConfig("aschema")
         .withScripts(files:_*)
         .build()
 
