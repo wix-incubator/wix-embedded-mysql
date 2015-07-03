@@ -5,7 +5,7 @@ import java.lang
 import com.wix.mysql.EmbeddedMysql.anEmbeddedMysql
 import com.wix.mysql.ScriptResolver.{classPathFile, classPathFiles}
 import com.wix.mysql.config.Charset.LATIN1
-import com.wix.mysql.config.{SchemaConfig, MysqldConfig}
+import com.wix.mysql.config.MysqldConfig
 import com.wix.mysql.config.MysqldConfig.aMysqldConfig
 import com.wix.mysql.config.SchemaConfig.aSchemaConfig
 import com.wix.mysql.distribution.Version._
@@ -27,7 +27,7 @@ class UsageExamplesTest extends IntegrationTest {
   "EmbeddedMysql can be run with " >> {
 
     "default configuration and a single schema provided via instance builder" in {
-      val mysqld = anEmbeddedMysql(v5_6_latest)
+      mysqld = anEmbeddedMysql(v5_6_latest)
         .addSchema("aschema", classPathFile("db/001_init.sql"))
         .start
 
@@ -43,23 +43,15 @@ class UsageExamplesTest extends IntegrationTest {
     }
 
     "MysqldConfig and a single schema provided via instance builder" in {
-    val config: MysqldConfig = aMysqldConfig(v5_6_latest)
-      .withPort(1120)
-      .withCharset(LATIN1)
-      .withUser("someuser", "somepassword")
-      .build
+      val config = aMysqldConfig(v5_6_latest)
+        .withPort(1120)
+        .withCharset(LATIN1)
+        .withUser("someuser", "somepassword")
+        .build
 
-    val schema: SchemaConfig = aSchemaConfig("aschema")
-      .withScripts(classPathFile("db/001_init.sql"))
-      .build
-
-    val mysqld: EmbeddedMysql = anEmbeddedMysql(config)
-      .addSchema("aschema", classPathFiles("db/*.sql"))
-      .start
-
-    // do stuff
-
-    mysqld.stop
+      mysqld = anEmbeddedMysql(config)
+        .addSchema("aschema", classPathFiles("db/*.sql"))
+        .start
 
       verifySchema("aschema", withChangeSet = "db/*.sql")
     }
