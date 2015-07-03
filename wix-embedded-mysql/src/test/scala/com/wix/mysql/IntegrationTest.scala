@@ -9,6 +9,7 @@ import ch.qos.logback.core.read.ListAppender
 import com.wix.mysql.config.MysqldConfig
 import org.apache.commons.dbcp2.BasicDataSource
 import org.slf4j.LoggerFactory
+import org.slf4j.LoggerFactory.getLogger
 import org.specs2.mutable.SpecWithJUnit
 import org.specs2.specification.AfterEach
 import org.springframework.jdbc.core.JdbcTemplate
@@ -24,7 +25,7 @@ class IntegrationTest extends SpecWithJUnit with AfterEach {
   sequential
 
   var mysqld: EmbeddedMysql = _
-  val log = LoggerFactory.getLogger(this.getClass)
+  val log = getLogger(this.getClass)
 
   override protected def after: Any = if (mysqld != null) mysqld.stop()
 

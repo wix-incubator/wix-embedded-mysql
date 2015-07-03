@@ -2,6 +2,8 @@ package com.wix.mysql
 
 import java.io.File
 
+import com.wix.mysql.config.Charset.aCharset
+import com.wix.mysql.config.SchemaConfig.aSchemaConfig
 import com.wix.mysql.config.{Charset, SchemaConfig}
 import org.specs2.mutable.SpecWithJUnit
 
@@ -15,7 +17,7 @@ class SchemaConfigTest extends SpecWithJUnit {
 
   "SchemaConfig" should {
     "build with defaults" in {
-      val schemaConfig = SchemaConfig.aSchemaConfig("aschema").build
+      val schemaConfig = aSchemaConfig("aschema").build
 
       schemaConfig.getName mustEqual "aschema"
       schemaConfig.getCharset mustEqual Charset.defaults
@@ -23,9 +25,9 @@ class SchemaConfigTest extends SpecWithJUnit {
     }
 
     "build with custom charset" in {
-      val charset = Charset.aCharset("charset", "collate")
+      val charset = aCharset("charset", "collate")
 
-      val schemaConfig = SchemaConfig.aSchemaConfig("aschema")
+      val schemaConfig = aSchemaConfig("aschema")
         .withCharset(charset)
         .build
 
@@ -35,7 +37,7 @@ class SchemaConfigTest extends SpecWithJUnit {
     "build with Files" in {
       val files = Seq(new File("/some"), new File("/some/other"))
 
-      val schemaConfig = SchemaConfig.aSchemaConfig("aschema")
+      val schemaConfig = aSchemaConfig("aschema")
         .withScripts(files)
         .build
 

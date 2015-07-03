@@ -2,7 +2,7 @@ package com.wix.mysql
 
 import com.wix.mysql.EmbeddedMysql._
 import com.wix.mysql.config.Charset
-import com.wix.mysql.config.Charset.{LATIN1, UTF8MB4}
+import com.wix.mysql.config.Charset.{aCharset, LATIN1, UTF8MB4}
 import com.wix.mysql.config.MysqldConfig.aMysqldConfig
 import com.wix.mysql.config.SchemaConfig.aSchemaConfig
 import com.wix.mysql.distribution.Version.v5_6_latest
@@ -67,14 +67,14 @@ class EmbeddedMysqlTest extends IntegrationTest {
 
   def serverCharset = {
     val ds = aDataSource(mysqld.getConfig, "information_schema")
-    Charset.aCharset(
+    aCharset(
       aSelect[String](ds, sql = "SELECT variable_value FROM information_schema.global_variables WHERE variable_name = 'character_set_server';"),
       aSelect[String](ds, sql = "SELECT variable_value FROM information_schema.global_variables WHERE variable_name = 'collation_server';"))
   }
 
   def schemaCharset(schema: String) = {
     val ds = aDataSource(mysqld.getConfig, schema)
-    Charset.aCharset(
+    aCharset(
       aSelect[String](ds, sql = s"SELECT default_character_set_name FROM information_schema.SCHEMATA where SCHEMA_NAME = '$schema';"),
       aSelect[String](ds, sql = s"SELECT DEFAULT_COLLATION_NAME FROM information_schema.SCHEMATA where SCHEMA_NAME = '$schema';"))
   }
