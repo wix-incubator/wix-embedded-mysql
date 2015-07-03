@@ -17,7 +17,7 @@ import java.util.Scanner;
 import static java.lang.String.format;
 
 /**
- * Helper for locating schema init scripts in a classpath
+ * Helper for locating schema init scripts in a classpath.
  *
  * @author viliusl
  * @since 06/06/15

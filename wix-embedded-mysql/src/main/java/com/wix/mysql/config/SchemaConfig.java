@@ -25,10 +25,6 @@ public class SchemaConfig {
         this.scripts = scripts;
     }
 
-    public static SchemaConfig defaults(final String name) {
-        return new Builder(name).build();
-    }
-
     public static Builder aSchemaConfig(final String name) {
         return new Builder(name);
     }

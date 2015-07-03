@@ -37,7 +37,6 @@ public class MysqldConfig extends ExecutableProcessConfig {
     public Charset getCharset() { return charset; }
     public int getPort() { return port; }
     public int getTimeout() { return 60000; }
-
     public String getUsername() { return user.name; }
     public String getPassword() { return user.password; }
 
@@ -58,7 +57,7 @@ public class MysqldConfig extends ExecutableProcessConfig {
         public MysqldConfig build() { return new MysqldConfig(version, port, charset, user); }
     }
 
-    public static class User {
+    protected static class User {
         private final String name;
         private final String password;
 
