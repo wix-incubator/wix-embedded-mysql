@@ -107,6 +107,13 @@
             <scope>test</scope>
         </dependency>
 
+        <dependency>
+            <groupId>org.specs2</groupId>
+            <artifactId>specs2-matcher-extra_${scala.library.version}</artifactId>
+            <version>${specs2.version}</version>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 
     <build>
