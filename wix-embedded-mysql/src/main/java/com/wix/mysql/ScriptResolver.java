@@ -18,6 +18,7 @@ import static java.lang.String.format;
 
 /**
  * Helper for locating schema init scripts in a classpath.
+ * TODO: replace impl with some library - guava or smth.
  *
  * @author viliusl
  * @since 06/06/15
