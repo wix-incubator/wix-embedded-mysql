@@ -3,7 +3,7 @@
 
     <groupId>com.wixpress.mysql</groupId>
     <artifactId>wix-embedded-mysql-parent</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.1.0-SNAPSHOT</version>
     <name>Wix Embedded MySql - parent</name>
     <packaging>pom</packaging>
     <description>Embedded MySql for testing purposes</description>

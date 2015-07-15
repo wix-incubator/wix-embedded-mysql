@@ -21,7 +21,7 @@ import static java.lang.String.format;
  * @author viliusl
  * @since 27/09/14
  */
-public class MysqldExecutable extends Executable<MysqldConfig, MysqldProcess> {
+class MysqldExecutable extends Executable<MysqldConfig, MysqldProcess> {
 
     private final IExtractedFileSet executable;
 
