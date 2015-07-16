@@ -12,16 +12,10 @@
         <developer>
             <name>Noam Almog</name>
             <email>noama@wix.com</email>
-            <roles>
-                <role>owner</role>
-            </roles>
         </developer>
         <developer>
             <name>Vilius Lukosius</name>
             <email>vilius@wix.com</email>
-            <roles>
-                <role>developer</role>
-            </roles>
         </developer>
     </developers>
 
@@ -55,4 +49,8 @@
             <url>http://dl.bintray.com/scalaz/releases/</url>
         </repository>
     </repositories>
+
+    <scm>
+        <developerConnection>scm:git:https://github.com/wix/wix-embedded-mysql</developerConnection>
+    </scm>
 </project>
