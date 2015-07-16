@@ -57,7 +57,7 @@ public class MysqldConfig extends ExecutableProcessConfig {
         public MysqldConfig build() { return new MysqldConfig(version, port, charset, user); }
     }
 
-    protected static class User {
+    public static class User {
         private final String name;
         private final String password;
 
