@@ -27,12 +27,13 @@ import java.util.Set;
 
 import static com.wix.mysql.utils.Utils.closeCloseables;
 import static de.flapdoodle.embed.process.distribution.Platform.Windows;
+import static java.lang.String.format;
 
 /**
  * @author viliusl
  * @since 27/09/14
  */
-public class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutable, MysqldProcess> {
+class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutable, MysqldProcess> {
 
     private final static Logger logger = LoggerFactory.getLogger(MysqldProcess.class);
 
@@ -69,9 +70,6 @@ public class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutabl
             if (!logWatch.isInitWithSuccess()) {
                 throw new RuntimeException("mysql start failed with error: " + logWatch.getFailureFound());
             }
-
-            new MysqlConfigurer(getConfig(), getExecutable()).configure();
-
         } catch (Exception e) {
             // emit IO exception for {@link AbstractProcess} would try to stop running process gracefully
             throw new IOException(e);
@@ -91,13 +89,15 @@ public class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutabl
                 "--skip-name-resolve",
                 "--log-output=NONE",
                 "--skip-name-resolve",
-                String.format("--basedir=%s", baseDir),
-                String.format("--datadir=%s/data", baseDir),
-                String.format("--plugin-dir=%s/lib/plugin", baseDir),
-                String.format("--socket=%s", sockFile(exe)),
-                String.format("--lc-messages-dir=%s/share", baseDir),
-                String.format("--port=%s", config.getPort()),
-                String.format("--log-error=%s/data/error.log", baseDir));
+                format("--basedir=%s", baseDir),
+                format("--datadir=%s/data", baseDir),
+                format("--plugin-dir=%s/lib/plugin", baseDir),
+                format("--socket=%s", sockFile(exe)),
+                format("--lc-messages-dir=%s/share", baseDir),
+                format("--port=%s", config.getPort()),
+                format("--log-error=%s/data/error.log", baseDir),
+                format("--character-set-server=%s", config.getCharset().getCharset()),
+                format("--collation-server=%s", config.getCharset().getCollate()));
     }
 
     @Override
@@ -143,8 +143,8 @@ public class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutabl
 
             Process p = Runtime.getRuntime().exec(new String[] {
                     cmd, "--no-defaults", "--protocol=tcp",
-                    String.format("-u%s", MysqldConfig.SystemDefaults.USERNAME),
-                    String.format("--port=%s", getConfig().getPort()),
+                    format("-u%s", MysqldConfig.SystemDefaults.USERNAME),
+                    format("--port=%s", getConfig().getPort()),
                     "shutdown"});
 
             retValue = p.waitFor() == 0;
@@ -177,9 +177,7 @@ public class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutabl
                 }
             }
 
-        } catch (InterruptedException e) {
-            logger.warn("Encountered error why shutting down process.", e);
-        } catch (IOException e) {
+        } catch (InterruptedException | IOException e) {
             logger.warn("Encountered error why shutting down process.", e);
         } finally {
             closeCloseables(stdOut, stdErr);
@@ -220,19 +218,19 @@ public class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutabl
     }
 
     /**
-     * Helper for getting stable sock file. Saving to local instance variable on service start does not work due
+     * Helper for getting stable sock classPathFile. Saving to local instance variable on service start does not work due
      * to the way flapdoodle process library works - it does all init in {@link AbstractProcess} and instance of
      * {@link MysqldProcess} is not yet present, so vars are not initialized.
-     * This algo gives stable sock file based on single apply profile, but can leave trash sock files in tmp dir.
+     * This algo gives stable sock classPathFile based on single executeCommands profile, but can leave trash sock classPathFiles in tmp dir.
      *
      * Notes:
-     * .sock file needs to be in system temp dir and not in ex. target/...
+     * .sock classPathFile needs to be in system temp dir and not in ex. target/...
      * This is due to possible problems with existing mysql installation and apparmor profiles
      * in linuxes.
      */
     private String sockFile(IExtractedFileSet exe) throws IOException {
         String sysTempDir = System.getProperty("java.io.tmpdir");
-        String sockFile = String.format("%s.sock", exe.generatedBaseDir().getName());
+        String sockFile = format("%s.sock", exe.generatedBaseDir().getName());
         return new File(sysTempDir, sockFile).getAbsolutePath();
     }
 }

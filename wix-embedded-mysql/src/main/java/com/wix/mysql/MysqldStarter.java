@@ -11,7 +11,7 @@ import de.flapdoodle.embed.process.runtime.Starter;
  * @author viliusl
  * @since 27/09/14
  */
-public class MysqldStarter extends Starter<MysqldConfig, MysqldExecutable, MysqldProcess>{
+class MysqldStarter extends Starter<MysqldConfig, MysqldExecutable, MysqldProcess>{
 
     public MysqldStarter(final IRuntimeConfig config) {
         super(config);
