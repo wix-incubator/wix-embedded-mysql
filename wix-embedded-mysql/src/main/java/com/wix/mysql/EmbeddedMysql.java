@@ -42,15 +42,12 @@ public class EmbeddedMysql {
 
     public MysqldConfig getConfig() { return this.config; }
 
-    private MysqlClient getClient(final String schemaName) {
-        return new MysqlClient(config, executable, schemaName);
-    }
+    //TODO: remove, and introduce 'public reloadSchema(schemaConfig) + reloadSchema(name, File...)'
+//    public EmbeddedMysql addSchema(final String schemaName, final File... scripts) {
+//        return addSchema(SchemaConfig.aSchemaConfig(schemaName).withScripts(scripts).build());
+//    }
 
-    public EmbeddedMysql addSchema(final String schemaName, final File... scripts) {
-        return addSchema(SchemaConfig.aSchemaConfig(schemaName).withScripts(scripts).build());
-    }
-
-    public EmbeddedMysql addSchema(final SchemaConfig schema) {
+    private EmbeddedMysql addSchema(final SchemaConfig schema) {
         getClient(SCHEMA).executeCommands(
                 format("CREATE DATABASE %s CHARACTER SET = %s COLLATE = %s;",
                         schema.getName(), schema.getCharset().getCharset(), schema.getCharset().getCollate()),
@@ -67,6 +64,11 @@ public class EmbeddedMysql {
             executable.stop();
         }
     }
+
+    private MysqlClient getClient(final String schemaName) {
+        return new MysqlClient(config, executable, schemaName);
+    }
+
 
     public static Builder anEmbeddedMysql(final Version version) {
         return new Builder(MysqldConfig.aMysqldConfig(version).build());

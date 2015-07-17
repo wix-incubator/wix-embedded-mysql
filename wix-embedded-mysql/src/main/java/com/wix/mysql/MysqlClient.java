@@ -37,12 +37,6 @@ class MysqlClient {
         }
     }
 
-    public void executeScripts(final File... files) {
-        for (File file: files) {
-            execute(format("source %s", file.getAbsolutePath()));
-        }
-    }
-
     public void executeCommands(final String... sqls) {
         for (String sql: sqls) {
             execute(sql);

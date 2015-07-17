@@ -77,11 +77,8 @@ class UsageExamplesTest extends IntegrationTest {
       verifySchema("aschema2", withChangeSet = "db/*.sql")
     }
 
-    "schema added after EmbeddedMysql start-up" in {
-      mysqld = anEmbeddedMysql(v5_6_latest).start()
-      mysqld.addSchema("aschema", classPathFile("db/001_init.sql"))
-
-      verifySchema("aschema", withChangeSet = "db/001_init.sql")
+    "reload schema for a running instance" in {
+      todo
     }
   }
 }
