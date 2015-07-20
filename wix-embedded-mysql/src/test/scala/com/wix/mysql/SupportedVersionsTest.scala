@@ -3,6 +3,7 @@ package com.wix.mysql
 import com.wix.mysql.EmbeddedMysql.anEmbeddedMysql
 import com.wix.mysql.config.MysqldConfig.aMysqldConfig
 import com.wix.mysql.distribution.Version
+import com.wix.mysql.support.IntegrationTest
 import org.specs2.matcher.Scope
 import org.specs2.specification.core.Fragment
 
@@ -25,7 +26,8 @@ class SupportedVersionsTest extends IntegrationTest {
         .addSchema("aschema")
         .start
 
-      validateConnection(config, "aschema")
+      mysqld must beAvailableOn(config, "aSchema")
+
       log must not(contain("Something bad happened."))
     }
   }

@@ -3,6 +3,7 @@ package com.wix.mysql
 import com.wix.mysql.EmbeddedMysql.anEmbeddedMysql
 import com.wix.mysql.distribution.Version.v5_6_latest
 import com.wix.mysql.exceptions.CommandFailedException
+import com.wix.mysql.support.IntegrationTest
 
 /**
  * @author viliusl

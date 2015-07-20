@@ -8,6 +8,7 @@ import com.wix.mysql.config.Charset.LATIN1
 import com.wix.mysql.config.MysqldConfig.aMysqldConfig
 import com.wix.mysql.config.SchemaConfig.aSchemaConfig
 import com.wix.mysql.distribution.Version._
+import com.wix.mysql.support.IntegrationTest
 
 /**
  * @author viliusl

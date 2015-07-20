@@ -1,4 +1,4 @@
-package com.wix.mysql
+package com.wix.mysql.support
 
 import javax.sql.DataSource
 
@@ -6,6 +6,7 @@ import ch.qos.logback.classic.Level.INFO
 import ch.qos.logback.classic.spi.ILoggingEvent
 import ch.qos.logback.classic.{Logger, LoggerContext}
 import ch.qos.logback.core.read.ListAppender
+import com.wix.mysql.EmbeddedMysql
 import com.wix.mysql.config.MysqldConfig
 import org.apache.commons.dbcp2.BasicDataSource
 import org.slf4j.LoggerFactory
@@ -21,13 +22,13 @@ import scala.reflect._
  * @author viliusl
  * @since 27/03/15
  */
-class IntegrationTest extends SpecWithJUnit with AfterEach {
+class IntegrationTest extends SpecWithJUnit with AfterEach with InstanceMatchers {
   sequential
 
   var mysqld: EmbeddedMysql = _
   val log = getLogger(this.getClass)
 
-  override protected def after: Any = if (mysqld != null) mysqld.stop()
+  def after: Any = if (mysqld != null) mysqld.stop()
 
   def validateConnection(config: MysqldConfig, schema: String) =
     new JdbcTemplate(aDataSource(config, schema))
