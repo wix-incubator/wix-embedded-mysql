@@ -22,58 +22,73 @@ Add dependency to your pom.xml:
 ```
 
 ## Examples
-Api supports simplified building of environment and schemas
 
-```scala
-import com.wix.mysql.EmbeddedMysql.anEmbeddedMysql
-import com.wix.mysql.ScriptResolver.classPathFile
-import com.wix.mysql.distribution.Version.v5_6_latest
+You can start and embedded mysql with defaults and a single schema
 
-val mysqld = anEmbeddedMysql(v5_6_latest)
-    .addSchema("aschema", classPathFile("db/001_init.sql"))
-    .start
+```java
+    EmbeddedMysql mysqld = anEmbeddedMysql(v5_6_latest)
+        .addSchema("aschema", classPathFile("db/001_init.sql"))
+        .start();
 
-//do stuff
-      
-mysqld.stop // you do not have to explicitly stop mysql as it registers to a shutdown hook for that. 
+    //do work
+
+    mysqld.stop(); //optional, as there is a shutdown hook
 ```
 
-Or builders in case you need more control of instance you are running and schemas you are creating
+If you need more control in configuring embeded mysql instance, you can use MysqlConfig builder 
 
-```scala
-import com.wix.mysql.EmbeddedMysql.anEmbeddedMysql
-import com.wix.mysql.ScriptResolver.classPathFiles
-import com.wix.mysql.config.Charset.LATIN1
-import com.wix.mysql.config.{SchemaConfig, MysqldConfig}
-import com.wix.mysql.config.MysqldConfig.aMysqldConfig
-import com.wix.mysql.config.SchemaConfig.aSchemaConfig
-import com.wix.mysql.distribution.Version.v5_6_latest
+```java
+    MysqldConfig config = aMysqldConfig(v5_6_23)
+        .withCharset(UTF8)
+        .withPort(2215)
+        .withUser("differentUser", "anotherPasword")
+        .build();
 
-val config: MysqldConfig = aMysqldConfig(v5_6_latest)
-  .withPort(1120)
-  .withCharset(LATIN1)
-  .withUser("someuser", "somepassword")
-  .build
+    EmbeddedMysql mysqld = anEmbeddedMysql(config)
+        .addSchema("aschema", classPathFile("db/001_init.sql"))
+        .addSchema("aschema2", classPathFiles("db/*.sql"))
+        .start();
 
-val schema: SchemaConfig = aSchemaConfig("aschema")
-  .withScripts(classPathFiles("db/*.sql"))
-  .build
+    //do work
 
-val mysqld: EmbeddedMysql = anEmbeddedMysql(config)
-  .addSchema(schema)
-  .start
-
-// do stuff
-
-mysqld.stop
-
+    mysqld.stop(); //optional, as there is a shutdown hook
 ```
 
-Additionally you can reset your schemas between tests
+EmbeddedMysql supports multiple schemas and additional configuration options provided via SchemaConfig builder
 
-```scala
-TBD
+```java
+    SchemaConfig schema = aSchemaConfig("aSchema")
+        .withScripts(classPathFile("db/001_init.sql"))
+        .withCharset(LATIN1)
+        .build();
+
+    EmbeddedMysql mysqld = anEmbeddedMysql(v5_6_latest)
+        .addSchema(schema)
+        .addSchema("aschema2", classPathFiles("db/*.sql"))
+        .start();
+
+    //do work
+
+    mysqld.stop(); //optional, as there is a shutdown hook
 ```
+
+EmbeddedMysql is intended to be started once per test-suite, but you can reset schema in between tests which recreates database and applies provided migrations
+
+```java
+    EmbeddedMysql mysqld = anEmbeddedMysql(v5_6_latest)
+        .addSchema("aschema", classPathFile("db/001_init.sql"))
+        .start();
+
+    //do work
+
+    mysqld.reloadSchema("aschema", classPathFile("db/001_init.sql"));
+
+    //continue on doing work
+
+    mysqld.stop(); //optional, as there is a shutdown hook
+```
+
+Source for examples can be found [here](https://github.com/wix/wix-embedded-mysql/blob/master/wix-embedded-mysql/src/test/scala/com/wix/mysql/JavaUsageExamplesTest.java)
 
 # Dependencies
 Build on top of embed Process Util [de.flapdoodle.embed.process](https://github.com/flapdoodle-oss/de.flapdoodle.embed.process)
