@@ -1,18 +1,15 @@
 package com.wix.mysql;
 
 import com.google.common.base.Joiner;
-import com.google.common.collect.Lists;
 import org.apache.commons.io.filefilter.WildcardFileFilter;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Scanner;
 
 import static java.lang.String.format;
 
@@ -43,7 +40,7 @@ public class ScriptResolver {
      *
      * Note: Supports only wildcards ('*') and only in file names for matching.
      */
-    public static List<File> classPathFiles(final String pattern) throws URISyntaxException {
+    public static List<File> classPathFiles(final String pattern) {
         List<File> results;
 
         String[] parts = pattern.split("/");
