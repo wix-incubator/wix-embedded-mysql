@@ -71,6 +71,7 @@ public class JavaUsageExamplesTest {
 
         EmbeddedMysql mysqld = anEmbeddedMysql(v5_6_latest)
             .addSchema(schema)
+            .addSchema("aschema2", classPathFiles("db/*.sql"))
             .start();
 
         //do work

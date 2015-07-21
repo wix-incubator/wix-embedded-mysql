@@ -26,7 +26,7 @@ class SupportedVersionsTest extends IntegrationTest {
         .addSchema("aschema")
         .start
 
-      mysqld must beAvailableOn(config, "aSchema")
+      mysqld must beAvailableOn(config, "aschema")
 
       log must not(contain("Something bad happened."))
     }
