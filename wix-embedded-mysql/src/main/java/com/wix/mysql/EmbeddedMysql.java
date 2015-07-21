@@ -2,6 +2,7 @@ package com.wix.mysql;
 
 import com.google.common.collect.Lists;
 import com.wix.mysql.config.MysqldConfig;
+import com.wix.mysql.config.MysqldConfig.SystemDefaults;
 import com.wix.mysql.config.RuntimeConfigBuilder;
 import com.wix.mysql.config.SchemaConfig;
 import com.wix.mysql.distribution.Version;
@@ -10,6 +11,7 @@ import de.flapdoodle.embed.process.distribution.Distribution;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -42,13 +44,21 @@ public class EmbeddedMysql {
 
     public MysqldConfig getConfig() { return this.config; }
 
-    //TODO: remove, and introduce 'public reloadSchema(schemaConfig) + reloadSchema(name, File...)'
-//    public EmbeddedMysql addSchema(final String schemaName, final File... scripts) {
-//        return addSchema(SchemaConfig.aSchemaConfig(schemaName).withScripts(scripts).build());
-//    }
+    public void reloadSchema(final String schemaName, final File... scripts) {
+        reloadSchema(SchemaConfig.aSchemaConfig(schemaName).withScripts(scripts).build());
+    }
+
+    public void reloadSchema(final String schemaName, final List<File> scripts) {
+        reloadSchema(SchemaConfig.aSchemaConfig(schemaName).withScripts(scripts).build());
+    }
+
+    public void reloadSchema(final SchemaConfig config) {
+        getClient(SystemDefaults.SCHEMA).executeCommands(format("DROP DATABASE %s", config.getName()));
+        addSchema(config);
+    }
 
     private EmbeddedMysql addSchema(final SchemaConfig schema) {
-        getClient(SCHEMA).executeCommands(
+        getClient(SystemDefaults.SCHEMA).executeCommands(
                 format("CREATE DATABASE %s CHARACTER SET = %s COLLATE = %s;",
                         schema.getName(), schema.getCharset().getCharset(), schema.getCharset().getCollate()),
                 format("GRANT ALL ON %s.* TO '%s'@'%%';", schema.getName(), config.getUsername()));

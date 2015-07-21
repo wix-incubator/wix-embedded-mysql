@@ -34,14 +34,6 @@ class UsageExamplesTest extends IntegrationTest {
       verifySchema("aschema", withChangeSet = "db/001_init.sql")
     }
 
-    "default configuration with custom version and a single schema provided via instance builder" in {
-      mysqld = anEmbeddedMysql(v5_5_40)
-        .addSchema("aschema", classPathFile("db/001_init.sql"))
-        .start
-
-      verifySchema("aschema", withChangeSet = "db/001_init.sql")
-    }
-
     "MysqldConfig and a single schema provided via instance builder" in {
       val config = aMysqldConfig(v5_6_latest)
         .withPort(1120)
@@ -79,7 +71,15 @@ class UsageExamplesTest extends IntegrationTest {
     }
 
     "reload schema for a running instance" in {
-      todo
+      mysqld = anEmbeddedMysql(v5_6_latest)
+        .addSchema("aschema", classPathFile("db/001_init.sql"))
+        .start
+
+      verifySchema("aschema", withChangeSet = "db/001_init.sql")
+
+      mysqld.reloadSchema("aschema", classPathFiles("db/*.sql"))
+
+      verifySchema("aschema", withChangeSet = "db/*.sql")
     }
   }
 }
