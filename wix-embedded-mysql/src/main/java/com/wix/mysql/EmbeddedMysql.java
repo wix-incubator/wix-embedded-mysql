@@ -11,7 +11,6 @@ import de.flapdoodle.embed.process.distribution.Distribution;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -25,7 +24,6 @@ import static java.lang.String.format;
 public class EmbeddedMysql {
     protected final MysqldConfig config;
     protected final MysqldExecutable executable;
-    protected final MysqldProcess process;
     private AtomicBoolean isRunning = new AtomicBoolean(true);
 
     protected EmbeddedMysql(final MysqldConfig config) {
@@ -34,7 +32,7 @@ public class EmbeddedMysql {
         this.executable = new MysqldStarter(runtimeConfig).prepare(config);
 
         try {
-            this.process = executable.start(Distribution.detectFor(config.getVersion()), config, runtimeConfig);
+            executable.start();
             getClient(SCHEMA).executeCommands(
                     format("CREATE USER '%s'@'%%' IDENTIFIED BY '%s';", config.getUsername(), config.getPassword()));
         } catch (IOException e) {
@@ -70,7 +68,6 @@ public class EmbeddedMysql {
 
     public synchronized void stop() {
         if (isRunning.getAndSet(false)) {
-            process.stop();
             executable.stop();
         }
     }
