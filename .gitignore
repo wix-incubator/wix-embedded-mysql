@@ -6,6 +6,4 @@ target/
 .idea
 dependency-reduced-pom.xml
 
-platform-tests/cookbooks/custom/embed-mysql/files/default/wix-embedded-mysql
-.vagrant
 .DS_Store
