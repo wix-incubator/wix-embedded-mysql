@@ -88,7 +88,7 @@ EmbeddedMysql is intended to be started once per test-suite, but you can reset s
     mysqld.stop(); //optional, as there is a shutdown hook
 ```
 
-Source for examples can be found [here](https://github.com/wix/wix-embedded-mysql/blob/master/wix-embedded-mysql/src/test/scala/com/wix/mysql/JavaUsageExamplesTest.java)
+Source for examples can be found [here](https://github.com/wix/wix-embedded-mysql/blob/master/src/test/scala/com/wix/mysql/JavaUsageExamplesTest.java)
 
 # Dependencies
 Build on top of embed Process Util [de.flapdoodle.embed.process](https://github.com/flapdoodle-oss/de.flapdoodle.embed.process)
