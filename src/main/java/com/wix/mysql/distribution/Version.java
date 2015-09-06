@@ -98,4 +98,8 @@ public enum Version implements IVersion {
                     Joiner.on(",").join(supportedPlatforms)));
         }
     }
+
+    public String getMajorVersion() {
+        return majorVersion;
+    }
 }
