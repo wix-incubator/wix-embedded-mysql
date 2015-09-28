@@ -52,9 +52,7 @@ class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutable, Mysq
     protected void onBeforeProcessStart(ProcessBuilder processBuilder, MysqldConfig config, IRuntimeConfig runtimeConfig) {
         super.onBeforeProcessStart(processBuilder, config, runtimeConfig);
 
-        logWatch = new OutputWatchStreamProcessor(
-                Sets.newHashSet("ready for connections"),
-                Sets.newHashSet("[ERROR]"),
+        logWatch = new OutputWatchStreamProcessor(Sets.newHashSet("ready for connections"), "[ERROR]",
                 StreamToLineProcessor.wrap(runtimeConfig.getProcessOutput().getOutput()));
 
         logFile = new LogFileProcessor(
@@ -63,11 +61,17 @@ class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutable, Mysq
     }
 
     @Override
+    protected void onAfterProcessStop(MysqldConfig config, IRuntimeConfig runtimeConfig) {
+        super.onAfterProcessStop(config, runtimeConfig);
+    }
+
+    @Override
     public void onAfterProcessStart(final ProcessControl process, final IRuntimeConfig runtimeConfig) throws IOException {
         try {
             logWatch.waitForResult(getConfig().getTimeout());
 
             if (!logWatch.isInitWithSuccess()) {
+                logger.error("Init failed with log: " + logWatch.collectedLog());
                 throw new RuntimeException("mysql start failed with error: " + logWatch.getFailureFound());
             }
         } catch (Exception e) {
@@ -149,9 +153,7 @@ class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutable, Mysq
 
             retValue = p.waitFor() == 0;
 
-            OutputWatchStreamProcessor outputWatch = new OutputWatchStreamProcessor(
-                    successPatterns,
-                    Sets.newHashSet("[ERROR]"),
+            OutputWatchStreamProcessor outputWatch = new OutputWatchStreamProcessor(successPatterns, "[ERROR]",
                     StreamToLineProcessor.wrap(getRuntimeConfig().getProcessOutput().getOutput()));
 
             processor = new LogFileProcessor(new File(this.getExecutable().getBaseDir() + "/data/error.log"), outputWatch);

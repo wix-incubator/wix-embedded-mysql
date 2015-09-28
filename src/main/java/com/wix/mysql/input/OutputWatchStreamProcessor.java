@@ -1,9 +1,11 @@
 package com.wix.mysql.input;
 
-import com.google.common.collect.Sets;
+import com.google.common.base.Joiner;
 import de.flapdoodle.embed.process.io.IStreamProcessor;
 
 import java.util.Set;
+
+import static java.lang.String.format;
 
 /**
  * @author viliusl
@@ -12,22 +14,22 @@ import java.util.Set;
 public class OutputWatchStreamProcessor implements IStreamProcessor {
 
     private final StringBuilder output = new StringBuilder();
-    private final Set<String> successes;
-    private final Set<String> failures;
+    private final Set<String> successSignals;
+    private final String failureSignal;
 
     private boolean initWithSuccess = false;
     private String failureFound = null;
 
     private final IStreamProcessor destination;
 
-    public OutputWatchStreamProcessor(Set<String> successes, Set<String> failures, IStreamProcessor destination) {
-        this.successes = successes;
-        this.failures = Sets.newHashSet(failures);
+    public OutputWatchStreamProcessor(Set<String> success, String failure, IStreamProcessor destination) {
+        this.successSignals = success;
+        this.failureSignal = failure;
         this.destination = destination;
     }
 
     public boolean isSuccess(String output) {
-        for (String success: successes) {
+        for (String success : successSignals) {
             if (output.contains(success))
                 return true;
         }
@@ -42,25 +44,25 @@ public class OutputWatchStreamProcessor implements IStreamProcessor {
         output.append(block);
 
         if (isSuccess(block)) {
-            gotResult(true,null);
+            gotResult(true, null);
         } else {
-            for (String failure : failures) {
-                int failureIndex = output.indexOf(failure);
-                if (failureIndex != -1) {
-                    gotResult(false,output.substring(failureIndex));
-                }
+            int failureIndex = output.indexOf(failureSignal);
+            if (failureIndex != -1) {
+                gotResult(false, output.substring(failureIndex));
             }
         }
     }
 
     @Override
     public void onProcessed() {
-        gotResult(false,"<EOF>");
+        gotResult(false, format(
+                "Success startup signal matching [%s] not found withing defined timeout.",
+                Joiner.on(", ").join(successSignals)));
     }
 
     private synchronized void gotResult(boolean success, String message) {
-        this.initWithSuccess=success;
-        failureFound=message;
+        this.initWithSuccess = success;
+        failureFound = message;
         notify();
     }
 
@@ -78,5 +80,9 @@ public class OutputWatchStreamProcessor implements IStreamProcessor {
 
     public String getFailureFound() {
         return failureFound;
+    }
+
+    public String collectedLog() {
+        return output.toString();
     }
 }
