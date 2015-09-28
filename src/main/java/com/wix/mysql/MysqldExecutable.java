@@ -9,8 +9,6 @@ import de.flapdoodle.embed.process.distribution.Platform;
 import de.flapdoodle.embed.process.extract.IExtractedFileSet;
 import de.flapdoodle.embed.process.runtime.Executable;
 import org.apache.commons.io.IOUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -86,5 +84,5 @@ class MysqldExecutable extends Executable<MysqldConfig, MysqldProcess> {
         }
     }
 
-    protected File getBaseDir() { return this.executable.generatedBaseDir(); }
+    protected File getBaseDir() { return this.executable.baseDir(); }
 }

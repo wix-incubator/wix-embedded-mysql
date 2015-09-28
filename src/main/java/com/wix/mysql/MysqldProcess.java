@@ -81,7 +81,7 @@ class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutable, Mysq
 
     @Override
     protected List<String> getCommandLine(Distribution distribution, MysqldConfig config, IExtractedFileSet exe) throws IOException {
-        final String baseDir = exe.generatedBaseDir().getAbsolutePath();
+        final String baseDir = exe.baseDir().getAbsolutePath();
 
         return Collections.newArrayList(
                 exe.executable().getAbsolutePath(),
@@ -139,7 +139,7 @@ class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutable, Mysq
                 Platform.detect() == Windows ? "mysqld.exe: Shutdown complete" : "mysqld: Shutdown complete");
 
         try {
-            String cmd = Paths.get(getExecutable().getFile().generatedBaseDir().getAbsolutePath(), "bin", "mysqladmin").toString();
+            String cmd = Paths.get(getExecutable().getFile().baseDir().getAbsolutePath(), "bin", "mysqladmin").toString();
 
             Process p = Runtime.getRuntime().exec(new String[] {
                     cmd, "--no-defaults", "--protocol=tcp",
@@ -230,7 +230,7 @@ class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutable, Mysq
      */
     private String sockFile(IExtractedFileSet exe) throws IOException {
         String sysTempDir = System.getProperty("java.io.tmpdir");
-        String sockFile = format("%s.sock", exe.generatedBaseDir().getName());
+        String sockFile = format("%s.sock", exe.baseDir().getName());
         return new File(sysTempDir, sockFile).getAbsolutePath();
     }
 }
