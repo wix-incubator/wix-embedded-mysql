@@ -1,5 +1,7 @@
 package com.wix.mysql
 
+import java.util.TimeZone
+
 import com.wix.mysql.config.Charset.{LATIN1, defaults}
 import com.wix.mysql.config.MysqldConfig.aMysqldConfig
 import com.wix.mysql.distribution.Version._
@@ -21,19 +23,22 @@ class MysqldConfigTest extends SpecWithJUnit {
       mysqldConfig.getCharset mustEqual defaults()
       mysqldConfig.getUsername mustEqual "auser"
       mysqldConfig.getPassword mustEqual "sa"
+      mysqldConfig.getTimeZone mustEqual TimeZone.getTimeZone("UTC")
     }
 
-    "accept custom port, user, charset" in {
+    "accept custom port, user, charset, timezone" in {
       val mysqldConfig = aMysqldConfig(v5_6_latest)
         .withPort(1111)
         .withCharset(LATIN1)
         .withUser("otheruser", "otherpassword")
+        .withTimeZone("Europe/Vilnius")
         .build()
 
       mysqldConfig.getPort mustEqual 1111
       mysqldConfig.getCharset mustEqual LATIN1
       mysqldConfig.getUsername mustEqual "otheruser"
       mysqldConfig.getPassword mustEqual "otherpassword"
+      mysqldConfig.getTimeZone mustEqual TimeZone.getTimeZone("Europe/Vilnius")
     }
   }
 }

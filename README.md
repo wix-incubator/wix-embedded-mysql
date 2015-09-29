@@ -3,7 +3,7 @@
 Wix Embedded MySql library provides an easy to use MySql for tests.
 
 ## Why?
-- Your tests can run on production-like environment: match version, encoding, database/schema/user settings;
+- Your tests can run on production-like environment: match version, encoding, timezone, database/schema/user settings;
 - Its easy, much easier than installing right version by hand;
 - You can use different versions/configuration per project without any local set-up;
 - Supports multiple platforms: Windows, Linux and OSX.
@@ -41,7 +41,8 @@ If you need more control in configuring embeded mysql instance, you can use Mysq
     MysqldConfig config = aMysqldConfig(v5_6_23)
         .withCharset(UTF8)
         .withPort(2215)
-        .withUser("differentUser", "anotherPasword")
+        .withUser("differentUser", "anotherPassword")
+        .withTimeZone("Europe/Vilnius")
         .build();
 
     EmbeddedMysql mysqld = anEmbeddedMysql(config)

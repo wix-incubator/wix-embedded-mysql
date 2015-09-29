@@ -1,9 +1,12 @@
 package com.wix.mysql.support
 
+import java.util.TimeZone
+
 import com.wix.mysql.EmbeddedMysql
 import com.wix.mysql.config.Charset._
 import com.wix.mysql.config.MysqldConfig.SystemDefaults
 import com.wix.mysql.config.{Charset, MysqldConfig}
+import com.wix.mysql.utils.Utils
 import org.specs2.matcher.{Matcher, Matchers}
 
 /**
@@ -28,6 +31,12 @@ trait InstanceMatchers extends Matchers { self: IntegrationTest =>
           aSelect[String](ds, sql = s"SELECT DEFAULT_COLLATION_NAME FROM information_schema.SCHEMATA where SCHEMA_NAME = '$onSchema';"))
     }
 
+  def haveServerTimezoneMatching(timeZoneId: String): Matcher[EmbeddedMysql] =
+    ===(Utils.asHHmmOffset(TimeZone.getTimeZone(timeZoneId))) ^^ { mySql: EmbeddedMysql =>
+      val ds = aDataSource(mySql.getConfig, SystemDefaults.SCHEMA)
+      aSelect[String](ds, sql = s"SELECT @@global.time_zone;")
+    }
+
   def beAvailableOn(port: Int, withUser: String, password: String, andSchema: String): Matcher[EmbeddedMysql] =
     beTrue ^^ { mySql: EmbeddedMysql =>
       aSelect[java.lang.Long](aDataSource(withUser, password, port, andSchema), "select 1;") == 1
@@ -35,5 +44,4 @@ trait InstanceMatchers extends Matchers { self: IntegrationTest =>
 
   def beAvailableOn(config: MysqldConfig, andSchema: String): Matcher[EmbeddedMysql] =
     beAvailableOn(config.getPort, config.getUsername, config.getPassword, andSchema)
-
 }

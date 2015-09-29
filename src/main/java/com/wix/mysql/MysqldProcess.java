@@ -5,6 +5,7 @@ import com.google.common.io.CharStreams;
 import com.wix.mysql.config.MysqldConfig;
 import com.wix.mysql.input.LogFileProcessor;
 import com.wix.mysql.input.OutputWatchStreamProcessor;
+import com.wix.mysql.utils.Utils;
 import de.flapdoodle.embed.process.collections.Collections;
 import de.flapdoodle.embed.process.config.IRuntimeConfig;
 import de.flapdoodle.embed.process.distribution.Distribution;
@@ -82,7 +83,6 @@ class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutable, Mysq
         }
     }
 
-
     @Override
     protected List<String> getCommandLine(Distribution distribution, MysqldConfig config, IExtractedFileSet exe) throws IOException {
         final String baseDir = exe.baseDir().getAbsolutePath();
@@ -101,7 +101,8 @@ class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutable, Mysq
                 format("--port=%s", config.getPort()),
                 format("--log-error=%s/data/error.log", baseDir),
                 format("--character-set-server=%s", config.getCharset().getCharset()),
-                format("--collation-server=%s", config.getCharset().getCollate()));
+                format("--collation-server=%s", config.getCharset().getCollate()),
+                format("--default-time-zone=%s", Utils.asHHmmOffset(config.getTimeZone())));
     }
 
     @Override

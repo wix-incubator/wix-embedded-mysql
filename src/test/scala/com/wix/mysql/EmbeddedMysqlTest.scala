@@ -1,11 +1,14 @@
 package com.wix.mysql
 
+import java.util.TimeZone
+
 import com.wix.mysql.EmbeddedMysql._
 import com.wix.mysql.config.Charset.{LATIN1, UTF8MB4}
 import com.wix.mysql.config.MysqldConfig.{SystemDefaults, aMysqldConfig}
 import com.wix.mysql.config.SchemaConfig.aSchemaConfig
 import com.wix.mysql.distribution.Version.v5_6_latest
 import com.wix.mysql.support.IntegrationTest
+import com.wix.mysql.utils.Utils
 
 
 /**
@@ -23,7 +26,8 @@ class EmbeddedMysqlTest extends IntegrationTest {
 
       mysqld must
         haveCharsetOf(UTF8MB4) and
-        beAvailableOn(3310, "auser", "sa", SystemDefaults.SCHEMA)
+        beAvailableOn(3310, "auser", "sa", SystemDefaults.SCHEMA) and
+        haveServerTimezoneMatching("UTC")
     }
 
     "use custom values provided via MysqldConfig" in {
@@ -31,13 +35,15 @@ class EmbeddedMysqlTest extends IntegrationTest {
         .withCharset(LATIN1)
         .withUser("zeUser", "zePassword")
         .withPort(1112)
+        .withTimeZone("US/Michigan")
         .build
 
       mysqld = anEmbeddedMysql(config).start
 
       mysqld must
         haveCharsetOf(LATIN1) and
-        beAvailableOn(1112, "zeUser", "zePassword", SystemDefaults.SCHEMA)
+        beAvailableOn(1112, "zeUser", "zePassword", SystemDefaults.SCHEMA) and
+        haveServerTimezoneMatching("US/Michigan")
     }
   }
 
