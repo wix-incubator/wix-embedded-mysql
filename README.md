@@ -95,14 +95,14 @@ Source for examples can be found [here](https://github.com/wix/wix-embedded-mysq
 Build on top of embed Process Util [de.flapdoodle.embed.process](https://github.com/flapdoodle-oss/de.flapdoodle.embed.process)
 
 # How it works
- - After detecting current platform and requested version, Wix Embedded MySql will download the correct version from [MySql Repo](http://dev.mysql.com/get/Downloads/). Note that this is a **one-time** action, where subsequent invocations use pre-downloaded cached package.
- - Upon execution needed files are being extracted into **target** folder, database created, service started and post-configuration (user, schema, etc.) performed.
+ - After detecting current platform and requested version, Wix Embedded MySql will download the correct version from [/dev.mysql.com](http://dev.mysql.com/get/Downloads/) and extract needed files to local folder. Note that this is a **one-time** action, where subsequent invocations use pre-downloaded cached package.
+ - Upon execution needed files are being copied into **target** folder, database created, service started and post-configuration (user, schema, etc.) performed.
  - On jvm shutdown mysqld process is stopped and temporary files cleaned-up.
 
 # Tested on
  - latest osx;
  - ubuntu precise 32/64;
- - windows 7;
+ - windows 7/2012;
 
 # Known issues
  - some linux distros does not have libaio1.so which is a requirement by latest version of mysql. Proper error is emitted if it's missing;
