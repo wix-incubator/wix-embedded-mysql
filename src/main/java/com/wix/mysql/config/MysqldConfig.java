@@ -41,7 +41,7 @@ public class MysqldConfig extends ExecutableProcessConfig {
     public Version getVersion() { return (Version)version; }
     public Charset getCharset() { return charset; }
     public int getPort() { return port; }
-    public int getTimeout() { return 60000; }
+    public int getTimeout() { return 30000; }
     public String getUsername() { return user.name; }
     public String getPassword() { return user.password; }
     public TimeZone getTimeZone() { return timeZone; }

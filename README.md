@@ -106,6 +106,7 @@ Build on top of embed Process Util [de.flapdoodle.embed.process](https://github.
 
 # Known issues
  - some linux distros does not have libaio1.so which is a requirement by latest version of mysql. Proper error is emitted if it's missing;
+ - does not play nicely with firewalls. There is not way to create proper exception in OS X, so only option is to disable firewall, on windows proper rule can be created. This problem is due to the fact that during each test-run mysql is extracted to different folder in 'target', so each run requires new exception as exceptions are per path.
 
 #License
 Use of this source code is governed by a [BSD License](LICENSE.md), which basically means you can use and modify it freely.

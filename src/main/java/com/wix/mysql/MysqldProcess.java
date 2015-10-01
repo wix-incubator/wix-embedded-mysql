@@ -1,16 +1,15 @@
 package com.wix.mysql;
 
-import com.google.common.collect.Sets;
 import com.google.common.io.CharStreams;
 import com.wix.mysql.config.MysqldConfig;
-import com.wix.mysql.input.LogFileProcessor;
-import com.wix.mysql.input.OutputWatchStreamProcessor;
+import com.wix.mysql.io.NotifyingStreamProcessor;
+import com.wix.mysql.io.NotifyingStreamProcessor.ResultMatchingListener;
 import com.wix.mysql.utils.Utils;
 import de.flapdoodle.embed.process.collections.Collections;
 import de.flapdoodle.embed.process.config.IRuntimeConfig;
 import de.flapdoodle.embed.process.distribution.Distribution;
-import de.flapdoodle.embed.process.distribution.Platform;
 import de.flapdoodle.embed.process.extract.IExtractedFileSet;
+import de.flapdoodle.embed.process.io.Processors;
 import de.flapdoodle.embed.process.io.StreamToLineProcessor;
 import de.flapdoodle.embed.process.runtime.AbstractProcess;
 import de.flapdoodle.embed.process.runtime.ProcessControl;
@@ -24,22 +23,19 @@ import java.io.Reader;
 import java.lang.reflect.Field;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.Set;
 
 import static com.wix.mysql.utils.Utils.closeCloseables;
-import static de.flapdoodle.embed.process.distribution.Platform.Windows;
 import static java.lang.String.format;
 
 /**
  * @author viliusl
  * @since 27/09/14
  */
-class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutable, MysqldProcess> {
+public class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutable, MysqldProcess> {
 
     private final static Logger logger = LoggerFactory.getLogger(MysqldProcess.class);
 
-    private OutputWatchStreamProcessor logWatch = null;
-    private LogFileProcessor logFile = null;
+    private NotifyingStreamProcessor outputWatch;
 
     public MysqldProcess(
             final Distribution distribution,
@@ -50,36 +46,21 @@ class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutable, Mysq
     }
 
     @Override
-    protected void onBeforeProcessStart(ProcessBuilder processBuilder, MysqldConfig config, IRuntimeConfig runtimeConfig) {
-        super.onBeforeProcessStart(processBuilder, config, runtimeConfig);
-
-        logWatch = new OutputWatchStreamProcessor(Sets.newHashSet("ready for connections"), "[ERROR]",
-                StreamToLineProcessor.wrap(runtimeConfig.getProcessOutput().getOutput()));
-
-        logFile = new LogFileProcessor(
-                new File(this.getExecutable().getBaseDir() + "/data/error.log"),
-                logWatch);
-    }
-
-    @Override
-    protected void onAfterProcessStop(MysqldConfig config, IRuntimeConfig runtimeConfig) {
-        super.onAfterProcessStop(config, runtimeConfig);
-    }
-
-    @Override
     public void onAfterProcessStart(final ProcessControl process, final IRuntimeConfig runtimeConfig) throws IOException {
-        try {
-            logWatch.waitForResult(getConfig().getTimeout());
+        outputWatch = new NotifyingStreamProcessor(StreamToLineProcessor.wrap(runtimeConfig.getProcessOutput().getOutput()));
+        Processors.connect(process.getReader(), outputWatch);
+        Processors.connect(process.getError(), outputWatch);
+        ResultMatchingListener startupListener = outputWatch.addListener(new ResultMatchingListener("ready for connections"));
 
-            if (!logWatch.isInitWithSuccess()) {
-                logger.error("Init failed with log: " + logWatch.collectedLog());
-                throw new RuntimeException("mysql start failed with error: " + logWatch.getFailureFound());
+        try {
+            startupListener.waitForResult(getConfig().getTimeout());
+
+            if (!startupListener.isInitWithSuccess()) {
+                throw new RuntimeException("mysql start failed with error: " + startupListener.getFailureFound());
             }
         } catch (Exception e) {
             // emit IO exception for {@link AbstractProcess} would try to stop running process gracefully
             throw new IOException(e);
-        } finally {
-            if (logFile != null) logFile.shutdown();
         }
     }
 
@@ -99,7 +80,7 @@ class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutable, Mysq
                 format("--socket=%s", sockFile(exe)),
                 format("--lc-messages-dir=%s/share", baseDir),
                 format("--port=%s", config.getPort()),
-                format("--log-error=%s/data/error.log", baseDir),
+                "--console",
                 format("--character-set-server=%s", config.getCharset().getCharset()),
                 format("--collation-server=%s", config.getCharset().getCollate()),
                 format("--default-time-zone=%s", Utils.asHHmmOffset(config.getTimeZone())));
@@ -131,22 +112,18 @@ class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutable, Mysq
     }
 
     @Override
-    protected void cleanupInternal() {}
+    protected void cleanupInternal() {
+    }
 
     private boolean stopUsingMysqldadmin() {
+        ResultMatchingListener shutdownListener = outputWatch.addListener(new ResultMatchingListener(": Shutdown complete"));
         boolean retValue = false;
-
-        Reader stdOut = null;
         Reader stdErr = null;
-        LogFileProcessor processor = null;
-        Set<String> successPatterns = Sets.newHashSet(
-                "'Can't connect to MySQL server on 'localhost'",
-                Platform.detect() == Windows ? "mysqld.exe: Shutdown complete" : "mysqld: Shutdown complete");
 
         try {
             String cmd = Paths.get(getExecutable().getFile().baseDir().getAbsolutePath(), "bin", "mysqladmin").toString();
 
-            Process p = Runtime.getRuntime().exec(new String[] {
+            Process p = Runtime.getRuntime().exec(new String[]{
                     cmd, "--no-defaults", "--protocol=tcp",
                     format("-u%s", MysqldConfig.SystemDefaults.USERNAME),
                     format("--port=%s", getConfig().getPort()),
@@ -154,21 +131,18 @@ class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutable, Mysq
 
             retValue = p.waitFor() == 0;
 
-            OutputWatchStreamProcessor outputWatch = new OutputWatchStreamProcessor(successPatterns, "[ERROR]",
-                    StreamToLineProcessor.wrap(getRuntimeConfig().getProcessOutput().getOutput()));
-
-            processor = new LogFileProcessor(new File(this.getExecutable().getBaseDir() + "/data/error.log"), outputWatch);
-
-            stdOut = new InputStreamReader(p.getInputStream());
             stdErr = new InputStreamReader(p.getErrorStream());
 
             if (retValue) {
-                outputWatch.waitForResult(getConfig().getTimeout());
+                shutdownListener.waitForResult(getConfig().getTimeout());
 
-                if (!outputWatch.isInitWithSuccess()) {
-                    logger.error("mysql shutdown failed. Expected to find in output: 'Shutdown complete', got: " + outputWatch.getFailureFound());
+                if (!shutdownListener.isInitWithSuccess()) {
+                    logger.error("mysql shutdown failed. Expected to find in output: 'Shutdown complete', got: " + shutdownListener.getFailureFound());
                     retValue = false;
+                } else {
+                    retValue = true;
                 }
+
             } else {
                 String errOutput = CharStreams.toString(stdErr);
 
@@ -176,15 +150,14 @@ class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutable, Mysq
                     logger.warn("mysql was already shutdown - no need to add extra shutdown hook - process does it out of the box.");
                     retValue = true;
                 } else {
-                    logger.error("mysql shutdown failed with error code: " + p.waitFor() + " and message: " + CharStreams.toString(stdErr));
+                    logger.error("mysql shutdown failed with error code: " + p.waitFor() + " and message: " + errOutput);
                 }
             }
 
         } catch (InterruptedException | IOException e) {
             logger.warn("Encountered error why shutting down process.", e);
         } finally {
-            closeCloseables(stdOut, stdErr);
-            if (processor != null) processor.shutdown();
+            closeCloseables(stdErr);
         }
 
         return retValue;
@@ -197,24 +170,9 @@ class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutable, Mysq
      */
     private MysqldExecutable getExecutable() {
         try {
-            Field f =  AbstractProcess.class.getDeclaredField("executable");
+            Field f = AbstractProcess.class.getDeclaredField("executable");
             f.setAccessible(true);
-            return (MysqldExecutable)f.get(this);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    /**
-     * Work-around to get IRuntimeConfig in hooks where it's not provided and as
-     * all init is done in base class constructor, local vars are still not
-     * initialized:/
-     */
-    private IRuntimeConfig getRuntimeConfig() {
-        try {
-            Field f = AbstractProcess.class.getDeclaredField("runtimeConfig");
-            f.setAccessible(true);
-            return (IRuntimeConfig)f.get(this);
+            return (MysqldExecutable) f.get(this);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -225,7 +183,7 @@ class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutable, Mysq
      * to the way flapdoodle process library works - it does all init in {@link AbstractProcess} and instance of
      * {@link MysqldProcess} is not yet present, so vars are not initialized.
      * This algo gives stable sock classPathFile based on single executeCommands profile, but can leave trash sock classPathFiles in tmp dir.
-     *
+     * <p>
      * Notes:
      * .sock classPathFile needs to be in system temp dir and not in ex. target/...
      * This is due to possible problems with existing mysql installation and apparmor profiles
@@ -237,5 +195,3 @@ class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutable, Mysq
         return new File(sysTempDir, sockFile).getAbsolutePath();
     }
 }
-
-
