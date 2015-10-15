@@ -1,5 +1,6 @@
 package com.wix.mysql.config;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 
 import java.io.File;
@@ -13,12 +14,12 @@ import java.util.List;
 public class SchemaConfig {
 
     private final String name;
-    private final Charset charset;
+    private final Optional<Charset> charset;
     private final List<File> scripts;
 
     private SchemaConfig(
             final String name,
-            final Charset charset,
+            final Optional<Charset> charset,
             final List<File> scripts) {
         this.name = name;
         this.charset = charset;
@@ -30,13 +31,13 @@ public class SchemaConfig {
     }
 
     public String getName() { return name; }
-    public Charset getCharset() { return charset; }
+    public Optional<Charset> getCharset() { return charset; }
     public List<File> getScripts() { return scripts; }
 
     public static class Builder {
 
         private final String name;
-        private Charset charset = Charset.defaults();
+        private Optional<Charset> charset = Optional.absent();
         private List<File> scripts = Lists.newArrayList();
 
         public Builder(final String name) {
@@ -44,7 +45,7 @@ public class SchemaConfig {
         }
 
         public Builder withCharset(final Charset charset) {
-            this.charset = charset;
+            this.charset = Optional.of(charset);
             return this;
         }
 

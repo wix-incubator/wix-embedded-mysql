@@ -1,14 +1,11 @@
 package com.wix.mysql
 
-import java.util.TimeZone
-
 import com.wix.mysql.EmbeddedMysql._
 import com.wix.mysql.config.Charset.{LATIN1, UTF8MB4}
 import com.wix.mysql.config.MysqldConfig.{SystemDefaults, aMysqldConfig}
 import com.wix.mysql.config.SchemaConfig.aSchemaConfig
 import com.wix.mysql.distribution.Version.v5_6_latest
 import com.wix.mysql.support.IntegrationTest
-import com.wix.mysql.utils.Utils
 
 
 /**
@@ -99,6 +96,19 @@ class EmbeddedMysqlTest extends IntegrationTest {
       val schema = aSchemaConfig("aSchema")
         .withCharset(LATIN1)
         .build
+
+      mysqld = anEmbeddedMysql(config)
+        .addSchema(schema)
+        .start
+
+      mysqld must
+        haveSchemaCharsetOf(LATIN1, "aSchema") and
+        beAvailableOn(3310, "auser", "sa", andSchema = "aSchema")
+    }
+
+    "inherit schema charset from instance" in {
+      val config = aMysqldConfig(v5_6_latest).withCharset(LATIN1).build
+      val schema = aSchemaConfig("aSchema").build
 
       mysqld = anEmbeddedMysql(config)
         .addSchema(schema)

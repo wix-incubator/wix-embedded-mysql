@@ -1,6 +1,7 @@
 package com.wix.mysql;
 
 import com.google.common.collect.Lists;
+import com.wix.mysql.config.Charset;
 import com.wix.mysql.config.MysqldConfig;
 import com.wix.mysql.config.MysqldConfig.SystemDefaults;
 import com.wix.mysql.config.RuntimeConfigBuilder;
@@ -56,9 +57,11 @@ public class EmbeddedMysql {
     }
 
     private EmbeddedMysql addSchema(final SchemaConfig schema) {
+        Charset effectiveCharset = schema.getCharset().or(config.getCharset());
+
         getClient(SystemDefaults.SCHEMA).executeCommands(
                 format("CREATE DATABASE %s CHARACTER SET = %s COLLATE = %s;",
-                        schema.getName(), schema.getCharset().getCharset(), schema.getCharset().getCollate()),
+                        schema.getName(), effectiveCharset.getCharset(), effectiveCharset.getCollate()),
                 format("GRANT ALL ON %s.* TO '%s'@'%%';", schema.getName(), config.getUsername()));
 
         getClient(schema.getName()).executeScripts(schema.getScripts());
