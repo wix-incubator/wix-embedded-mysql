@@ -2,6 +2,7 @@ package com.wix.mysql.config;
 
 import com.wix.mysql.MysqldProcess;
 import com.wix.mysql.distribution.Version;
+import com.wix.mysql.embed.process.store.SafeExtractedArtifactStoreBuilder;
 import de.flapdoodle.embed.process.config.io.ProcessOutput;
 import de.flapdoodle.embed.process.runtime.ICommandLinePostProcessor;
 import de.flapdoodle.embed.process.store.IArtifactStore;
@@ -34,6 +35,6 @@ public class RuntimeConfigBuilder extends de.flapdoodle.embed.process.config.Run
     }
 
     private IArtifactStore artifactStoreBuilderFor(String directoryName) {
-        return new ArtifactStoreBuilder().defaults().defaults(directoryName).build();
+        return new SafeExtractedArtifactStoreBuilder().defaults(directoryName).build();
     }
 }
