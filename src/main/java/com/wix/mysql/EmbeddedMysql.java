@@ -8,7 +8,6 @@ import com.wix.mysql.config.RuntimeConfigBuilder;
 import com.wix.mysql.config.SchemaConfig;
 import com.wix.mysql.distribution.Version;
 import de.flapdoodle.embed.process.config.IRuntimeConfig;
-import de.flapdoodle.embed.process.distribution.Distribution;
 
 import java.io.File;
 import java.io.IOException;
@@ -29,7 +28,7 @@ public class EmbeddedMysql {
 
     protected EmbeddedMysql(final MysqldConfig config) {
         this.config = config;
-        IRuntimeConfig runtimeConfig = new RuntimeConfigBuilder().defaults().build();
+        IRuntimeConfig runtimeConfig = new RuntimeConfigBuilder().defaults(config.getVersion()).build();
         this.executable = new MysqldStarter(runtimeConfig).prepare(config);
 
         try {

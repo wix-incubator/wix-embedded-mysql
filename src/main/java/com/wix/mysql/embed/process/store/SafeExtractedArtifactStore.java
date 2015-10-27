@@ -1,0 +1,35 @@
+package com.wix.mysql.embed.process.store;
+
+import de.flapdoodle.embed.process.config.store.IDownloadConfig;
+import de.flapdoodle.embed.process.distribution.Distribution;
+import de.flapdoodle.embed.process.extract.DirectoryAndExecutableNaming;
+import de.flapdoodle.embed.process.extract.IExtractedFileSet;
+import de.flapdoodle.embed.process.store.ExtractedArtifactStore;
+import de.flapdoodle.embed.process.store.IDownloader;
+import org.apache.commons.io.FileUtils;
+
+import java.io.File;
+import java.io.IOException;
+
+/**
+ * This is a wrapper around `ExtractedArtifactStore` which deletes the temp directory BEFORE extracting
+ * just in case we have left overs from last crashed run.
+ *
+ * @author maximn
+ * @since 22-Oct-2015
+ */
+public class SafeExtractedArtifactStore extends ExtractedArtifactStore {
+    private String directory;
+
+    public SafeExtractedArtifactStore(IDownloadConfig downloadConfig, IDownloader downloader, DirectoryAndExecutableNaming extraction, DirectoryAndExecutableNaming directory) {
+        super(downloadConfig, downloader, extraction, directory);
+        this.directory = directory.getDirectory().asFile().getAbsolutePath();
+    }
+
+    @Override
+    public IExtractedFileSet extractFileSet(Distribution distribution) throws IOException {
+        FileUtils.deleteDirectory(new File(directory));
+
+        return super.extractFileSet(distribution);
+    }
+}

@@ -4,14 +4,13 @@ import de.flapdoodle.embed.process.distribution.Platform;
 import de.flapdoodle.embed.process.io.directories.IDirectory;
 
 import java.io.File;
-import java.util.UUID;
 
 public class TargetGeneratedFixedPath implements IDirectory {
 
     private final String baseDir;
 
     public TargetGeneratedFixedPath(String prefix) {
-        this.baseDir = String.format("target/%s-%s", prefix, UUID.randomUUID().toString());
+        this.baseDir = String.format("target/%s", prefix);
     }
 
     @Override
