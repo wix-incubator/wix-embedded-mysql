@@ -8,8 +8,6 @@ import de.flapdoodle.embed.process.distribution.BitSize;
 import de.flapdoodle.embed.process.distribution.Distribution;
 import de.flapdoodle.embed.process.distribution.IVersion;
 
-import java.util.Objects;
-
 import static de.flapdoodle.embed.process.config.store.FileType.Executable;
 import static de.flapdoodle.embed.process.config.store.FileType.Library;
 import static de.flapdoodle.embed.process.distribution.ArchiveType.TGZ;
@@ -28,7 +26,7 @@ public class PackagePaths implements IPackageResolver {
             case Windows:
                 return buildWindowsFileSet();
             default:
-                return buildNixFileSet((Version)distribution.getVersion());
+                return buildNixFileSet((Version) distribution.getVersion());
         }
     }
 
@@ -183,7 +181,6 @@ public class PackagePaths implements IPackageResolver {
                 .addEntry(Library, "data/performance_schema/users.frm");
 
 
-
         //TODO: patch up process library to support multi-match pattern.
         //then we could just have regex and mark it as multi-match and no file-counting
         //as this one is dodgy especially when considering multiple versions etc.
@@ -197,23 +194,26 @@ public class PackagePaths implements IPackageResolver {
     private FileSet buildNixFileSet(final Version version) {
         FileSet.Builder initial = FileSet.builder()
                 .addEntry(Executable, "bin/mysqld")
-                .addEntry(Library,    "bin/mysql")
-                .addEntry(Library,    "bin/resolveip")
-                .addEntry(Library,    "bin/mysqladmin")
-                .addEntry(Library,    "bin/my_print_defaults")
-                .addEntry(Library,    "scripts/mysql_install_db")
-                .addEntry(Library,    "share/english/errmsg.sys")
-                .addEntry(Library,    "share/fill_help_tables.sql")
-                .addEntry(Library,    "share/mysql_system_tables.sql")
-                .addEntry(Library,    "share/mysql_system_tables_data.sql");
+                .addEntry(Library, "bin/mysql")
+                .addEntry(Library, "bin/resolveip")
+                .addEntry(Library, "bin/mysqladmin")
+                .addEntry(Library, "bin/my_print_defaults")
+                .addEntry(Library, "share/english/errmsg.sys")
+                .addEntry(Library, "share/fill_help_tables.sql")
+                .addEntry(Library, "share/mysql_system_tables.sql")
+                .addEntry(Library, "share/mysql_system_tables_data.sql");
 
 
-            if (!version.getMajorVersion().equals("5.5")) {
-                initial.addEntry(Library, "share/mysql_security_commands.sql");//not available for 5.5
-                initial.addEntry(Library, "support-files/my-default.cnf");
-            }
+        if (!version.getMajorVersion().equals("5.5")) {
+            initial.addEntry(Library, "share/mysql_security_commands.sql");//not available for 5.5
+            initial.addEntry(Library, "support-files/my-default.cnf");
+        }
 
-            return initial.build();
+        if (!version.getMajorVersion().equals("5.7")) {
+            initial.addEntry(Library, "scripts/mysql_install_db");
+        }
+
+        return initial.build();
     }
 
 

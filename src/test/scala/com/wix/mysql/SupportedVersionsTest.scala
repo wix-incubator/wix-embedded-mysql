@@ -19,7 +19,7 @@ class SupportedVersionsTest extends IntegrationTest {
 
   Fragment.foreach( Version.values filter(_.supportsCurrentPlatform) ) { version =>
 
-    s"${version} should work on ${System.getProperty("os.name")}" in new Context {
+    s"$version should work on ${System.getProperty("os.name")}" in new Context {
       val config = aMysqldConfig(version).build
 
       mysqld = anEmbeddedMysql(config)
