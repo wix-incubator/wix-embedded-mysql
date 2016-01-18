@@ -1,6 +1,5 @@
 package com.wix.mysql;
 
-import com.google.common.base.Strings;
 import com.wix.mysql.config.MysqldConfig;
 import com.wix.mysql.config.MysqldConfig.SystemDefaults;
 import com.wix.mysql.exceptions.CommandFailedException;
@@ -12,6 +11,7 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.List;
 
+import static com.wix.mysql.utils.Utils.isNullOrEmpty;
 import static de.flapdoodle.embed.process.distribution.Platform.Windows;
 import static java.lang.String.format;
 
@@ -59,7 +59,7 @@ class MysqlClient {
                 String out = IOUtils.toString(p.getInputStream());
                 String err = IOUtils.toString(p.getErrorStream());
 
-                if (Strings.isNullOrEmpty(out))
+                if (isNullOrEmpty(out))
                     throw new CommandFailedException(command, schemaName, p.waitFor(), err);
                 else
                     throw new CommandFailedException(command, schemaName, p.waitFor(), out);

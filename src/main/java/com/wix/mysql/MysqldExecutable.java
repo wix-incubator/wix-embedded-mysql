@@ -12,10 +12,8 @@ import org.apache.commons.io.IOUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.concurrent.TimeUnit;
 
 import static java.lang.String.format;
-import static java.util.concurrent.TimeUnit.SECONDS;
 
 /**
  * @author viliusl
@@ -64,10 +62,10 @@ class MysqldExecutable extends Executable<MysqldConfig, MysqldProcess> {
                     null,
                     getBaseDir());
 
-            boolean retCode = p.waitFor(30, SECONDS);
+            int retCode = p.waitFor();
 
-            if (!retCode) {
-                resolveException(-1, IOUtils.toString(p.getInputStream()) + IOUtils.toString(p.getErrorStream()));
+            if (retCode != 0) {
+                resolveException(retCode, IOUtils.toString(p.getInputStream()) + IOUtils.toString(p.getErrorStream()));
             }
 
         } catch (InterruptedException e) {

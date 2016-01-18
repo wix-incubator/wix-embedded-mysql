@@ -1,6 +1,6 @@
 package com.wix.mysql.config;
 
-import com.google.common.base.Objects;
+import java.util.Arrays;
 
 /**
  * @author viliusl
@@ -19,25 +19,29 @@ public class Charset {
         this.collate = collate;
     }
 
-    public String getCharset() { return charset; }
-
-    public String getCollate() { return collate; }
-
     public static Charset aCharset(final String charset, final String collate) {
         return new Charset(charset, collate);
     }
 
-    public static Charset defaults()  { return UTF8MB4; }
+    public static Charset defaults() {
+        return UTF8MB4;
+    }
 
+    public String getCharset() {
+        return charset;
+    }
+
+    public String getCollate() {
+        return collate;
+    }
 
     @Override
     public String toString() {
-        return Objects.toStringHelper(this)
-                .add("charset", charset)
-                .add("collate", collate)
-                .toString();
+        return "Charset{" +
+                "charset='" + charset + '\'' +
+                ", collate='" + collate + '\'' +
+                '}';
     }
-
 
     @Override
     public boolean equals(Object o) {
@@ -46,12 +50,16 @@ public class Charset {
 
         Charset that = (Charset) o;
 
-        return Objects.equal(this.charset, that.charset) &&
-                Objects.equal(this.collate, that.collate);
+        return areObjectsEqual(this.charset, that.charset) &&
+                areObjectsEqual(this.collate, that.collate);
+    }
+
+    private <T> boolean areObjectsEqual(T o1, T o2) {
+        return o1 == o2 || (o1 != null && o1.equals(o2));
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(charset, collate);
+        return Arrays.hashCode(new Object[]{charset, collate});
     }
 }

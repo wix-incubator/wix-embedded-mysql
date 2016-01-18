@@ -2,10 +2,8 @@ package com.wix.mysql
 
 import java.io.File
 
-import com.google.common.base.Optional
 import com.wix.mysql.config.Charset.aCharset
 import com.wix.mysql.config.SchemaConfig.aSchemaConfig
-import com.wix.mysql.config.{Charset, SchemaConfig}
 import org.specs2.mutable.SpecWithJUnit
 
 import scala.collection.convert.wrapAll._
@@ -21,7 +19,7 @@ class SchemaConfigTest extends SpecWithJUnit {
       val schemaConfig = aSchemaConfig("aschema").build
 
       schemaConfig.getName mustEqual "aschema"
-      schemaConfig.getCharset mustEqual Optional.absent()
+      schemaConfig.getCharset must beNull
       schemaConfig.getScripts must beEmpty
     }
 
@@ -32,7 +30,7 @@ class SchemaConfigTest extends SpecWithJUnit {
         .withCharset(charset)
         .build
 
-      schemaConfig.getCharset mustEqual Optional.of(charset)
+      schemaConfig.getCharset mustEqual charset
     }
 
     "build with Files" in {
