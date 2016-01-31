@@ -1,21 +1,21 @@
 package com.wix.mysql;
 
-import com.google.common.base.Joiner;
 import org.apache.commons.io.filefilter.WildcardFileFilter;
 
 import java.io.File;
 import java.io.FileFilter;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import static com.wix.mysql.utils.Utils.join;
 import static java.lang.String.format;
+import static java.util.Arrays.asList;
+import static java.util.Arrays.copyOfRange;
 
 /**
  * Helper for locating schema init scripts in a classpath.
- * TODO: replace impl with some library - guava or smth.
  *
  * @author viliusl
  * @since 06/06/15
@@ -37,14 +37,14 @@ public class ScriptResolver {
 
     /**
      * Locates classPathFiles matching pattern, ordered using natural alphanumeric order, ex. 'db/*.sql'.
-     *
+     * <p/>
      * Note: Supports only wildcards ('*') and only in file names for matching.
      */
     public static List<File> classPathFiles(final String pattern) {
         List<File> results;
 
         String[] parts = pattern.split("/");
-        String path = Joiner.on("/").join(Arrays.copyOfRange(parts, 0, parts.length - 1));
+        String path = join(asList(copyOfRange(parts, 0, parts.length - 1)), "/");
 
         URL baseFolder = ScriptResolver.class.getResource(path.startsWith("/") ? path : format("/%s", path));
         FileFilter filter = new WildcardFileFilter(parts[parts.length - 1]);
@@ -52,7 +52,7 @@ public class ScriptResolver {
         if (baseFolder == null)
             throw new ScriptResolutionException(path);
 
-        results = Arrays.asList(asFile(baseFolder).listFiles(filter));
+        results = asList(asFile(baseFolder).listFiles(filter));
 
         Collections.sort(results);
 

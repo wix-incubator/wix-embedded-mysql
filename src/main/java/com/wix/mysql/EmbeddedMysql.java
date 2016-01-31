@@ -1,6 +1,5 @@
 package com.wix.mysql;
 
-import com.google.common.collect.Lists;
 import com.wix.mysql.config.Charset;
 import com.wix.mysql.config.MysqldConfig;
 import com.wix.mysql.config.MysqldConfig.SystemDefaults;
@@ -11,10 +10,12 @@ import de.flapdoodle.embed.process.config.IRuntimeConfig;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.wix.mysql.config.MysqldConfig.SystemDefaults.SCHEMA;
+import static com.wix.mysql.utils.Utils.or;
 import static java.lang.String.format;
 
 /**
@@ -56,7 +57,7 @@ public class EmbeddedMysql {
     }
 
     private EmbeddedMysql addSchema(final SchemaConfig schema) {
-        Charset effectiveCharset = schema.getCharset().or(config.getCharset());
+        Charset effectiveCharset = or(schema.getCharset(), config.getCharset());
 
         getClient(SystemDefaults.SCHEMA).executeCommands(
                 format("CREATE DATABASE %s CHARACTER SET = %s COLLATE = %s;",
@@ -89,7 +90,7 @@ public class EmbeddedMysql {
 
     public static class Builder {
         private final MysqldConfig config;
-        private List<SchemaConfig> schemas = Lists.newArrayList();
+        private List<SchemaConfig> schemas = new ArrayList<>();
 
         public Builder(final MysqldConfig config) {
             this.config = config;

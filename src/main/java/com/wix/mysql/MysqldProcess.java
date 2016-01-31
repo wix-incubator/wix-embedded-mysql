@@ -1,6 +1,5 @@
 package com.wix.mysql;
 
-import com.google.common.io.CharStreams;
 import com.wix.mysql.config.MysqldConfig;
 import com.wix.mysql.io.NotifyingStreamProcessor;
 import com.wix.mysql.io.NotifyingStreamProcessor.ResultMatchingListener;
@@ -25,6 +24,7 @@ import java.nio.file.Paths;
 import java.util.List;
 
 import static com.wix.mysql.utils.Utils.closeCloseables;
+import static com.wix.mysql.utils.Utils.readToString;
 import static java.lang.String.format;
 
 /**
@@ -144,7 +144,7 @@ public class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutabl
                 }
 
             } else {
-                String errOutput = CharStreams.toString(stdErr);
+                String errOutput = readToString(stdErr);
 
                 if (errOutput.contains("Can't connect to MySQL server on")) {
                     logger.warn("mysql was already shutdown - no need to add extra shutdown hook - process does it out of the box.");

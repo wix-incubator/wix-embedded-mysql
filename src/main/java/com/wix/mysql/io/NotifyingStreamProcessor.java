@@ -1,8 +1,8 @@
 package com.wix.mysql.io;
 
-import com.google.common.collect.Lists;
 import de.flapdoodle.embed.process.io.IStreamProcessor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -11,7 +11,7 @@ import java.util.List;
  */
 public class NotifyingStreamProcessor implements IStreamProcessor {
 
-    private final List<ResultMatchingListener> listeners = Lists.newArrayList();
+    private final List<ResultMatchingListener> listeners = new ArrayList<>();
     private final IStreamProcessor delegate;
 
     public NotifyingStreamProcessor(IStreamProcessor processor) {

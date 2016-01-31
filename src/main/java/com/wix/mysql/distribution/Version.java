@@ -1,7 +1,7 @@
 package com.wix.mysql.distribution;
 
-import com.google.common.base.Joiner;
 import com.wix.mysql.exceptions.UnsupportedPlatformException;
+import com.wix.mysql.utils.Utils;
 import de.flapdoodle.embed.process.distribution.IVersion;
 import de.flapdoodle.embed.process.distribution.Platform;
 
@@ -95,7 +95,7 @@ public enum Version implements IVersion {
         if (!supportsCurrentPlatform()) {
             throw new UnsupportedPlatformException(String.format("Platform %s is not in a supported platform list: %s",
                     currentPlatform().name(),
-                    Joiner.on(",").join(supportedPlatforms)));
+                    Utils.join(supportedPlatforms, ",")));
         }
     }
 
