@@ -5,9 +5,9 @@
         </encoder>
     </appender>
 
-    <logger name="com.wix.mysql" level="TRACE"/>
+    <logger name="com.wix.mysql" level="INFO"/>
 
-    <root level="DEBUG">
+    <root level="INFO">
         <appender-ref ref="STDOUT" />
     </root>
 
