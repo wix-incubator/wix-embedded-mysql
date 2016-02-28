@@ -71,7 +71,7 @@ public enum Version implements IVersion {
     }
 
     private String osVersion() {
-        if (majorVersion.equals("5.6"))
+        if (majorVersion.equals("5.6") || majorVersion.equals("5.7"))
             //TODO: 5.6 has support for 10.8 as well. Maybe we should be smarter about it?
             return "10.9";
         if (majorVersion.equals("5.5"))
