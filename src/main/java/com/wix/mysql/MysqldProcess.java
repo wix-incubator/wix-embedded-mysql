@@ -68,12 +68,10 @@ public class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutabl
     protected List<String> getCommandLine(Distribution distribution, MysqldConfig config, IExtractedFileSet exe) throws IOException {
         final String baseDir = exe.baseDir().getAbsolutePath();
 
-        return Collections.newArrayList(
+        List<String> commandLine = Collections.newArrayList(
                 exe.executable().getAbsolutePath(),
                 "--no-defaults",
-                "--skip-name-resolve",
                 "--log-output=NONE",
-                "--skip-name-resolve",
                 format("--basedir=%s", baseDir),
                 format("--datadir=%s/data", baseDir),
                 format("--plugin-dir=%s/lib/plugin", baseDir),
@@ -84,6 +82,11 @@ public class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutabl
                 format("--character-set-server=%s", config.getCharset().getCharset()),
                 format("--collation-server=%s", config.getCharset().getCollate()),
                 format("--default-time-zone=%s", Utils.asHHmmOffset(config.getTimeZone())));
+
+        if (!config.getVersion().getMajorVersion().equals("5.7"))
+            commandLine.add("--skip-name-resolve");
+
+        return commandLine;
     }
 
     @Override

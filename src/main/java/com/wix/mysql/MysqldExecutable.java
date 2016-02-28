@@ -41,26 +41,22 @@ class MysqldExecutable extends Executable<MysqldConfig, MysqldProcess> {
         markAllLibraryFilesExecutable();
 
         if (Platform.detect().isUnixLike())// windows already comes with data - otherwise installed python is needed:/
-            this.initDatabase();
+            this.initDatabase(config);
 
         return new MysqldProcess(distribution, config, runtime, this);
     }
 
     private void markAllLibraryFilesExecutable() {
-        for (File f: executable.files(FileType.Library)) {
+        for (File f : executable.files(FileType.Library)) {
             f.setExecutable(true);
         }
     }
 
-    private void initDatabase() throws IOException {
+    private void initDatabase(MysqldConfig config) throws IOException {
         try {
-            Process p = Runtime.getRuntime().exec(new String[]{
-                            "scripts/mysql_install_db",
-                            "--no-defaults",
-                            format("--basedir=%s", getBaseDir()),
-                            format("--datadir=%s/data", getBaseDir())},
-                    null,
-                    getBaseDir());
+            boolean isSeverVersion57 = config.getVersion().getMajorVersion().equals("5.7");
+
+            Process p = isSeverVersion57 ? getProcessForVersion57() : getProcess();
 
             int retCode = p.waitFor();
 
@@ -73,16 +69,39 @@ class MysqldExecutable extends Executable<MysqldConfig, MysqldProcess> {
         }
     }
 
+    private Process getProcessForVersion57() throws IOException {
+        return Runtime.getRuntime().exec(new String[]{
+                        "bin/mysqld",
+                        "--no-defaults",
+                        "--initialize-insecure",
+                        format("--basedir=%s", getBaseDir()),
+                        format("--datadir=%s/data", getBaseDir())},
+                null,
+                getBaseDir());
+    }
+
+    private Process getProcess() throws IOException {
+        return Runtime.getRuntime().exec(new String[]{
+                        "scripts/mysql_install_db",
+                        "--no-defaults",
+                        format("--basedir=%s", getBaseDir()),
+                        format("--datadir=%s/data", getBaseDir())},
+                null,
+                getBaseDir());
+    }
+
     private void resolveException(int retCode, String output) {
         if (output.contains("error while loading shared libraries: libaio.so")) {
             throw new MissingDependencyException(
                     "System library 'libaio.so.1' missing. " +
-                    "Please install it via system package manager, ex. 'sudo apt-get install libaio1'.\n" +
-                    "For details see: http://bugs.mysql.com/bug.php?id=60544");
+                            "Please install it via system package manager, ex. 'sudo apt-get install libaio1'.\n" +
+                            "For details see: http://bugs.mysql.com/bug.php?id=60544");
         } else {
             throw new RuntimeException(format("'scripts/mysql_install_db' command exited with error code: '%s' and output: '%s'", retCode, output));
         }
     }
 
-    protected File getBaseDir() { return this.executable.baseDir(); }
+    protected File getBaseDir() {
+        return this.executable.baseDir();
+    }
 }
