@@ -18,7 +18,7 @@ public class DownloadConfigBuilder extends de.flapdoodle.embed.process.config.st
     public DownloadConfigBuilder defaults() {
         fileNaming().setDefault(new UUIDTempNaming());
         downloadPath().setDefault(new DownloadPath("http://dev.mysql.com/get/Downloads/"));
-        progressListener().setDefault(Platform.detect() == Platform.OS_X ? new ConsoleOneLineProgressListener() : new StandardConsoleProgressListener());
+        progressListener().setDefault(new StandardConsoleProgressListener());
         artifactStorePath().setDefault(new UserHome(".embedmysql"));
         downloadPrefix().setDefault(new DownloadPrefix("embedmysql-download"));
         userAgent().setDefault(new UserAgent("Mozilla/5.0 (compatible; Embedded MySql; +https://github.com/wix/wix-embedded-mysql)"));
