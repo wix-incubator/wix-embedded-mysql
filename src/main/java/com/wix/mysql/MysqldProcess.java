@@ -7,6 +7,7 @@ import com.wix.mysql.utils.Utils;
 import de.flapdoodle.embed.process.collections.Collections;
 import de.flapdoodle.embed.process.config.IRuntimeConfig;
 import de.flapdoodle.embed.process.distribution.Distribution;
+import de.flapdoodle.embed.process.distribution.Platform;
 import de.flapdoodle.embed.process.extract.IExtractedFileSet;
 import de.flapdoodle.embed.process.io.Processors;
 import de.flapdoodle.embed.process.io.StreamToLineProcessor;
@@ -25,6 +26,7 @@ import java.util.List;
 
 import static com.wix.mysql.utils.Utils.closeCloseables;
 import static com.wix.mysql.utils.Utils.readToString;
+import static de.flapdoodle.embed.process.distribution.Platform.Windows;
 import static java.lang.String.format;
 
 /**
@@ -139,10 +141,16 @@ public class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutabl
             if (retValue) {
                 shutdownListener.waitForResult(getConfig().getTimeout());
 
+                //TODO: figure out a better strategy for this. It seems windows does not actually shuts down process after it says it does.
+                if (Platform.detect() == Windows) {
+                    Thread.sleep(2000);
+                }
+
                 if (!shutdownListener.isInitWithSuccess()) {
                     logger.error("mysql shutdown failed. Expected to find in output: 'Shutdown complete', got: " + shutdownListener.getFailureFound());
                     retValue = false;
                 } else {
+                    logger.debug("mysql shutdown succeeded.");
                     retValue = true;
                 }
 
