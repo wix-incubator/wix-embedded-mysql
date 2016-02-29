@@ -50,7 +50,7 @@ public class NotifyingStreamProcessor implements IStreamProcessor {
 
         public void onMessage(final String message) {
             output.append(message);
-            if (output.indexOf(successPattern) != -1) {
+            if (containsPattern()) {
                 gotResult(true, null);
             } else {
                 int failureIndex = output.indexOf(failurePattern);
@@ -58,6 +58,10 @@ public class NotifyingStreamProcessor implements IStreamProcessor {
                     gotResult(false, output.substring(failureIndex));
                 }
             }
+        }
+
+        private boolean containsPattern() {
+            return output.indexOf(this.successPattern) != -1;
         }
 
         private synchronized void gotResult(boolean success, String message) {

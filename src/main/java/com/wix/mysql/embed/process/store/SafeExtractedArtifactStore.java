@@ -18,10 +18,10 @@ import java.io.IOException;
  * @author maximn
  * @since 22-Oct-2015
  */
-public class SafeExtractedArtifactStore extends ExtractedArtifactStore {
+class SafeExtractedArtifactStore extends ExtractedArtifactStore {
     private String directory;
 
-    public SafeExtractedArtifactStore(IDownloadConfig downloadConfig, IDownloader downloader, DirectoryAndExecutableNaming extraction, DirectoryAndExecutableNaming directory) {
+    SafeExtractedArtifactStore(IDownloadConfig downloadConfig, IDownloader downloader, DirectoryAndExecutableNaming extraction, DirectoryAndExecutableNaming directory) {
         super(downloadConfig, downloader, extraction, directory);
         this.directory = directory.getDirectory().asFile().getAbsolutePath();
     }

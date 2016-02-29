@@ -1,6 +1,6 @@
 ---
 language: java
-script: mvn clean verify
+script: mvn -q -B clean verify
 
 before_install:
 # os x - workaround for JAVA_HOME not set and mvn missing
