@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.wix</groupId>
@@ -39,14 +40,14 @@
         <maven.compiler.target>1.7</maven.compiler.target>
         <encoding>UTF-8</encoding>
 
-        <flapdoodle.process.version>1.50.0</flapdoodle.process.version>
-        <spring.jdbc.version>4.1.1.RELEASE</spring.jdbc.version>
-        <mysql.connector.version>5.1.36</mysql.connector.version>
+        <flapdoodle.process.version>1.50.1</flapdoodle.process.version>
+        <spring.jdbc.version>4.2.5.RELEASE</spring.jdbc.version>
+        <mysql.connector.version>5.1.38</mysql.connector.version>
         <slf4j.version>1.7.10</slf4j.version>
-        <logback.version>1.1.3</logback.version>
+        <logback.version>1.1.6</logback.version>
         <scala.library.version>2.11</scala.library.version>
         <scala.version>2.11.7</scala.version>
-        <specs2.version>3.6.4</specs2.version>
+        <specs2.version>3.7.1</specs2.version>
     </properties>
 
     <dependencies>
@@ -81,7 +82,7 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-dbcp2</artifactId>
-            <version>2.1</version>
+            <version>2.1.1</version>
             <scope>test</scope>
         </dependency>
 
@@ -115,14 +116,6 @@
 
     </dependencies>
 
-    <repositories>
-        <repository>
-            <id>scalaz</id>
-            <name>bintray</name>
-            <url>http://dl.bintray.com/scalaz/releases/</url>
-        </repository>
-    </repositories>
-
     <build>
         <plugins>
             <plugin>
@@ -140,7 +133,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.18.1</version>
+                <version>2.19.1</version>
                 <configuration>
                     <systemPropertyVariables>
                         <!-- appveyor ci has old version of jna (3.5) which clashes with one shipped with a library (4.0) -->
@@ -158,7 +151,7 @@
                         <version>1.9.4</version>
                     </dependency>
                 </dependencies>
-                <version>2.5.2</version>
+                <version>2.5.3</version>
                 <configuration>
                     <autoVersionSubmodules>true</autoVersionSubmodules>
                     <useReleaseProfile>false</useReleaseProfile>
@@ -169,7 +162,7 @@
             <plugin>
                 <groupId>org.sonatype.plugins</groupId>
                 <artifactId>nexus-staging-maven-plugin</artifactId>
-                <version>1.6.5</version>
+                <version>1.6.6</version>
                 <extensions>true</extensions>
                 <configuration>
                     <serverId>ossrh</serverId>

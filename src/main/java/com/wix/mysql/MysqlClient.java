@@ -32,19 +32,19 @@ class MysqlClient {
     }
 
     public void executeScripts(final List<File> files) {
-        for (File file: files) {
+        for (File file : files) {
             execute(format("source %s", file.getAbsolutePath()));
         }
     }
 
     public void executeCommands(final String... sqls) {
-        for (String sql: sqls) {
+        for (String sql : sqls) {
             execute(sql);
         }
     }
 
     private void execute(final String sql) {
-        String command = (Platform.detect() == Windows) ? format("\"%s\"", sql): sql;
+        String command = (Platform.detect() == Windows) ? format("\"%s\"", sql) : sql;
         try {
             Process p = Runtime.getRuntime().exec(new String[]{
                     Paths.get(executable.getBaseDir().getAbsolutePath(), "bin", "mysql").toString(),

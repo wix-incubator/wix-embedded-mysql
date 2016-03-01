@@ -41,7 +41,9 @@ public class EmbeddedMysql {
         }
     }
 
-    public MysqldConfig getConfig() { return this.config; }
+    public MysqldConfig getConfig() {
+        return this.config;
+    }
 
     public void reloadSchema(final String schemaName, final File... scripts) {
         reloadSchema(SchemaConfig.aSchemaConfig(schemaName).withScripts(scripts).build());
@@ -114,7 +116,7 @@ public class EmbeddedMysql {
         public EmbeddedMysql start() {
             EmbeddedMysql instance = new EmbeddedMysql(config);
 
-            for (SchemaConfig schema: schemas) {
+            for (SchemaConfig schema : schemas) {
                 instance.addSchema(schema);
             }
 

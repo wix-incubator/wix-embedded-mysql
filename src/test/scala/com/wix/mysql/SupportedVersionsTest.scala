@@ -8,16 +8,16 @@ import org.specs2.matcher.Scope
 import org.specs2.specification.core.Fragment
 
 /**
- * @author viliusl
- * @since 27/03/15
- */
+  * @author viliusl
+  * @since 27/03/15
+  */
 class SupportedVersionsTest extends IntegrationTest {
 
   trait Context extends Scope {
     val log = aLogFor("root")
   }
 
-  Fragment.foreach( Version.values filter(_.supportsCurrentPlatform) ) { version =>
+  Fragment.foreach(Version.values filter (_.supportsCurrentPlatform)) { version =>
 
     s"$version should work on ${System.getProperty("os.name")}" in new Context {
       val config = aMysqldConfig(version).build

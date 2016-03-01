@@ -10,10 +10,11 @@ import com.wix.mysql.utils.Utils
 import org.specs2.matcher.{Matcher, Matchers}
 
 /**
- * @author viliusl
- * @since 20/07/15
- */
-trait InstanceMatchers extends Matchers { self: IntegrationTest =>
+  * @author viliusl
+  * @since 20/07/15
+  */
+trait InstanceMatchers extends Matchers {
+  self: IntegrationTest =>
 
   def haveCharsetOf(charset: Charset): Matcher[EmbeddedMysql] =
     ===(charset) ^^ { mySql: EmbeddedMysql =>
@@ -26,9 +27,9 @@ trait InstanceMatchers extends Matchers { self: IntegrationTest =>
   def haveSchemaCharsetOf(charset: Charset, onSchema: String): Matcher[EmbeddedMysql] =
     ===(charset) ^^ { mySql: EmbeddedMysql =>
       val ds = aDataSource(mySql.getConfig, onSchema)
-        aCharset(
-          aSelect[String](ds, sql = s"SELECT default_character_set_name FROM information_schema.SCHEMATA where SCHEMA_NAME = '$onSchema';"),
-          aSelect[String](ds, sql = s"SELECT DEFAULT_COLLATION_NAME FROM information_schema.SCHEMATA where SCHEMA_NAME = '$onSchema';"))
+      aCharset(
+        aSelect[String](ds, sql = s"SELECT default_character_set_name FROM information_schema.SCHEMATA where SCHEMA_NAME = '$onSchema';"),
+        aSelect[String](ds, sql = s"SELECT DEFAULT_COLLATION_NAME FROM information_schema.SCHEMATA where SCHEMA_NAME = '$onSchema';"))
     }
 
   def haveServerTimezoneMatching(timeZoneId: String): Matcher[EmbeddedMysql] =

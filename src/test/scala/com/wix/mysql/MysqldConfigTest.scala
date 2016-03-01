@@ -8,9 +8,9 @@ import com.wix.mysql.distribution.Version._
 import org.specs2.mutable.SpecWithJUnit
 
 /**
- * @author viliusl
- * @since 28/05/15
- */
+  * @author viliusl
+  * @since 28/05/15
+  */
 class MysqldConfigTest extends SpecWithJUnit {
 
   "MysqldConfig" should {

@@ -11,7 +11,7 @@ import de.flapdoodle.embed.process.runtime.Starter;
  * @author viliusl
  * @since 27/09/14
  */
-class MysqldStarter extends Starter<MysqldConfig, MysqldExecutable, MysqldProcess>{
+class MysqldStarter extends Starter<MysqldConfig, MysqldExecutable, MysqldProcess> {
 
     public MysqldStarter(final IRuntimeConfig config) {
         super(config);
@@ -23,7 +23,7 @@ class MysqldStarter extends Starter<MysqldConfig, MysqldExecutable, MysqldProces
             final Distribution distribution,
             final IRuntimeConfig runtime,
             final IExtractedFileSet exe) {
-        return  new MysqldExecutable(distribution, config, runtime, exe);
+        return new MysqldExecutable(distribution, config, runtime, exe);
     }
 
     public static MysqldStarter instance(final IRuntimeConfig config) {

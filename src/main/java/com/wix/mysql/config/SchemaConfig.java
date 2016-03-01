@@ -28,9 +28,17 @@ public class SchemaConfig {
         return new Builder(name);
     }
 
-    public String getName() { return name; }
-    public Charset getCharset() { return charset; }
-    public List<File> getScripts() { return scripts; }
+    public String getName() {
+        return name;
+    }
+
+    public Charset getCharset() {
+        return charset;
+    }
+
+    public List<File> getScripts() {
+        return scripts;
+    }
 
     public static class Builder {
 

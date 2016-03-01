@@ -19,12 +19,11 @@ import org.springframework.jdbc.core.JdbcTemplate
 
 import scala.collection.JavaConversions._
 import scala.reflect._
-import scala.util.Try
 
 /**
- * @author viliusl
- * @since 27/03/15
- */
+  * @author viliusl
+  * @since 27/03/15
+  */
 class IntegrationTest extends SpecWithJUnit with AfterEach
   with InstanceMatchers with TestResourcesSupport with JdbcSupport {
 
@@ -49,12 +48,13 @@ class IntegrationTest extends SpecWithJUnit with AfterEach
     appender.start()
 
     new Iterable[String] {
-      def iterator = appender.list map ( _.getMessage ) iterator
+      def iterator = appender.list map (_.getMessage) iterator
     }
   }
 }
 
-trait JdbcSupport { self: IntegrationTest =>
+trait JdbcSupport {
+  self: IntegrationTest =>
 
   def aDataSource(config: MysqldConfig, schema: String): DataSource =
     aDataSource(config.getUsername, config.getPassword, config.getPort, schema)
@@ -84,7 +84,9 @@ trait JdbcSupport { self: IntegrationTest =>
     aJdbcTemplate(forSchema = onSchema).execute(sql)
 
   def aMigrationWith(sql: String): File = createTempFile(sql)
+
   def beSuccessful = not(throwAn[Exception])
+
   def failWith(fragment: String) = throwA[DataAccessException].like { case e =>
     e.getMessage must contain(fragment)
   }

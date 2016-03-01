@@ -25,8 +25,8 @@ public class JavaUsageExamplesTest {
     @Test
     public void defaultConfigurationAndASingleSchema() {
         EmbeddedMysql mysqld = anEmbeddedMysql(v5_6_latest)
-            .addSchema("aschema", classPathFile("db/001_init.sql"))
-            .start();
+                .addSchema("aschema", classPathFile("db/001_init.sql"))
+                .start();
 
         //do work
 
@@ -36,8 +36,8 @@ public class JavaUsageExamplesTest {
     @Test
     public void defaultConfigurationAndASingleSchemaWithMultipleMigrations() {
         EmbeddedMysql mysqld = anEmbeddedMysql(v5_6_latest)
-            .addSchema("aschema", classPathFiles("db/*.sql"))
-            .start();
+                .addSchema("aschema", classPathFiles("db/*.sql"))
+                .start();
 
         //do work
 
@@ -47,15 +47,15 @@ public class JavaUsageExamplesTest {
     @Test
     public void mysqldConfigAndMultipleSchemas() {
         MysqldConfig config = aMysqldConfig(v5_6_23)
-            .withCharset(UTF8)
-            .withPort(2215)
-            .withUser("differentUser", "anotherPasword")
-            .build();
+                .withCharset(UTF8)
+                .withPort(2215)
+                .withUser("differentUser", "anotherPasword")
+                .build();
 
         EmbeddedMysql mysqld = anEmbeddedMysql(config)
-            .addSchema("aschema", classPathFile("db/001_init.sql"))
-            .addSchema("aschema2", classPathFiles("db/*.sql"))
-            .start();
+                .addSchema("aschema", classPathFile("db/001_init.sql"))
+                .addSchema("aschema2", classPathFiles("db/*.sql"))
+                .start();
 
         //do work
 
@@ -65,14 +65,14 @@ public class JavaUsageExamplesTest {
     @Test
     public void schemaConfigViaBuilder() {
         SchemaConfig schema = aSchemaConfig("aSchema")
-            .withScripts(classPathFile("db/001_init.sql"))
-            .withCharset(LATIN1)
-            .build();
+                .withScripts(classPathFile("db/001_init.sql"))
+                .withCharset(LATIN1)
+                .build();
 
         EmbeddedMysql mysqld = anEmbeddedMysql(v5_6_latest)
-            .addSchema(schema)
-            .addSchema("aschema2", classPathFiles("db/*.sql"))
-            .start();
+                .addSchema(schema)
+                .addSchema("aschema2", classPathFiles("db/*.sql"))
+                .start();
 
         //do work
 
@@ -82,8 +82,8 @@ public class JavaUsageExamplesTest {
     @Test
     public void schemaReset() {
         EmbeddedMysql mysqld = anEmbeddedMysql(v5_6_latest)
-            .addSchema("aschema", classPathFile("db/001_init.sql"))
-            .start();
+                .addSchema("aschema", classPathFile("db/001_init.sql"))
+                .start();
 
         //do work
 

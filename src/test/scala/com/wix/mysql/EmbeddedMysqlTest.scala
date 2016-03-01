@@ -9,9 +9,9 @@ import com.wix.mysql.support.IntegrationTest
 
 
 /**
- * @author viliusl
- * @since 03/07/15
- */
+  * @author viliusl
+  * @since 03/07/15
+  */
 class EmbeddedMysqlTest extends IntegrationTest {
 
   "EmbeddedMysql instance" should {

@@ -88,7 +88,9 @@ public enum Version implements IVersion {
         throw new UnsupportedOperationException();
     }
 
-    private Platform currentPlatform() { return Platform.detect(); }
+    private Platform currentPlatform() {
+        return Platform.detect();
+    }
 
     private String path() {
         return format("MySQL-%s", majorVersion);

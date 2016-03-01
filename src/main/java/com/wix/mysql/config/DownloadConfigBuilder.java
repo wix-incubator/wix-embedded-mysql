@@ -3,10 +3,8 @@ package com.wix.mysql.config;
 import com.wix.mysql.PackagePaths;
 import de.flapdoodle.embed.process.config.store.DownloadPath;
 import de.flapdoodle.embed.process.config.store.TimeoutConfigBuilder;
-import de.flapdoodle.embed.process.distribution.Platform;
 import de.flapdoodle.embed.process.extract.UUIDTempNaming;
 import de.flapdoodle.embed.process.io.directories.UserHome;
-import de.flapdoodle.embed.process.io.progress.ConsoleOneLineProgressListener;
 import de.flapdoodle.embed.process.io.progress.StandardConsoleProgressListener;
 
 /**
