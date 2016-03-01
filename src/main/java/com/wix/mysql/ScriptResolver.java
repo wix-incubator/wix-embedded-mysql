@@ -23,7 +23,11 @@ import static java.util.Arrays.copyOfRange;
 public class ScriptResolver {
 
     /**
+     * /**
      * Locates a single classPathFile in a classpath, ex. 'db/init_schema.sql'
+     *
+     * @param path path to file
+     * @return resolved File
      */
     public static File classPathFile(final String path) {
         String normalizedPath = path.startsWith("/") ? path : format("/%s", path);
@@ -36,9 +40,11 @@ public class ScriptResolver {
     }
 
     /**
-     * Locates classPathFiles matching pattern, ordered using natural alphanumeric order, ex. 'db/*.sql'.
-     * <p/>
-     * Note: Supports only wildcards ('*') and only in file names for matching.
+     * Locates classPathFiles matching pattern, ordered using natural alphanumeric order
+     * Note: Supports only wildcards ('*') and only in file names for matching
+     *
+     * @param pattern ex. 'db/*.sql'
+     * @return list of resolved files
      */
     public static List<File> classPathFiles(final String pattern) {
         List<File> results;
