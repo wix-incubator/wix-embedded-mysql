@@ -43,6 +43,12 @@ class MysqlClient {
         }
     }
 
+    public void executeCommands(final List<String> sqls) {
+        for (String sql : sqls) {
+            execute(sql);
+        }
+    }
+
     private void execute(final String sql) {
         String command = (Platform.detect() == Windows) ? format("\"%s\"", sql) : sql;
         try {
