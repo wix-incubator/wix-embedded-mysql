@@ -145,9 +145,7 @@ class EmbeddedMysqlTest extends IntegrationTest {
           aMigrationWith("create table t2 (col1 INTEGER);"))
         .withCommands(
           "create table t3 (col1 INTEGER);\n" +
-          "create table t4 (col2 INTEGER)",
-          "create table t5 (col3 INTEGER)"
-        )
+          "create table t4 (col2 INTEGER)")
         .build
 
       mysqld = anEmbeddedMysql(v5_6_latest)
@@ -158,7 +156,6 @@ class EmbeddedMysqlTest extends IntegrationTest {
       aQuery(onSchema = "aSchema", sql = "select count(col1) from t2;") must beSuccessful
       aQuery(onSchema = "aSchema", sql = "select count(col1) from t3;") must beSuccessful
       aQuery(onSchema = "aSchema", sql = "select count(col2) from t4;") must beSuccessful
-      aQuery(onSchema = "aSchema", sql = "select count(col3) from t5;") must beSuccessful
     }
   }
 }
