@@ -1,7 +1,6 @@
 package com.wix.mysql.config;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -17,8 +16,7 @@ public class SchemaConfig {
     private final List<File> scripts;
     private final List<String> commands;
 
-    private SchemaConfig(String name, Charset charset, List<File> scripts, List<String> commands)
-    {
+    private SchemaConfig(String name, Charset charset, List<File> scripts, List<String> commands) {
         this.name = name;
         this.charset = charset;
         this.scripts = scripts;
@@ -41,8 +39,7 @@ public class SchemaConfig {
         return scripts;
     }
 
-    public List<String> getCommands()
-    {
+    public List<String> getCommands() {
         return commands;
     }
 
@@ -71,13 +68,11 @@ public class SchemaConfig {
             return this;
         }
 
-        public Builder withCommands(final String... commands)
-        {
+        public Builder withCommands(final String... commands) {
             return withCommands(Arrays.asList(commands));
         }
 
-        public Builder withCommands(final List<String> commands)
-        {
+        public Builder withCommands(final List<String> commands) {
             this.commands = commands;
             return this;
         }
