@@ -45,10 +45,12 @@ public class EmbeddedMysql {
         return this.config;
     }
 
+    /** @deprecated Use overload with SchemaConfig */
     public void reloadSchema(final String schemaName, final File... scripts) {
         reloadSchema(SchemaConfig.aSchemaConfig(schemaName).withScripts(scripts).build());
     }
 
+    /** @deprecated Use overload with SchemaConfig */
     public void reloadSchema(final String schemaName, final List<File> scripts) {
         reloadSchema(SchemaConfig.aSchemaConfig(schemaName).withScripts(scripts).build());
     }

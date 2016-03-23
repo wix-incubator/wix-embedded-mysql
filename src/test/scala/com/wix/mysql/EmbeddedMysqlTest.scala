@@ -45,21 +45,7 @@ class EmbeddedMysqlTest extends IntegrationTest {
   }
 
   "EmbeddedMysql schema reload" should {
-    "reset schema with schema name and migration files" in {
-      mysqld = anEmbeddedMysql(v5_6_latest)
-        .addSchema("aSchema", aMigrationWith("create table t1 (col1 INTEGER);"))
-        .start
-
-      anUpdate(onSchema = "aSchema", sql = "insert into t1 values(10)") must beSuccessful
-      aSelect[java.lang.Long](onSchema = "aSchema", sql = "select col1 from t1 where col1 = 10;") mustEqual 10
-
-      mysqld.reloadSchema("aSchema", aMigrationWith("create table t1 (col1 INTEGER);"))
-
-      aSelect[java.lang.Long](onSchema = "aSchema", sql = "select col1 from t1 where col1 = 10;") must
-        failWith("Incorrect result size: expected 1, actual 0")
-    }
-
-    "reset schema with schema config" in {
+    "reset schema" in {
       val config = aSchemaConfig("aSchema")
         .withScripts(aMigrationWith("create table t1 (col1 INTEGER);"))
         .build
