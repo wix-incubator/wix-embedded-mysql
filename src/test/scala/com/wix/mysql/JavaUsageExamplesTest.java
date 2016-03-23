@@ -87,7 +87,10 @@ public class JavaUsageExamplesTest {
 
         //do work
 
-        mysqld.reloadSchema("aschema", classPathFile("db/001_init.sql"));
+        SchemaConfig schema = aSchemaConfig("aschema")
+                .withScripts(classPathFile("db/001_init.sql"))
+                .build();
+        mysqld.reloadSchema(schema);
 
         //continue on doing work
 

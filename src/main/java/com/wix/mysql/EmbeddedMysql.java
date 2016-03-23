@@ -45,10 +45,12 @@ public class EmbeddedMysql {
         return this.config;
     }
 
+    /** @deprecated Use overload with SchemaConfig */
     public void reloadSchema(final String schemaName, final File... scripts) {
         reloadSchema(SchemaConfig.aSchemaConfig(schemaName).withScripts(scripts).build());
     }
 
+    /** @deprecated Use overload with SchemaConfig */
     public void reloadSchema(final String schemaName, final List<File> scripts) {
         reloadSchema(SchemaConfig.aSchemaConfig(schemaName).withScripts(scripts).build());
     }
@@ -66,7 +68,9 @@ public class EmbeddedMysql {
                         schema.getName(), effectiveCharset.getCharset(), effectiveCharset.getCollate()),
                 format("GRANT ALL ON %s.* TO '%s'@'%%';", schema.getName(), config.getUsername()));
 
-        getClient(schema.getName()).executeScripts(schema.getScripts());
+        MysqlClient client = getClient(schema.getName());
+        client.executeScripts(schema.getScripts());
+        client.executeCommands(schema.getCommands());
 
         return this;
     }
