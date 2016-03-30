@@ -56,11 +56,15 @@ public class EmbeddedMysql {
     }
 
     public void reloadSchema(final SchemaConfig config) {
-        getClient(SystemDefaults.SCHEMA).executeCommands(format("DROP DATABASE %s", config.getName()));
+        dropSchema(config);
         addSchema(config);
     }
 
-    private EmbeddedMysql addSchema(final SchemaConfig schema) {
+    public void dropSchema(final SchemaConfig config) {
+        getClient(SystemDefaults.SCHEMA).executeCommands(format("DROP DATABASE %s", config.getName()));
+    }
+
+    public EmbeddedMysql addSchema(final SchemaConfig schema) {
         Charset effectiveCharset = or(schema.getCharset(), config.getCharset());
 
         getClient(SystemDefaults.SCHEMA).executeCommands(

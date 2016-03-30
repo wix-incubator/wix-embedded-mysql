@@ -32,6 +32,12 @@ trait InstanceMatchers extends Matchers {
         aSelect[String](ds, sql = s"SELECT DEFAULT_COLLATION_NAME FROM information_schema.SCHEMATA where SCHEMA_NAME = '$onSchema';"))
     }
 
+  def notHaveSchema(onSchema: String): Matcher[EmbeddedMysql] =
+    ===(0) ^^ { mySql: EmbeddedMysql =>
+      val ds = aDataSource(mySql.getConfig, "information_schema")
+      aSelect[java.lang.Integer](ds, sql = s"SELECT COUNT(1) FROM information_schema.SCHEMATA where SCHEMA_NAME = '$onSchema';").toInt
+    }
+
   def haveServerTimezoneMatching(timeZoneId: String): Matcher[EmbeddedMysql] =
     ===(Utils.asHHmmOffset(TimeZone.getTimeZone(timeZoneId))) ^^ { mySql: EmbeddedMysql =>
       val ds = aDataSource(mySql.getConfig, SystemDefaults.SCHEMA)

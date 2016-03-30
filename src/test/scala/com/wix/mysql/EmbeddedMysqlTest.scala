@@ -5,6 +5,7 @@ import com.wix.mysql.config.Charset.{LATIN1, UTF8MB4}
 import com.wix.mysql.config.MysqldConfig.{SystemDefaults, aMysqldConfig}
 import com.wix.mysql.config.SchemaConfig.aSchemaConfig
 import com.wix.mysql.distribution.Version.v5_6_latest
+import com.wix.mysql.exceptions.CommandFailedException
 import com.wix.mysql.support.IntegrationTest
 
 
@@ -142,6 +143,59 @@ class EmbeddedMysqlTest extends IntegrationTest {
       aQuery(onSchema = "aSchema", sql = "select count(col1) from t2;") must beSuccessful
       aQuery(onSchema = "aSchema", sql = "select count(col1) from t3;") must beSuccessful
       aQuery(onSchema = "aSchema", sql = "select count(col2) from t4;") must beSuccessful
+    }
+  }
+
+  "EmbeddedMysql schema modification" should {
+
+    "drop existing schema" in {
+      val schemaConfig = aSchemaConfig("aSchema").build
+
+      mysqld = anEmbeddedMysql(aMysqldConfig(v5_6_latest).build)
+        .addSchema(schemaConfig)
+        .start
+
+      mysqld must haveSchemaCharsetOf(UTF8MB4, schemaConfig.getName)
+
+      mysqld.dropSchema(schemaConfig)
+
+      mysqld must notHaveSchema(schemaConfig.getName)
+    }
+
+    "fail on dropping of non existing schema" in {
+      val schemaConfig = aSchemaConfig("aSchema").build
+
+      mysqld = anEmbeddedMysql(aMysqldConfig(v5_6_latest).build)
+        .start
+
+      mysqld must notHaveSchema(schemaConfig.getName)
+
+      mysqld.dropSchema(schemaConfig) must throwA[CommandFailedException]
+    }
+
+    "add schema after mysqld start" in {
+      val schemaConfig = aSchemaConfig("aSchema").build
+
+      mysqld = anEmbeddedMysql(aMysqldConfig(v5_6_latest).build)
+        .start
+
+      mysqld must notHaveSchema(schemaConfig.getName)
+
+      mysqld.addSchema(schemaConfig)
+
+      mysqld must haveSchemaCharsetOf(UTF8MB4, schemaConfig.getName)
+    }
+
+    "fail on adding existing schema" in {
+      val schemaConfig = aSchemaConfig("aSchema").build
+
+      mysqld = anEmbeddedMysql(aMysqldConfig(v5_6_latest).build)
+        .addSchema(schemaConfig)
+        .start
+
+      mysqld must haveSchemaCharsetOf(UTF8MB4, schemaConfig.getName)
+
+      mysqld.addSchema(schemaConfig) must throwA[CommandFailedException]
     }
   }
 }
