@@ -74,6 +74,7 @@ public class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutabl
                 exe.executable().getAbsolutePath(),
                 "--no-defaults",
                 "--log-output=NONE",
+                "--show_compatibility_56=ON",
                 format("--basedir=%s", baseDir),
                 format("--datadir=%s/data", baseDir),
                 format("--plugin-dir=%s/lib/plugin", baseDir),

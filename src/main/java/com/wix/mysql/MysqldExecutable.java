@@ -8,6 +8,7 @@ import de.flapdoodle.embed.process.distribution.Distribution;
 import de.flapdoodle.embed.process.distribution.Platform;
 import de.flapdoodle.embed.process.extract.IExtractedFileSet;
 import de.flapdoodle.embed.process.runtime.Executable;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 
 import java.io.File;
@@ -40,7 +41,7 @@ class MysqldExecutable extends Executable<MysqldConfig, MysqldProcess> {
 
         markAllLibraryFilesExecutable();
 
-        if (Platform.detect().isUnixLike())// windows already comes with data - otherwise installed python is needed:/
+        if (Platform.detect().isUnixLike() || config.getVersion().getMajorVersion().equals("5.7"))// windows already comes with data - otherwise installed python is needed:/
             this.initDatabase(config);
 
         return new MysqldProcess(distribution, config, runtime, this);
@@ -55,8 +56,17 @@ class MysqldExecutable extends Executable<MysqldConfig, MysqldProcess> {
     private void initDatabase(MysqldConfig config) throws IOException {
         try {
             boolean isSeverVersion57 = config.getVersion().getMajorVersion().equals("5.7");
+            Process p;
 
-            Process p = isSeverVersion57 ? getProcessForVersion57() : getProcess();
+            if (isSeverVersion57) {
+                if (Platform.detect().isUnixLike()) {
+                    p = getProcessForVersion57();
+                } else {
+                    p = getProcessForVersion57Windows();
+                }
+            } else {
+                p = getProcess();
+            }
 
             int retCode = p.waitFor();
 
@@ -80,6 +90,20 @@ class MysqldExecutable extends Executable<MysqldConfig, MysqldProcess> {
                 getBaseDir());
     }
 
+    private Process getProcessForVersion57Windows() throws IOException {
+        //TODO: ouch
+        FileUtils.deleteDirectory(new File(getBaseDir(), "data"));
+        return Runtime.getRuntime().exec(new String[]{
+                        this.executable.executable().getAbsolutePath(),
+                        "--no-defaults",
+                        "--initialize-insecure",
+                        format("--basedir=%s", getBaseDir()),
+                        format("--datadir=%s/data", getBaseDir())},
+                null,
+                getBaseDir());
+    }
+
+
     private Process getProcess() throws IOException {
         return Runtime.getRuntime().exec(new String[]{
                         "scripts/mysql_install_db",
@@ -97,7 +121,7 @@ class MysqldExecutable extends Executable<MysqldConfig, MysqldProcess> {
                             "Please install it via system package manager, ex. 'sudo apt-get install libaio1'.\n" +
                             "For details see: http://bugs.mysql.com/bug.php?id=60544");
         } else {
-            throw new RuntimeException(format("'scripts/mysql_install_db' command exited with error code: '%s' and output: '%s'", retCode, output));
+            throw new RuntimeException(format("Command exited with error code: '%s' and output: '%s'", retCode, output));
         }
     }
 
