@@ -21,10 +21,9 @@ public enum Version implements IVersion {
     v5_6_22("5.6", "22"),
     v5_6_23("5.6", "23"),
     v5_6_24("5.6", "24"),
-    //TODO: introduce support for windows - need to refactor as fileset/commands have changed considerably
-    v5_7_10("5.7", "10", Platform.Linux, Platform.OS_X),
-    v5_7_latest(v5_7_10),
-    v5_6_latest(v5_6_24);
+    v5_6_latest(v5_6_24),
+    v5_7_10("5.7", "10"),
+    v5_7_latest(v5_7_10);
 
     private final String majorVersion;
     private final String minorVersion;

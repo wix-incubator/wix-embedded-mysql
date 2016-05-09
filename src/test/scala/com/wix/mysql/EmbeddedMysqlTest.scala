@@ -4,6 +4,7 @@ import com.wix.mysql.EmbeddedMysql._
 import com.wix.mysql.config.Charset.{LATIN1, UTF8MB4}
 import com.wix.mysql.config.MysqldConfig.{SystemDefaults, aMysqldConfig}
 import com.wix.mysql.config.SchemaConfig.aSchemaConfig
+import com.wix.mysql.distribution.Version
 import com.wix.mysql.distribution.Version.v5_6_latest
 import com.wix.mysql.exceptions.CommandFailedException
 import com.wix.mysql.support.IntegrationTest
@@ -18,7 +19,7 @@ class EmbeddedMysqlTest extends IntegrationTest {
   "EmbeddedMysql instance" should {
 
     "start with default values" in {
-      val config = aMysqldConfig(v5_6_latest).build
+      val config = aMysqldConfig(Version.v5_7_latest).build
 
       mysqld = anEmbeddedMysql(config).start
 
@@ -26,6 +27,7 @@ class EmbeddedMysqlTest extends IntegrationTest {
         haveCharsetOf(UTF8MB4) and
         beAvailableOn(3310, "auser", "sa", SystemDefaults.SCHEMA) and
         haveServerTimezoneMatching("UTC")
+
     }
 
     "use custom values provided via MysqldConfig" in {
