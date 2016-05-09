@@ -81,7 +81,7 @@ class MysqldExecutable extends Executable<MysqldConfig, MysqldProcess> {
 
     private Process getProcessForVersion57() throws IOException {
         return Runtime.getRuntime().exec(new String[]{
-                        "bin/mysqld",
+                        this.executable.executable().getAbsolutePath(),
                         "--no-defaults",
                         "--initialize-insecure",
                         format("--basedir=%s", getBaseDir()),
