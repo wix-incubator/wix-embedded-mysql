@@ -1,10 +1,9 @@
 package com.wix.mysql;
 
 import com.wix.mysql.config.MysqldConfig;
+import com.wix.mysql.distribution.Service;
 import com.wix.mysql.io.NotifyingStreamProcessor;
 import com.wix.mysql.io.NotifyingStreamProcessor.ResultMatchingListener;
-import com.wix.mysql.utils.Utils;
-import de.flapdoodle.embed.process.collections.Collections;
 import de.flapdoodle.embed.process.config.IRuntimeConfig;
 import de.flapdoodle.embed.process.distribution.Distribution;
 import de.flapdoodle.embed.process.distribution.Platform;
@@ -16,7 +15,6 @@ import de.flapdoodle.embed.process.runtime.ProcessControl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -29,10 +27,6 @@ import static com.wix.mysql.utils.Utils.readToString;
 import static de.flapdoodle.embed.process.distribution.Platform.Windows;
 import static java.lang.String.format;
 
-/**
- * @author viliusl
- * @since 27/09/14
- */
 public class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutable, MysqldProcess> {
 
     private final static Logger logger = LoggerFactory.getLogger(MysqldProcess.class);
@@ -68,30 +62,7 @@ public class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutabl
 
     @Override
     protected List<String> getCommandLine(Distribution distribution, MysqldConfig config, IExtractedFileSet exe) throws IOException {
-        final String baseDir = exe.baseDir().getAbsolutePath();
-
-        List<String> commandLine = Collections.newArrayList(
-                exe.executable().getAbsolutePath(),
-                "--no-defaults",
-                "--log-output=NONE",
-                format("--basedir=%s", baseDir),
-                format("--datadir=%s/data", baseDir),
-                format("--plugin-dir=%s/lib/plugin", baseDir),
-                format("--socket=%s", sockFile(exe)),
-                format("--lc-messages-dir=%s/share", baseDir),
-                format("--port=%s", config.getPort()),
-                "--console",
-                format("--character-set-server=%s", config.getCharset().getCharset()),
-                format("--collation-server=%s", config.getCharset().getCollate()),
-                format("--default-time-zone=%s", Utils.asHHmmOffset(config.getTimeZone())));
-
-        if (!config.getVersion().getMajorVersion().equals("5.7"))
-            commandLine.add("--skip-name-resolve");
-
-        if (config.getVersion().getMajorVersion().equals("5.7"))
-            commandLine.add("--show_compatibility_56=ON");
-
-        return commandLine;
+        return Service.commandLine(config, exe);
     }
 
     @Override
@@ -190,22 +161,5 @@ public class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutabl
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-    }
-
-    /**
-     * Helper for getting stable sock classPathFile. Saving to local instance variable on service start does not work due
-     * to the way flapdoodle process library works - it does all init in {@link AbstractProcess} and instance of
-     * {@link MysqldProcess} is not yet present, so vars are not initialized.
-     * This algo gives stable sock classPathFile based on single executeCommands profile, but can leave trash sock classPathFiles in tmp dir.
-     * <p>
-     * Notes:
-     * .sock classPathFile needs to be in system temp dir and not in ex. target/...
-     * This is due to possible problems with existing mysql installation and apparmor profiles
-     * in linuxes.
-     */
-    private String sockFile(IExtractedFileSet exe) throws IOException {
-        String sysTempDir = System.getProperty("java.io.tmpdir");
-        String sockFile = format("%s.sock", exe.baseDir().getName());
-        return new File(sysTempDir, sockFile).getAbsolutePath();
     }
 }

@@ -1,32 +1,31 @@
-package com.wix.mysql.distribution.initializers;
+package com.wix.mysql.distribution.setup;
 
 import com.wix.mysql.distribution.Version;
+import de.flapdoodle.embed.process.distribution.Platform;
 import de.flapdoodle.embed.process.extract.IExtractedFileSet;
-import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
 
 import static java.lang.String.format;
 
-public class Mysql57Initializer implements Initializer {
+public class NixBefore57Initializer implements Initializer {
     @Override
     public boolean matches(Version version) {
-        return version.getMajorVersion().equals("5.7");
+        return Platform.detect().isUnixLike() &&
+                (version.getMajorVersion().equals("5.6") || version.getMajorVersion().equals("5.5"));
     }
 
     @Override
     public void apply(IExtractedFileSet files) throws IOException {
         File baseDir = files.baseDir();
-        // TODO: wait until https://github.com/flapdoodle-oss/de.flapdoodle.embed.process/pull/41 is merged
-        FileUtils.deleteDirectory(new File(baseDir, "data"));
-
         Process p = Runtime.getRuntime().exec(new String[]{
-                        files.executable().getAbsolutePath(),
+                        "scripts/mysql_install_db",
                         "--no-defaults",
-                        "--initialize-insecure",
                         format("--basedir=%s", baseDir),
-                        format("--datadir=%s/data", baseDir)});
+                        format("--datadir=%s/data", baseDir)},
+                null,
+                baseDir);
 
         ProcessRunner.run(p);
     }

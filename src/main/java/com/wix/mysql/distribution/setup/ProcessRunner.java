@@ -1,4 +1,4 @@
-package com.wix.mysql.distribution.initializers;
+package com.wix.mysql.distribution.setup;
 
 import com.wix.mysql.exceptions.MissingDependencyException;
 import org.apache.commons.io.IOUtils;

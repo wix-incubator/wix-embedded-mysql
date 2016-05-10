@@ -1,4 +1,4 @@
-package com.wix.mysql.distribution.initializers;
+package com.wix.mysql.distribution.setup;
 
 import com.wix.mysql.distribution.Version;
 import de.flapdoodle.embed.process.config.store.FileType;
