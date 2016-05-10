@@ -38,7 +38,6 @@ class MysqldExecutable extends Executable<MysqldConfig, MysqldProcess> {
         initializers.add(new NixBefore57Initializer());
     }
 
-
     @Override
     protected MysqldProcess start(
             final Distribution distribution,
