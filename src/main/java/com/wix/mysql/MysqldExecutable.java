@@ -1,6 +1,8 @@
 package com.wix.mysql;
 
 import com.wix.mysql.config.MysqldConfig;
+import com.wix.mysql.distribution.Initializer;
+import com.wix.mysql.distribution.Version;
 import com.wix.mysql.exceptions.MissingDependencyException;
 import de.flapdoodle.embed.process.config.IRuntimeConfig;
 import de.flapdoodle.embed.process.config.store.FileType;
@@ -13,6 +15,8 @@ import org.apache.commons.io.IOUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import static java.lang.String.format;
 
@@ -24,6 +28,93 @@ class MysqldExecutable extends Executable<MysqldConfig, MysqldProcess> {
 
     private final IExtractedFileSet executable;
 
+    private static class Mysql57Initializer implements Initializer {
+        @Override
+        public boolean matches(Version version) {
+            return version.getMajorVersion().equals("5.7");
+        }
+
+        @Override
+        public void apply(IExtractedFileSet files) throws IOException {
+            File baseDir = files.baseDir();
+            try {
+                FileUtils.deleteDirectory(new File(baseDir, "data"));
+                Process p = Runtime.getRuntime().exec(new String[]{
+                                files.executable().getAbsolutePath(),
+                                "--no-defaults",
+                                "--initialize-insecure",
+                                format("--basedir=%s", baseDir),
+                                format("--datadir=%s/data", baseDir)},
+                        null,
+                        baseDir);
+
+
+                int retCode = p.waitFor();
+
+                if (retCode != 0) {
+                    resolveException(retCode, IOUtils.toString(p.getInputStream()) + IOUtils.toString(p.getErrorStream()));
+                }
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        private void resolveException(int retCode, String output) {
+            if (output.contains("error while loading shared libraries: libaio.so")) {
+                throw new MissingDependencyException(
+                        "System library 'libaio.so.1' missing. " +
+                                "Please install it via system package manager, ex. 'sudo apt-get install libaio1'.\n" +
+                                "For details see: http://bugs.mysql.com/bug.php?id=60544");
+            } else {
+                throw new RuntimeException(format("Command exited with error code: '%s' and output: '%s'", retCode, output));
+            }
+        }
+    }
+
+    private static class NixBefore57Initializer implements Initializer {
+        @Override
+        public boolean matches(Version version) {
+            return Platform.detect().isUnixLike() &&
+                    (version.getMajorVersion().equals("5.6") || version.getMajorVersion().equals("5.5"));
+        }
+
+        @Override
+        public void apply(IExtractedFileSet files) throws IOException {
+            File baseDir = files.baseDir();
+            try {
+                Process p = Runtime.getRuntime().exec(new String[]{
+                                "scripts/mysql_install_db",
+                                "--no-defaults",
+                                format("--basedir=%s", baseDir),
+                                format("--datadir=%s/data", baseDir)},
+                        null,
+                        baseDir);
+
+                int retCode = p.waitFor();
+
+                if (retCode != 0) {
+                    resolveException(retCode, IOUtils.toString(p.getInputStream()) + IOUtils.toString(p.getErrorStream()));
+                }
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        private void resolveException(int retCode, String output) {
+            if (output.contains("error while loading shared libraries: libaio.so")) {
+                throw new MissingDependencyException(
+                        "System library 'libaio.so.1' missing. " +
+                                "Please install it via system package manager, ex. 'sudo apt-get install libaio1'.\n" +
+                                "For details see: http://bugs.mysql.com/bug.php?id=60544");
+            } else {
+                throw new RuntimeException(format("Command exited with error code: '%s' and output: '%s'", retCode, output));
+            }
+        }
+
+    }
+
+    private List<Initializer> initializers = new ArrayList<>();
+
     public MysqldExecutable(
             final Distribution distribution,
             final MysqldConfig config,
@@ -31,7 +122,10 @@ class MysqldExecutable extends Executable<MysqldConfig, MysqldProcess> {
             final IExtractedFileSet executable) {
         super(distribution, config, runtimeConfig, executable);
         this.executable = executable;
+        initializers.add(new Mysql57Initializer());
+        initializers.add(new NixBefore57Initializer());
     }
+
 
     @Override
     protected MysqldProcess start(
@@ -41,8 +135,11 @@ class MysqldExecutable extends Executable<MysqldConfig, MysqldProcess> {
 
         markAllLibraryFilesExecutable();
 
-        if (Platform.detect().isUnixLike() || config.getVersion().getMajorVersion().equals("5.7"))// windows already comes with data - otherwise installed python is needed:/
-            this.initDatabase(config);
+        for(Initializer initializer : initializers) {
+            if(initializer.matches(config.getVersion())) {
+                initializer.apply(executable);
+            }
+        }
 
         return new MysqldProcess(distribution, config, runtime, this);
     }
@@ -53,79 +150,7 @@ class MysqldExecutable extends Executable<MysqldConfig, MysqldProcess> {
         }
     }
 
-    private void initDatabase(MysqldConfig config) throws IOException {
-        try {
-            boolean isSeverVersion57 = config.getVersion().getMajorVersion().equals("5.7");
-            Process p;
-
-            if (isSeverVersion57) {
-                if (Platform.detect().isUnixLike()) {
-                    p = getProcessForVersion57();
-                } else {
-                    p = getProcessForVersion57Windows();
-                }
-            } else {
-                p = getProcess();
-            }
-
-            int retCode = p.waitFor();
-
-            if (retCode != 0) {
-                resolveException(retCode, IOUtils.toString(p.getInputStream()) + IOUtils.toString(p.getErrorStream()));
-            }
-
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private Process getProcessForVersion57() throws IOException {
-        return Runtime.getRuntime().exec(new String[]{
-                        this.executable.executable().getAbsolutePath(),
-                        "--no-defaults",
-                        "--initialize-insecure",
-                        format("--basedir=%s", getBaseDir()),
-                        format("--datadir=%s/data", getBaseDir())},
-                null,
-                getBaseDir());
-    }
-
-    private Process getProcessForVersion57Windows() throws IOException {
-        //TODO: ouch
-        FileUtils.deleteDirectory(new File(getBaseDir(), "data"));
-        return Runtime.getRuntime().exec(new String[]{
-                        this.executable.executable().getAbsolutePath(),
-                        "--no-defaults",
-                        "--initialize-insecure",
-                        format("--basedir=%s", getBaseDir()),
-                        format("--datadir=%s/data", getBaseDir())},
-                null,
-                getBaseDir());
-    }
-
-
-    private Process getProcess() throws IOException {
-        return Runtime.getRuntime().exec(new String[]{
-                        "scripts/mysql_install_db",
-                        "--no-defaults",
-                        format("--basedir=%s", getBaseDir()),
-                        format("--datadir=%s/data", getBaseDir())},
-                null,
-                getBaseDir());
-    }
-
-    private void resolveException(int retCode, String output) {
-        if (output.contains("error while loading shared libraries: libaio.so")) {
-            throw new MissingDependencyException(
-                    "System library 'libaio.so.1' missing. " +
-                            "Please install it via system package manager, ex. 'sudo apt-get install libaio1'.\n" +
-                            "For details see: http://bugs.mysql.com/bug.php?id=60544");
-        } else {
-            throw new RuntimeException(format("Command exited with error code: '%s' and output: '%s'", retCode, output));
-        }
-    }
-
-    protected File getBaseDir() {
-        return this.executable.baseDir();
+    public File getBaseDir() {
+        return executable.baseDir();
     }
 }
