@@ -19,7 +19,7 @@ public class Setup {
 
 
     public static void apply(Version version, IExtractedFileSet files) throws IOException {
-        for (Initializer initializer: initializers) {
+        for (Initializer initializer : initializers) {
             if (initializer.matches(version)) {
                 initializer.apply(files);
             }

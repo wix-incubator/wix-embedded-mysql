@@ -1,4 +1,4 @@
-package com.wix.mysql.embed.process.store;
+package com.wix.mysql.store;
 
 import de.flapdoodle.embed.process.config.store.IDownloadConfig;
 import de.flapdoodle.embed.process.distribution.Distribution;

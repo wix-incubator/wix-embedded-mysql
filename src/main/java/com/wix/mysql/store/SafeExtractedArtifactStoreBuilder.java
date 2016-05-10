@@ -1,4 +1,4 @@
-package com.wix.mysql.embed.process.store;
+package com.wix.mysql.store;
 
 import com.wix.mysql.config.ArtifactStoreBuilder;
 import de.flapdoodle.embed.process.extract.DirectoryAndExecutableNaming;

@@ -2,7 +2,7 @@ package com.wix.mysql.config;
 
 import com.wix.mysql.MysqldProcess;
 import com.wix.mysql.distribution.Version;
-import com.wix.mysql.embed.process.store.SafeExtractedArtifactStoreBuilder;
+import com.wix.mysql.store.SafeExtractedArtifactStoreBuilder;
 import de.flapdoodle.embed.process.config.io.ProcessOutput;
 import de.flapdoodle.embed.process.runtime.ICommandLinePostProcessor;
 import de.flapdoodle.embed.process.store.IArtifactStore;
