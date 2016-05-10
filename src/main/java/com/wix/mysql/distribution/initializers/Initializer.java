@@ -1,6 +1,7 @@
-package com.wix.mysql.distribution;
+package com.wix.mysql.distribution.initializers;
 
 
+import com.wix.mysql.distribution.Version;
 import de.flapdoodle.embed.process.extract.IExtractedFileSet;
 
 import java.io.IOException;
