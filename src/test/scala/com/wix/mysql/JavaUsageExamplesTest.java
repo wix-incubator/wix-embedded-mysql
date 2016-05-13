@@ -15,10 +15,6 @@ import static com.wix.mysql.config.SchemaConfig.aSchemaConfig;
 import static com.wix.mysql.distribution.Version.v5_6_23;
 import static com.wix.mysql.distribution.Version.v5_6_latest;
 
-/**
- * @author viliusl
- * @since 21/07/15
- */
 @Ignore
 public class JavaUsageExamplesTest {
 

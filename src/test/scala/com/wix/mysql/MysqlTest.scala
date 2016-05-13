@@ -5,10 +5,6 @@ import com.wix.mysql.distribution.Version.v5_6_latest
 import com.wix.mysql.exceptions.CommandFailedException
 import com.wix.mysql.support.IntegrationTest
 
-/**
-  * @author viliusl
-  * @since 25/05/15
-  */
 class MysqlTest extends IntegrationTest {
 
   "mysql should emit exception info with message from 'mysql' command output'" in {

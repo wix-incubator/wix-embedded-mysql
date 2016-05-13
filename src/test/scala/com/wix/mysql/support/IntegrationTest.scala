@@ -20,12 +20,8 @@ import org.springframework.jdbc.core.JdbcTemplate
 import scala.collection.JavaConversions._
 import scala.reflect._
 
-/**
-  * @author viliusl
-  * @since 27/03/15
-  */
-class IntegrationTest extends SpecWithJUnit with AfterEach
-  with InstanceMatchers with TestResourcesSupport with JdbcSupport {
+abstract class IntegrationTest extends SpecWithJUnit with AfterEach
+  with InstanceMatchers with TestResourceSupport with JdbcSupport {
 
   sequential
 

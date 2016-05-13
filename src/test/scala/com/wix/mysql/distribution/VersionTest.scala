@@ -10,10 +10,6 @@ import org.specs2.execute.{AsResult, Result}
 import org.specs2.mutable.SpecWithJUnit
 import org.specs2.specification.AroundEach
 
-/**
-  * @author viliusl
-  * @since 27/03/15
-  */
 class VersionTest extends SpecWithJUnit with AroundEach {
   sequential
 

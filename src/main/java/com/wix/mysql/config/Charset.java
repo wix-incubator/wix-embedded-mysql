@@ -2,10 +2,6 @@ package com.wix.mysql.config;
 
 import java.util.Arrays;
 
-/**
- * @author viliusl
- * @since 06/06/15
- */
 public class Charset {
     public static final Charset UTF8MB4 = new Charset("utf8mb4", "utf8mb4_unicode_ci");
     public static final Charset UTF8 = new Charset("utf8", "utf8_general_ci");

@@ -8,10 +8,6 @@ import org.specs2.mutable.SpecWithJUnit
 
 import scala.collection.convert.decorateAsScala._
 
-/**
-  * @author viliusl
-  * @since 06/06/15
-  */
 class ScriptResolverTest extends SpecWithJUnit with FileMatchers {
 
   //TODO: add additional variations for sorting, etc.

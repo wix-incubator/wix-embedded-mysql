@@ -5,10 +5,6 @@ import de.flapdoodle.embed.process.io.IStreamProcessor;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * @author viliusl
- * @since 30/09/15
- */
 public class NotifyingStreamProcessor implements IStreamProcessor {
 
     private final List<ResultMatchingListener> listeners = new ArrayList<>();

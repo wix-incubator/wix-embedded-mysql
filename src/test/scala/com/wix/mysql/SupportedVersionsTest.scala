@@ -7,10 +7,6 @@ import com.wix.mysql.support.IntegrationTest
 import org.specs2.matcher.Scope
 import org.specs2.specification.core.Fragment
 
-/**
-  * @author viliusl
-  * @since 27/03/15
-  */
 class SupportedVersionsTest extends IntegrationTest {
 
   trait Context extends Scope {

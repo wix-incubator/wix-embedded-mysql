@@ -2,7 +2,7 @@ package com.wix.mysql.config;
 
 import com.wix.mysql.MysqldProcess;
 import com.wix.mysql.distribution.Version;
-import com.wix.mysql.embed.process.store.SafeExtractedArtifactStoreBuilder;
+import com.wix.mysql.store.SafeExtractedArtifactStoreBuilder;
 import de.flapdoodle.embed.process.config.io.ProcessOutput;
 import de.flapdoodle.embed.process.runtime.ICommandLinePostProcessor;
 import de.flapdoodle.embed.process.store.IArtifactStore;
@@ -12,10 +12,6 @@ import org.slf4j.LoggerFactory;
 import static de.flapdoodle.embed.process.io.Processors.logTo;
 import static de.flapdoodle.embed.process.io.Slf4jLevel.DEBUG;
 
-/**
- * @author viliusl
- * @since 27/09/14
- */
 public class RuntimeConfigBuilder extends de.flapdoodle.embed.process.config.RuntimeConfigBuilder {
 
     private Logger logger = LoggerFactory.getLogger(MysqldProcess.class);

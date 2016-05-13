@@ -9,10 +9,6 @@ import com.wix.mysql.config.{Charset, MysqldConfig}
 import com.wix.mysql.utils.Utils
 import org.specs2.matcher.{Matcher, Matchers}
 
-/**
-  * @author viliusl
-  * @since 20/07/15
-  */
 trait InstanceMatchers extends Matchers {
   self: IntegrationTest =>
 

@@ -16,9 +16,6 @@ import static java.util.Arrays.copyOfRange;
 
 /**
  * Helper for locating schema init scripts in a classpath.
- *
- * @author viliusl
- * @since 06/06/15
  */
 public class ScriptResolver {
 

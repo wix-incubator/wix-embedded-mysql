@@ -6,11 +6,6 @@ import com.wix.mysql.config.extract.PathPrefixingNaming;
 import de.flapdoodle.embed.process.io.directories.UserHome;
 import de.flapdoodle.embed.process.store.Downloader;
 
-
-/**
- * @author viliusl
- * @since 27/09/14
- */
 public class ArtifactStoreBuilder extends de.flapdoodle.embed.process.store.ExtractedArtifactStoreBuilder {
 
     public ArtifactStoreBuilder defaults() {
