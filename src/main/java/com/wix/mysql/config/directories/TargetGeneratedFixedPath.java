@@ -20,7 +20,7 @@ public class TargetGeneratedFixedPath implements IDirectory {
     }
 
     private void generateNeededDirs() {
-        String[] paths = null;
+        String[] paths;
 
         if (Platform.detect() == Platform.Windows ) {
             paths = new String[]{"bin", "share/english", "data/test", "data/mysql", "data/performance_schema"};
@@ -38,4 +38,3 @@ public class TargetGeneratedFixedPath implements IDirectory {
         return true;
     }
 }
-

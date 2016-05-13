@@ -12,10 +12,6 @@ import org.slf4j.LoggerFactory;
 import static de.flapdoodle.embed.process.io.Processors.logTo;
 import static de.flapdoodle.embed.process.io.Slf4jLevel.DEBUG;
 
-/**
- * @author viliusl
- * @since 27/09/14
- */
 public class RuntimeConfigBuilder extends de.flapdoodle.embed.process.config.RuntimeConfigBuilder {
 
     private Logger logger = LoggerFactory.getLogger(MysqldProcess.class);

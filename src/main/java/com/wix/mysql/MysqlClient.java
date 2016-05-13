@@ -15,10 +15,6 @@ import static com.wix.mysql.utils.Utils.isNullOrEmpty;
 import static de.flapdoodle.embed.process.distribution.Platform.Windows;
 import static java.lang.String.format;
 
-/**
- * @author viliusl
- * @since 25/05/15
- */
 class MysqlClient {
 
     private final MysqldConfig config;

@@ -16,10 +16,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * @author viliusl
- * @since 27/09/14
- */
 class MysqldExecutable extends Executable<MysqldConfig, MysqldProcess> {
 
     private final IExtractedFileSet executable;

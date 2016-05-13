@@ -7,7 +7,7 @@ import org.apache.commons.io.FileUtils
 
 import scala.reflect.io.File
 
-trait TestResourcesSupport {
+trait TestResourceSupport {
 
   def createTempFile(content: String): JFile = {
     testResourceDirExists()

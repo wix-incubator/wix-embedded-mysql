@@ -18,10 +18,6 @@ import static com.wix.mysql.config.MysqldConfig.SystemDefaults.SCHEMA;
 import static com.wix.mysql.utils.Utils.or;
 import static java.lang.String.format;
 
-/**
- * @author viliusl
- * @since 07/06/15
- */
 public class EmbeddedMysql {
     protected final MysqldConfig config;
     protected final MysqldExecutable executable;

@@ -14,9 +14,6 @@ import java.io.IOException;
 /**
  * This is a wrapper around `ExtractedArtifactStore` which deletes the temp directory BEFORE extracting
  * just in case we have left overs from last crashed run.
- *
- * @author maximn
- * @since 22-Oct-2015
  */
 class SafeExtractedArtifactStore extends ExtractedArtifactStore {
     private String directory;

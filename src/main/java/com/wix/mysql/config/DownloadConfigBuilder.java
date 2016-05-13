@@ -7,10 +7,6 @@ import de.flapdoodle.embed.process.extract.UUIDTempNaming;
 import de.flapdoodle.embed.process.io.directories.UserHome;
 import de.flapdoodle.embed.process.io.progress.StandardConsoleProgressListener;
 
-/**
- * @author viliusl
- * @since 27/09/14
- */
 public class DownloadConfigBuilder extends de.flapdoodle.embed.process.config.store.DownloadConfigBuilder {
 
     public DownloadConfigBuilder defaults() {

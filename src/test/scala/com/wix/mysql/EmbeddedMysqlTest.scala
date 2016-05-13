@@ -9,11 +9,6 @@ import com.wix.mysql.distribution.Version.v5_6_latest
 import com.wix.mysql.exceptions.CommandFailedException
 import com.wix.mysql.support.IntegrationTest
 
-
-/**
-  * @author viliusl
-  * @since 03/07/15
-  */
 class EmbeddedMysqlTest extends IntegrationTest {
 
   "EmbeddedMysql instance" should {

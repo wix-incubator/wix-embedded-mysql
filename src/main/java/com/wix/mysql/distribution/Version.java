@@ -10,10 +10,6 @@ import java.util.List;
 
 import static java.lang.String.format;
 
-/**
- * @author viliusl
- * @since 27/09/14
- */
 public enum Version implements IVersion {
 
     v5_5_40("5.5", "40", Platform.Linux, Platform.OS_X),

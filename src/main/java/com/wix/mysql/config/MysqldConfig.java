@@ -7,10 +7,6 @@ import de.flapdoodle.embed.process.distribution.IVersion;
 
 import java.util.TimeZone;
 
-/**
- * @author viliusl
- * @since 27/09/14
- */
 public class MysqldConfig extends ExecutableProcessConfig {
 
     private final Integer port;

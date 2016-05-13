@@ -8,10 +8,6 @@ import org.specs2.mutable.SpecWithJUnit
 
 import scala.collection.convert.wrapAll._
 
-/**
-  * @author viliusl
-  * @since 06/06/15
-  */
 class SchemaConfigTest extends SpecWithJUnit {
 
   "SchemaConfig" should {

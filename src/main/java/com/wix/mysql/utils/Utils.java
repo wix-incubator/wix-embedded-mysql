@@ -10,10 +10,6 @@ import static java.lang.String.format;
 import static java.util.concurrent.TimeUnit.HOURS;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
-/**
- * @author viliusl
- * @since 13/02/15
- */
 public class Utils {
     public static void closeCloseables(Reader... readers) {
 

@@ -5,10 +5,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-/**
- * @author viliusl
- * @since 06/06/15
- */
 public class SchemaConfig {
 
     private final String name;

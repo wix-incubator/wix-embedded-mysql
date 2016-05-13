@@ -4,10 +4,6 @@ import com.wix.mysql.config.ArtifactStoreBuilder;
 import de.flapdoodle.embed.process.extract.DirectoryAndExecutableNaming;
 import de.flapdoodle.embed.process.store.IArtifactStore;
 
-/**
- * @author maximn
- * @since 22-Oct-2015
- */
 public class SafeExtractedArtifactStoreBuilder extends ArtifactStoreBuilder {
     @Override
     public IArtifactStore build() {
