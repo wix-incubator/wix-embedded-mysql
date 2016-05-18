@@ -7,6 +7,8 @@ import com.wix.mysql.config.RuntimeConfigBuilder;
 import com.wix.mysql.config.SchemaConfig;
 import com.wix.mysql.distribution.Version;
 import de.flapdoodle.embed.process.config.IRuntimeConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,17 +21,22 @@ import static com.wix.mysql.utils.Utils.or;
 import static java.lang.String.format;
 
 public class EmbeddedMysql {
+    private final static Logger logger = LoggerFactory.getLogger(EmbeddedMysql.class);
+
     protected final MysqldConfig config;
     protected final MysqldExecutable executable;
     private AtomicBoolean isRunning = new AtomicBoolean(true);
 
     protected EmbeddedMysql(final MysqldConfig config) {
+        logger.info("Preparing EmbeddedMysql version '{}'...", config.getVersion());
         this.config = config;
         IRuntimeConfig runtimeConfig = new RuntimeConfigBuilder().defaults(config.getVersion()).build();
         this.executable = new MysqldStarter(runtimeConfig).prepare(config);
 
         try {
+            logger.info("Starting EmbeddedMysql...");
             executable.start();
+            logger.info("Starting EmbeddedMysql... done.");
             getClient(SCHEMA).executeCommands(
                     format("CREATE USER '%s'@'%%' IDENTIFIED BY '%s';", config.getUsername(), config.getPassword()));
         } catch (IOException e) {
