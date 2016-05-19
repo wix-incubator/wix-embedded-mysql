@@ -10,6 +10,8 @@ import de.flapdoodle.embed.process.config.IRuntimeConfig;
 import de.flapdoodle.embed.process.distribution.Distribution;
 import de.flapdoodle.embed.process.extract.IExtractedFileSet;
 import de.flapdoodle.embed.process.runtime.Executable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,6 +19,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 class MysqldExecutable extends Executable<MysqldConfig, MysqldProcess> {
+
+    private final static Logger logger = LoggerFactory.getLogger(MysqldExecutable.class);
 
     private final IExtractedFileSet executable;
 
@@ -34,8 +38,9 @@ class MysqldExecutable extends Executable<MysqldConfig, MysqldProcess> {
             final Distribution distribution,
             final MysqldConfig config,
             final IRuntimeConfig runtime) throws IOException {
-        Setup.apply(config.getVersion(), executable);
-
+        logger.info("Preparing mysqld for startup");
+        Setup.apply(config.getVersion(), executable, runtime);
+        logger.info("Starting MysqldProcess");
         return new MysqldProcess(distribution, config, runtime, this);
     }
 
