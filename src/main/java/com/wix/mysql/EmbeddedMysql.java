@@ -34,9 +34,7 @@ public class EmbeddedMysql {
         this.executable = new MysqldStarter(runtimeConfig).prepare(config);
 
         try {
-            logger.info("Starting EmbeddedMysql...");
             executable.start();
-            logger.info("Starting EmbeddedMysql... done.");
             getClient(SCHEMA).executeCommands(
                     format("CREATE USER '%s'@'%%' IDENTIFIED BY '%s';", config.getUsername(), config.getPassword()));
         } catch (IOException e) {

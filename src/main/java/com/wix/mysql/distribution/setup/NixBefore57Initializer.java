@@ -1,6 +1,7 @@
 package com.wix.mysql.distribution.setup;
 
 import com.wix.mysql.distribution.Version;
+import de.flapdoodle.embed.process.config.IRuntimeConfig;
 import de.flapdoodle.embed.process.distribution.Platform;
 import de.flapdoodle.embed.process.extract.IExtractedFileSet;
 
@@ -17,7 +18,7 @@ public class NixBefore57Initializer implements Initializer {
     }
 
     @Override
-    public void apply(IExtractedFileSet files) throws IOException {
+    public void apply(IExtractedFileSet files, IRuntimeConfig runtimeConfig) throws IOException {
         File baseDir = files.baseDir();
         Process p = Runtime.getRuntime().exec(new String[]{
                         "scripts/mysql_install_db",
@@ -27,6 +28,6 @@ public class NixBefore57Initializer implements Initializer {
                 null,
                 baseDir);
 
-        ProcessRunner.run(p);
+        ProcessRunner.run(p, runtimeConfig);
     }
 }

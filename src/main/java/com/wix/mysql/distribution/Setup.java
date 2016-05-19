@@ -5,6 +5,7 @@ import com.wix.mysql.distribution.setup.Initializer;
 import com.wix.mysql.distribution.setup.Mysql57Initializer;
 import com.wix.mysql.distribution.setup.NixBefore57Initializer;
 import de.flapdoodle.embed.process.collections.Collections;
+import de.flapdoodle.embed.process.config.IRuntimeConfig;
 import de.flapdoodle.embed.process.extract.IExtractedFileSet;
 
 import java.io.IOException;
@@ -18,10 +19,10 @@ public class Setup {
             new NixBefore57Initializer());
 
 
-    public static void apply(Version version, IExtractedFileSet files) throws IOException {
+    public static void apply(Version version, IExtractedFileSet files, IRuntimeConfig runtimeConfig) throws IOException {
         for (Initializer initializer : initializers) {
             if (initializer.matches(version)) {
-                initializer.apply(files);
+                initializer.apply(files, runtimeConfig);
             }
         }
     }
