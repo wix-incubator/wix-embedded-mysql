@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -46,14 +47,27 @@ public class EmbeddedMysql {
         return this.config;
     }
 
-    /** @deprecated Use overload with SchemaConfig */
+    /**
+     * @deprecated Use overload with SchemaConfig
+     */
     public void reloadSchema(final String schemaName, final File... scripts) {
-        reloadSchema(SchemaConfig.aSchemaConfig(schemaName).withScripts(scripts).build());
+        List<SqlCommandSource> commands = Collections.emptyList();
+        for (File f : scripts) {
+            commands.add(Sources.fromFile(f));
+        }
+        reloadSchema(SchemaConfig.aSchemaConfig(schemaName).withScripts(commands).build());
     }
 
-    /** @deprecated Use overload with SchemaConfig */
+    /**
+     * @deprecated Use overload with SchemaConfig
+     */
     public void reloadSchema(final String schemaName, final List<File> scripts) {
-        reloadSchema(SchemaConfig.aSchemaConfig(schemaName).withScripts(scripts).build());
+        List<SqlCommandSource> commands = Collections.emptyList();
+        for (File f : scripts) {
+            commands.add(Sources.fromFile(f));
+        }
+
+        reloadSchema(SchemaConfig.aSchemaConfig(schemaName).withScripts(commands).build());
     }
 
     public void reloadSchema(final SchemaConfig config) {
@@ -75,7 +89,6 @@ public class EmbeddedMysql {
 
         MysqlClient client = getClient(schema.getName());
         client.executeScripts(schema.getScripts());
-        client.executeCommands(schema.getCommands());
 
         return this;
     }
@@ -107,12 +120,12 @@ public class EmbeddedMysql {
             this.config = config;
         }
 
-        public Builder addSchema(final String name, final File... scripts) {
+        public Builder addSchema(final String name, final SqlCommandSource... scripts) {
             this.schemas.add(SchemaConfig.aSchemaConfig(name).withScripts(scripts).build());
             return this;
         }
 
-        public Builder addSchema(final String name, final List<File> scripts) {
+        public Builder addSchema(final String name, final List<SqlCommandSource> scripts) {
             this.schemas.add(SchemaConfig.aSchemaConfig(name).withScripts(scripts).build());
             return this;
         }

@@ -6,9 +6,9 @@ import com.wix.mysql.exceptions.CommandFailedException;
 import de.flapdoodle.embed.process.distribution.Platform;
 import org.apache.commons.io.IOUtils;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.List;
 
 import static com.wix.mysql.utils.Utils.isNullOrEmpty;
@@ -27,19 +27,17 @@ class MysqlClient {
         this.schemaName = schemaName;
     }
 
-    public void executeScripts(final List<File> files) {
-        for (File file : files) {
-            execute(format("source %s", file.getAbsolutePath()));
+    public void executeScripts(final List<SqlCommandSource> sqls) {
+        try {
+            for (SqlCommandSource sql : sqls) {
+                execute(sql.read());
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
     public void executeCommands(final String... sqls) {
-        for (String sql : sqls) {
-            execute(sql);
-        }
-    }
-
-    public void executeCommands(final List<String> sqls) {
         for (String sql : sqls) {
             execute(sql);
         }

@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileFilter;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -24,16 +25,16 @@ public class ScriptResolver {
      * Locates a single classPathFile in a classpath, ex. 'db/init_schema.sql'
      *
      * @param path path to file
-     * @return resolved File
+     * @return resolved SqlCommandSource
      */
-    public static File classPathFile(final String path) {
+    public static SqlCommandSource classPathFile(final String path) {
         String normalizedPath = path.startsWith("/") ? path : format("/%s", path);
         URL resource = ScriptResolver.class.getResource(normalizedPath);
 
         if (resource == null)
             throw new ScriptResolutionException(normalizedPath);
 
-        return asFile(resource);
+        return Sources.fromURL(resource);
     }
 
     /**
@@ -41,9 +42,9 @@ public class ScriptResolver {
      * Note: Supports only wildcards ('*') and only in file names for matching
      *
      * @param pattern ex. 'db/*.sql'
-     * @return list of resolved files
+     * @return list of resolved SqlCommandSource objects
      */
-    public static List<File> classPathFiles(final String pattern) {
+    public static List<SqlCommandSource> classPathFiles(final String pattern) {
         List<File> results;
 
         String[] parts = pattern.split("/");
@@ -59,7 +60,7 @@ public class ScriptResolver {
 
         Collections.sort(results);
 
-        return results;
+        return fromFiles(results);
     }
 
     private static File asFile(final URL resource) {
@@ -70,8 +71,17 @@ public class ScriptResolver {
         }
     }
 
+    private static List<SqlCommandSource> fromFiles(List<File> files) {
+        List<SqlCommandSource> res = new ArrayList<>();
+
+        for (File f: files) {
+            res.add(Sources.fromFile(f));
+        }
+        return res;
+    }
+
     public static class ScriptResolutionException extends RuntimeException {
-        public ScriptResolutionException(final String path) {
+        ScriptResolutionException(final String path) {
             super(format("No script(s) found for path '%s'", path));
         }
     }
