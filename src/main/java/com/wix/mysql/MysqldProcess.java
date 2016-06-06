@@ -66,27 +66,25 @@ public class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutabl
     }
 
     @Override
-    protected void stopInternal() {
-        synchronized (this) {
-            logger.info("try to stop mysqld");
-            if (!stopUsingMysqldadmin()) {
-                logger.warn("could not stop mysqld via mysqladmin, try next");
-                if (!sendKillToProcess()) {
+    protected synchronized void stopInternal() {
+        logger.info("try to stop mysqld");
+        if (!stopUsingMysqldadmin()) {
+            logger.warn("could not stop mysqld via mysqladmin, try next");
+            if (!sendKillToProcess()) {
+                logger.warn("could not stop mysqld, try next");
+                if (!sendTermToProcess()) {
                     logger.warn("could not stop mysqld, try next");
-                    if (!sendTermToProcess()) {
-                        logger.warn("could not stop mysqld, try next");
-                        if (!tryKillToProcess()) {
-                            logger.warn("could not stop mysqld the second time, try one last thing");
-                            try {
-                                stopProcess();
-                            } catch (IllegalStateException e) {
-                                logger.error("error while trying to stop mysql process", e);
-                            }
+                    if (!tryKillToProcess()) {
+                        logger.warn("could not stop mysqld the second time, try one last thing");
+                        try {
+                            stopProcess();
+                        } catch (IllegalStateException e) {
+                            logger.error("error while trying to stop mysql process", e);
                         }
                     }
                 }
-
             }
+
         }
     }
 
