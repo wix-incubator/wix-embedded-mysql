@@ -27,7 +27,7 @@ class MysqlClient {
         this.schemaName = schemaName;
     }
 
-    public void executeScripts(final List<SqlCommandSource> sqls) {
+    void executeScripts(final List<SqlCommandSource> sqls) {
         try {
             for (SqlCommandSource sql : sqls) {
                 execute(sql.read());

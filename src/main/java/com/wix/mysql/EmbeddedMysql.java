@@ -10,10 +10,8 @@ import de.flapdoodle.embed.process.config.IRuntimeConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -47,27 +45,12 @@ public class EmbeddedMysql {
         return this.config;
     }
 
-    /**
-     * @deprecated Use overload with SchemaConfig
-     */
-    public void reloadSchema(final String schemaName, final File... scripts) {
-        List<SqlCommandSource> commands = Collections.emptyList();
-        for (File f : scripts) {
-            commands.add(Sources.fromFile(f));
-        }
-        reloadSchema(SchemaConfig.aSchemaConfig(schemaName).withScripts(commands).build());
+    public void reloadSchema(final String schemaName, final SqlCommandSource... scripts) {
+        reloadSchema(SchemaConfig.aSchemaConfig(schemaName).withScripts(scripts).build());
     }
 
-    /**
-     * @deprecated Use overload with SchemaConfig
-     */
-    public void reloadSchema(final String schemaName, final List<File> scripts) {
-        List<SqlCommandSource> commands = Collections.emptyList();
-        for (File f : scripts) {
-            commands.add(Sources.fromFile(f));
-        }
-
-        reloadSchema(SchemaConfig.aSchemaConfig(schemaName).withScripts(commands).build());
+    public void reloadSchema(final String schemaName, final List<SqlCommandSource> scripts) {
+        reloadSchema(SchemaConfig.aSchemaConfig(schemaName).withScripts(scripts).build());
     }
 
     public void reloadSchema(final SchemaConfig config) {
