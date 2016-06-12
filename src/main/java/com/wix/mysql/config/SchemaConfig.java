@@ -1,22 +1,19 @@
 package com.wix.mysql.config;
 
 import com.wix.mysql.Sources;
-import com.wix.mysql.SqlCommandSource;
+import com.wix.mysql.SqlScriptSource;
 
-import java.io.File;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 public class SchemaConfig {
 
     private final String name;
     private final Charset charset;
-    private final List<SqlCommandSource> scripts;
+    private final List<SqlScriptSource> scripts;
 
-    private SchemaConfig(String name, Charset charset, List<SqlCommandSource> scripts) {
+    private SchemaConfig(String name, Charset charset, List<SqlScriptSource> scripts) {
         this.name = name;
         this.charset = charset;
         this.scripts = scripts;
@@ -34,7 +31,7 @@ public class SchemaConfig {
         return charset;
     }
 
-    public List<SqlCommandSource> getScripts() {
+    public List<SqlScriptSource> getScripts() {
         return scripts;
     }
 
@@ -42,7 +39,7 @@ public class SchemaConfig {
 
         private final String name;
         private Charset charset;
-        private List<SqlCommandSource> scripts = new ArrayList<>();
+        private List<SqlScriptSource> scripts = new ArrayList<>();
 
         public Builder(final String name) {
             this.name = name;
@@ -53,11 +50,11 @@ public class SchemaConfig {
             return this;
         }
 
-        public Builder withScripts(final SqlCommandSource... scripts) {
+        public Builder withScripts(final SqlScriptSource... scripts) {
             return withScripts(Arrays.asList(scripts));
         }
 
-        public Builder withScripts(final List<SqlCommandSource> scripts) {
+        public Builder withScripts(final List<SqlScriptSource> scripts) {
             this.scripts.addAll(scripts);
             return this;
         }

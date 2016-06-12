@@ -45,11 +45,11 @@ public class EmbeddedMysql {
         return this.config;
     }
 
-    public void reloadSchema(final String schemaName, final SqlCommandSource... scripts) {
+    public void reloadSchema(final String schemaName, final SqlScriptSource... scripts) {
         reloadSchema(SchemaConfig.aSchemaConfig(schemaName).withScripts(scripts).build());
     }
 
-    public void reloadSchema(final String schemaName, final List<SqlCommandSource> scripts) {
+    public void reloadSchema(final String schemaName, final List<SqlScriptSource> scripts) {
         reloadSchema(SchemaConfig.aSchemaConfig(schemaName).withScripts(scripts).build());
     }
 
@@ -103,12 +103,12 @@ public class EmbeddedMysql {
             this.config = config;
         }
 
-        public Builder addSchema(final String name, final SqlCommandSource... scripts) {
+        public Builder addSchema(final String name, final SqlScriptSource... scripts) {
             this.schemas.add(SchemaConfig.aSchemaConfig(name).withScripts(scripts).build());
             return this;
         }
 
-        public Builder addSchema(final String name, final List<SqlCommandSource> scripts) {
+        public Builder addSchema(final String name, final List<SqlScriptSource> scripts) {
             this.schemas.add(SchemaConfig.aSchemaConfig(name).withScripts(scripts).build());
             return this;
         }

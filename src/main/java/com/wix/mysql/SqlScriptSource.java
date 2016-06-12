@@ -2,6 +2,6 @@ package com.wix.mysql;
 
 import java.io.IOException;
 
-public interface SqlCommandSource {
+public interface SqlScriptSource {
     String read() throws IOException;
 }

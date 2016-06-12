@@ -8,7 +8,6 @@ import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
 import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.List;
 
 import static com.wix.mysql.utils.Utils.isNullOrEmpty;
@@ -27,9 +26,9 @@ class MysqlClient {
         this.schemaName = schemaName;
     }
 
-    void executeScripts(final List<SqlCommandSource> sqls) {
+    void executeScripts(final List<SqlScriptSource> sqls) {
         try {
-            for (SqlCommandSource sql : sqls) {
+            for (SqlScriptSource sql : sqls) {
                 execute(sql.read());
             }
         } catch (IOException e) {

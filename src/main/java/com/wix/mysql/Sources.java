@@ -10,19 +10,19 @@ import java.net.URL;
 
 public class Sources {
 
-    public static SqlCommandSource fromString(final String str) {
+    public static SqlScriptSource fromString(final String str) {
         return new StringSource(str);
     }
 
-    public static SqlCommandSource fromFile(final File str) {
+    public static SqlScriptSource fromFile(final File str) {
         return new FileSource(str);
     }
 
-    public static SqlCommandSource fromURL(final URL str) {
+    public static SqlScriptSource fromURL(final URL str) {
         return new URLSource(str);
     }
 
-    private static class StringSource implements SqlCommandSource {
+    private static class StringSource implements SqlScriptSource {
         final String str;
 
         StringSource(final String str) {
@@ -35,7 +35,7 @@ public class Sources {
         }
     }
 
-    private static class FileSource implements SqlCommandSource {
+    private static class FileSource implements SqlScriptSource {
         final File str;
 
         FileSource(final File str) {
@@ -48,7 +48,7 @@ public class Sources {
         }
     }
 
-    private static class URLSource implements SqlCommandSource {
+    private static class URLSource implements SqlScriptSource {
         final URL url;
 
         URLSource(final URL str) {

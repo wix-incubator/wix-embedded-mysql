@@ -27,7 +27,7 @@ public class ScriptResolver {
      * @param path path to file
      * @return resolved SqlCommandSource
      */
-    public static SqlCommandSource classPathFile(final String path) {
+    public static SqlScriptSource classPathFile(final String path) {
         String normalizedPath = path.startsWith("/") ? path : format("/%s", path);
         URL resource = ScriptResolver.class.getResource(normalizedPath);
 
@@ -44,7 +44,7 @@ public class ScriptResolver {
      * @param pattern ex. 'db/*.sql'
      * @return list of resolved SqlCommandSource objects
      */
-    public static List<SqlCommandSource> classPathFiles(final String pattern) {
+    public static List<SqlScriptSource> classPathFiles(final String pattern) {
         List<File> results;
 
         String[] parts = pattern.split("/");
@@ -71,8 +71,8 @@ public class ScriptResolver {
         }
     }
 
-    private static List<SqlCommandSource> fromFiles(List<File> files) {
-        List<SqlCommandSource> res = new ArrayList<>();
+    private static List<SqlScriptSource> fromFiles(List<File> files) {
+        List<SqlScriptSource> res = new ArrayList<>();
 
         for (File f: files) {
             res.add(Sources.fromFile(f));
