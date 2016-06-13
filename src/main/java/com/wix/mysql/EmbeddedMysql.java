@@ -10,7 +10,6 @@ import de.flapdoodle.embed.process.config.IRuntimeConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -46,13 +45,11 @@ public class EmbeddedMysql {
         return this.config;
     }
 
-    /** @deprecated Use overload with SchemaConfig */
-    public void reloadSchema(final String schemaName, final File... scripts) {
+    public void reloadSchema(final String schemaName, final SqlScriptSource... scripts) {
         reloadSchema(SchemaConfig.aSchemaConfig(schemaName).withScripts(scripts).build());
     }
 
-    /** @deprecated Use overload with SchemaConfig */
-    public void reloadSchema(final String schemaName, final List<File> scripts) {
+    public void reloadSchema(final String schemaName, final List<SqlScriptSource> scripts) {
         reloadSchema(SchemaConfig.aSchemaConfig(schemaName).withScripts(scripts).build());
     }
 
@@ -75,7 +72,6 @@ public class EmbeddedMysql {
 
         MysqlClient client = getClient(schema.getName());
         client.executeScripts(schema.getScripts());
-        client.executeCommands(schema.getCommands());
 
         return this;
     }
@@ -107,12 +103,12 @@ public class EmbeddedMysql {
             this.config = config;
         }
 
-        public Builder addSchema(final String name, final File... scripts) {
+        public Builder addSchema(final String name, final SqlScriptSource... scripts) {
             this.schemas.add(SchemaConfig.aSchemaConfig(name).withScripts(scripts).build());
             return this;
         }
 
-        public Builder addSchema(final String name, final List<File> scripts) {
+        public Builder addSchema(final String name, final List<SqlScriptSource> scripts) {
             this.schemas.add(SchemaConfig.aSchemaConfig(name).withScripts(scripts).build());
             return this;
         }

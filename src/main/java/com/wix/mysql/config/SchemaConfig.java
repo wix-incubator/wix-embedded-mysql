@@ -1,22 +1,22 @@
 package com.wix.mysql.config;
 
-import java.io.File;
+import com.wix.mysql.Sources;
+import com.wix.mysql.SqlScriptSource;
+
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 public class SchemaConfig {
 
     private final String name;
     private final Charset charset;
-    private final List<File> scripts;
-    private final List<String> commands;
+    private final List<SqlScriptSource> scripts;
 
-    private SchemaConfig(String name, Charset charset, List<File> scripts, List<String> commands) {
+    private SchemaConfig(String name, Charset charset, List<SqlScriptSource> scripts) {
         this.name = name;
         this.charset = charset;
         this.scripts = scripts;
-        this.commands = commands;
     }
 
     public static Builder aSchemaConfig(final String name) {
@@ -31,20 +31,15 @@ public class SchemaConfig {
         return charset;
     }
 
-    public List<File> getScripts() {
+    public List<SqlScriptSource> getScripts() {
         return scripts;
-    }
-
-    public List<String> getCommands() {
-        return commands;
     }
 
     public static class Builder {
 
         private final String name;
         private Charset charset;
-        private List<File> scripts = Collections.emptyList();
-        private List<String> commands = Collections.emptyList();
+        private List<SqlScriptSource> scripts = new ArrayList<>();
 
         public Builder(final String name) {
             this.name = name;
@@ -55,12 +50,12 @@ public class SchemaConfig {
             return this;
         }
 
-        public Builder withScripts(final File... scripts) {
+        public Builder withScripts(final SqlScriptSource... scripts) {
             return withScripts(Arrays.asList(scripts));
         }
 
-        public Builder withScripts(final List<File> scripts) {
-            this.scripts = scripts;
+        public Builder withScripts(final List<SqlScriptSource> scripts) {
+            this.scripts.addAll(scripts);
             return this;
         }
 
@@ -69,12 +64,14 @@ public class SchemaConfig {
         }
 
         public Builder withCommands(final List<String> commands) {
-            this.commands = commands;
+            for (String cmd: commands) {
+                this.scripts.add(Sources.fromString(cmd));
+            }
             return this;
         }
 
         public SchemaConfig build() {
-            return new SchemaConfig(name, charset, scripts, commands);
+            return new SchemaConfig(name, charset, scripts);
         }
     }
 }

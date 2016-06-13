@@ -7,7 +7,7 @@ import ch.qos.logback.classic.Level.INFO
 import ch.qos.logback.classic.spi.ILoggingEvent
 import ch.qos.logback.classic.{Logger, LoggerContext}
 import ch.qos.logback.core.read.ListAppender
-import com.wix.mysql.EmbeddedMysql
+import com.wix.mysql.{EmbeddedMysql, Sources, SqlScriptSource}
 import com.wix.mysql.config.MysqldConfig
 import org.apache.commons.dbcp2.BasicDataSource
 import org.slf4j.LoggerFactory
@@ -79,7 +79,7 @@ trait JdbcSupport {
   def anUpdate(onSchema: String, sql: String): Unit =
     aJdbcTemplate(forSchema = onSchema).execute(sql)
 
-  def aMigrationWith(sql: String): File = createTempFile(sql)
+  def aMigrationWith(sql: String): SqlScriptSource = Sources.fromFile(createTempFile(sql))
 
   def beSuccessful = not(throwAn[Exception])
 

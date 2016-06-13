@@ -106,6 +106,7 @@ public class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutabl
                     format("--port=%s", getConfig().getPort()),
                     "shutdown"});
 
+            //TODO: make wait with timeout
             retValue = p.waitFor() == 0;
 
             stdErr = new InputStreamReader(p.getErrorStream());

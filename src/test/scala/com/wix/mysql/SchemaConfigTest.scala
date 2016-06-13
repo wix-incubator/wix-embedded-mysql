@@ -29,14 +29,14 @@ class SchemaConfigTest extends SpecWithJUnit {
       schemaConfig.getCharset mustEqual charset
     }
 
-    "build with Files" in {
-      val files = Seq(new File("/some"), new File("/some/other"))
+    "build with sources" in {
+      val sources = Seq(Sources.fromFile(new File("/some")), Sources.fromFile(new File("/some/other")))
 
       val schemaConfig = aSchemaConfig("aschema")
-        .withScripts(files)
+        .withScripts(sources)
         .build
 
-      schemaConfig.getScripts.toSeq mustEqual files
+      schemaConfig.getScripts.toSeq mustEqual sources
     }
   }
 }
