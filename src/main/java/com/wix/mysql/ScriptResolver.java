@@ -78,7 +78,6 @@ public class ScriptResolver {
         }
 
         return results;
-
     }
 
     /**
