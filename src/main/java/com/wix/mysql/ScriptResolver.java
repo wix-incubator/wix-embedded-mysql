@@ -4,11 +4,16 @@ import org.apache.commons.io.filefilter.WildcardFileFilter;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.List;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
 import static com.wix.mysql.utils.Utils.join;
 import static java.lang.String.format;
@@ -21,13 +26,68 @@ import static java.util.Arrays.copyOfRange;
 public class ScriptResolver {
 
     /**
-     * /**
+     * Locates classPathFiles matching pattern, ordered using natural alphanumeric order
+     * Note: Supports only wildcards ('*') and only in file names for matching
+     *
+     * @param pattern ex. 'db/*.sql'
+     * @return list of resolved SqlScriptSource objects
+     */
+    public static List<SqlScriptSource> classPathScripts(final String pattern) {
+        List<SqlScriptSource> results = new ArrayList<>();
+
+        String[] parts = pattern.split("/");
+        String path = join(asList(copyOfRange(parts, 0, parts.length - 1)), "/");
+        String normalizedPath = path.startsWith("/") ? path : format("/%s", path);
+
+        URL baseFolder = ScriptResolver.class.getResource(normalizedPath);
+
+        if (baseFolder == null)
+            throw new ScriptResolutionException(normalizedPath);
+
+        if (baseFolder.getProtocol().equals("jar")) {
+            String normalizedPattern = pattern.startsWith("/") ? pattern : format("/%s", pattern);
+            String regexPattern = normalizedPattern.replace("*", ".*");
+            String jarPath = baseFolder.getPath().substring(5, baseFolder.getPath().indexOf("!"));
+            JarFile jar;
+
+            try {
+                jar = new JarFile(URLDecoder.decode(jarPath, "UTF-8"));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
+            Enumeration<JarEntry> entries = jar.entries();
+            List<String> names = new ArrayList<>();
+            while (entries.hasMoreElements()) {
+                String name = "/" + entries.nextElement().getName();
+                if (name.matches(regexPattern)) {
+                    names.add(name);
+                }
+            }
+            Collections.sort(names);
+            for (String found : names) {
+                results.add(classPathScript(found));
+            }
+        } else {
+            FileFilter filter = new WildcardFileFilter(parts[parts.length - 1]);
+            List<File> filesInPath = asList(asFile(baseFolder).listFiles(filter));
+            Collections.sort(filesInPath);
+            for (File f : filesInPath) {
+                results.add(Sources.fromFile(f));
+            }
+        }
+
+        return results;
+
+    }
+
+    /**
      * Locates a single classPathFile in a classpath, ex. 'db/init_schema.sql'
      *
      * @param path path to file
-     * @return resolved SqlCommandSource
+     * @return resolved SqlScriptSource
      */
-    public static SqlScriptSource classPathFile(final String path) {
+    public static SqlScriptSource classPathScript(final String path) {
         String normalizedPath = path.startsWith("/") ? path : format("/%s", path);
         URL resource = ScriptResolver.class.getResource(normalizedPath);
 
@@ -38,29 +98,28 @@ public class ScriptResolver {
     }
 
     /**
+     * Locates a single classPathFile in a classpath, ex. 'db/init_schema.sql'
+     *
+     * @param path path to file
+     * @return resolved SqlScriptSource
+     * @deprecated in favor of {@link #classPathScript(String)}
+     */
+    @Deprecated
+    public static SqlScriptSource classPathFile(final String path) {
+        return classPathScript(path);
+    }
+
+    /**
      * Locates classPathFiles matching pattern, ordered using natural alphanumeric order
      * Note: Supports only wildcards ('*') and only in file names for matching
      *
      * @param pattern ex. 'db/*.sql'
-     * @return list of resolved SqlCommandSource objects
+     * @return list of resolved SqlScriptSource objects
+     * @deprecated in favor of {@link #classPathScripts(String)}
      */
+    @Deprecated
     public static List<SqlScriptSource> classPathFiles(final String pattern) {
-        List<File> results;
-
-        String[] parts = pattern.split("/");
-        String path = join(asList(copyOfRange(parts, 0, parts.length - 1)), "/");
-
-        URL baseFolder = ScriptResolver.class.getResource(path.startsWith("/") ? path : format("/%s", path));
-        FileFilter filter = new WildcardFileFilter(parts[parts.length - 1]);
-
-        if (baseFolder == null)
-            throw new ScriptResolutionException(path);
-
-        results = asList(asFile(baseFolder).listFiles(filter));
-
-        Collections.sort(results);
-
-        return fromFiles(results);
+        return classPathScripts(pattern);
     }
 
     private static File asFile(final URL resource) {
@@ -69,15 +128,6 @@ public class ScriptResolver {
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    private static List<SqlScriptSource> fromFiles(List<File> files) {
-        List<SqlScriptSource> res = new ArrayList<>();
-
-        for (File f: files) {
-            res.add(Sources.fromFile(f));
-        }
-        return res;
     }
 
     public static class ScriptResolutionException extends RuntimeException {

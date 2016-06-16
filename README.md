@@ -28,67 +28,99 @@ Add dependency to your pom.xml:
 You can start and embedded mysql with defaults and a single schema:
 
 ```java
-    EmbeddedMysql mysqld = anEmbeddedMysql(v5_6_latest)
-        .addSchema("aschema", classPathFile("db/001_init.sql"))
-        .start();
+import com.wix.mysql.EmbeddedMysql;
 
-    //do work
+import static com.wix.mysql.EmbeddedMysql.anEmbeddedMysql;
+import static com.wix.mysql.ScriptResolver.classPathScript;
+import static com.wix.mysql.distribution.Version.v5_6_latest;
 
-    mysqld.stop(); //optional, as there is a shutdown hook
+EmbeddedMysql mysqld = anEmbeddedMysql(v5_6_latest)
+    .addSchema("aschema", classPathScript("db/001_init.sql"))
+    .start();
+
+//do work
+
+mysqld.stop(); //optional, as there is a shutdown hook
 ```
 
 If you need more control in configuring embeded mysql instance, you can use MysqlConfig builder:
 
 ```java
-    MysqldConfig config = aMysqldConfig(v5_6_23)
-        .withCharset(UTF8)
-        .withPort(2215)
-        .withUser("differentUser", "anotherPassword")
-        .withTimeZone("Europe/Vilnius")
-        .build();
+import com.wix.mysql.config.MysqldConfig;
+import com.wix.mysql.EmbeddedMysql;
 
-    EmbeddedMysql mysqld = anEmbeddedMysql(config)
-        .addSchema("aschema", classPathFile("db/001_init.sql"))
-        .addSchema("aschema2", classPathFiles("db/*.sql"))
-        .start();
+import static com.wix.mysql.config.MysqldConfig.aMysqldConfig;
+import static com.wix.mysql.EmbeddedMysql.anEmbeddedMysql;
+import static com.wix.mysql.ScriptResolver.classPathScript;
+import static com.wix.mysql.ScriptResolver.classPathScripts;
+import static com.wix.mysql.distribution.Version.v5_6_23;
+import static com.wix.mysql.config.Charset.UTF8;
 
-    //do work
+MysqldConfig config = aMysqldConfig(v5_6_23)
+    .withCharset(UTF8)
+    .withPort(2215)
+    .withUser("differentUser", "anotherPassword")
+    .withTimeZone("Europe/Vilnius")
+    .build();
 
-    mysqld.stop(); //optional, as there is a shutdown hook
+EmbeddedMysql mysqld = anEmbeddedMysql(config)
+    .addSchema("aschema", classPathScript("db/001_init.sql"))
+    .addSchema("aschema2", classPathScripts("db/*.sql"))
+    .start();
+
+//do work
+
+mysqld.stop(); //optional, as there is a shutdown hook
 ```
 
 EmbeddedMysql supports multiple schemas and additional configuration options provided via SchemaConfig builder:
 
 ```java
-    SchemaConfig schema = aSchemaConfig("aSchema")
-        .withScripts(classPathFile("db/001_init.sql"))
-        .withCharset(LATIN1)
-        .build();
+import com.wix.mysql.EmbeddedMysql;
+import com.wix.mysql.config.SchemaConfig;
 
-    EmbeddedMysql mysqld = anEmbeddedMysql(v5_6_latest)
-        .addSchema(schema)
-        .addSchema("aschema2", classPathFiles("db/*.sql"))
-        .start();
+import static com.wix.mysql.EmbeddedMysql.anEmbeddedMysql;
+import static com.wix.mysql.ScriptResolver.classPathScript;
+import static com.wix.mysql.ScriptResolver.classPathScripts;
+import static com.wix.mysql.config.SchemaConfig.aSchemaConfig;
+import static com.wix.mysql.config.Charset.LATIN1;
+import static com.wix.mysql.distribution.Version.v5_6_latest;
 
-    //do work
+SchemaConfig schema = aSchemaConfig("aSchema")
+    .withScripts(classPathScript("db/001_init.sql"))
+    .withCharset(LATIN1)
+    .build();
 
-    mysqld.stop(); //optional, as there is a shutdown hook
+EmbeddedMysql mysqld = anEmbeddedMysql(v5_6_latest)
+    .addSchema(schema)
+    .addSchema("aschema2", classPathScripts("db/*.sql"))
+    .start();
+
+//do work
+
+mysqld.stop(); //optional, as there is a shutdown hook
 ```
 
 It is intended to be started once per test-suite, but you can reset schema in between tests which recreates database and applies provided migrations:
 
 ```java
-    EmbeddedMysql mysqld = anEmbeddedMysql(v5_6_latest)
-        .addSchema("aschema", classPathFile("db/001_init.sql"))
-        .start();
+import com.wix.mysql.EmbeddedMysql;
 
-    //do work
+import static com.wix.mysql.EmbeddedMysql.anEmbeddedMysql;
+import static com.wix.mysql.ScriptResolver.classPathScript;
+import static com.wix.mysql.distribution.Version.v5_6_latest;
 
-    mysqld.reloadSchema("aschema", classPathFile("db/001_init.sql"));
+EmbeddedMysql mysqld = anEmbeddedMysql(v5_6_latest)
+    .addSchema("aschema", classPathScript("db/001_init.sql"))
+    .start();
 
-    //continue on doing work
+//do work
 
-    mysqld.stop(); //optional, as there is a shutdown hook
+mysqld.reloadSchema("aschema", classPathScript("db/001_init.sql"));
+
+//continue on doing work
+
+mysqld.stop(); //optional, as there is a shutdown hook
 ```
 
 Source for examples can be found [here](https://github.com/wix/wix-embedded-mysql/blob/master/src/test/scala/com/wix/mysql/JavaUsageExamplesTest.java)
