@@ -1,10 +1,7 @@
 package com.wix.mysql;
 
-import com.wix.mysql.config.Charset;
-import com.wix.mysql.config.MysqldConfig;
+import com.wix.mysql.config.*;
 import com.wix.mysql.config.MysqldConfig.SystemDefaults;
-import com.wix.mysql.config.RuntimeConfigBuilder;
-import com.wix.mysql.config.SchemaConfig;
 import com.wix.mysql.distribution.Version;
 import de.flapdoodle.embed.process.config.IRuntimeConfig;
 import org.slf4j.Logger;
@@ -23,13 +20,15 @@ public class EmbeddedMysql {
     private final static Logger logger = LoggerFactory.getLogger(EmbeddedMysql.class);
 
     protected final MysqldConfig config;
+    protected final DownloadConfig downloadConfig;
     protected final MysqldExecutable executable;
     private AtomicBoolean isRunning = new AtomicBoolean(true);
 
-    protected EmbeddedMysql(final MysqldConfig config) {
+    protected EmbeddedMysql(final MysqldConfig config, final DownloadConfig downloadConfig) {
         logger.info("Preparing EmbeddedMysql version '{}'...", config.getVersion());
         this.config = config;
-        IRuntimeConfig runtimeConfig = new RuntimeConfigBuilder().defaults(config.getVersion()).build();
+        this.downloadConfig = downloadConfig;
+        IRuntimeConfig runtimeConfig = new RuntimeConfigBuilder().defaults(config.getVersion(), downloadConfig).build();
         this.executable = new MysqldStarter(runtimeConfig).prepare(config);
 
         try {
@@ -97,10 +96,16 @@ public class EmbeddedMysql {
 
     public static class Builder {
         private final MysqldConfig config;
+        private DownloadConfig downloadConfig = DownloadConfig.aDownloadConfig().build();
         private List<SchemaConfig> schemas = new ArrayList<>();
 
         public Builder(final MysqldConfig config) {
             this.config = config;
+        }
+
+        public Builder withDownloadConfig(final DownloadConfig downloadConfig) {
+            this.downloadConfig = downloadConfig;
+            return this;
         }
 
         public Builder addSchema(final String name, final SqlScriptSource... scripts) {
@@ -119,7 +124,7 @@ public class EmbeddedMysql {
         }
 
         public EmbeddedMysql start() {
-            EmbeddedMysql instance = new EmbeddedMysql(config);
+            EmbeddedMysql instance = new EmbeddedMysql(config, downloadConfig);
 
             for (SchemaConfig schema : schemas) {
                 instance.addSchema(schema);

@@ -1,13 +1,24 @@
 package com.wix.mysql
 
+import java.io.File
+import java.net.Proxy.Type
+import java.net.{InetAddress, SocketAddress}
+
 import com.wix.mysql.EmbeddedMysql._
 import com.wix.mysql.config.Charset.{LATIN1, UTF8MB4}
+import com.wix.mysql.config.DownloadConfig
+import com.wix.mysql.config.DownloadConfig.aDownloadConfig
 import com.wix.mysql.config.MysqldConfig.{SystemDefaults, aMysqldConfig}
 import com.wix.mysql.config.SchemaConfig.aSchemaConfig
 import com.wix.mysql.distribution.Version
 import com.wix.mysql.distribution.Version.v5_6_latest
 import com.wix.mysql.exceptions.CommandFailedException
 import com.wix.mysql.support.IntegrationTest
+import de.flapdoodle.embed.process.io.directories.UserHome
+import org.apache.commons.io.FileUtils
+import org.apache.commons.io.FileUtils.deleteDirectory
+import org.littleshoot.proxy.HttpProxyServer
+import org.littleshoot.proxy.impl.DefaultHttpProxyServer
 
 class EmbeddedMysqlTest extends IntegrationTest {
 
@@ -39,6 +50,36 @@ class EmbeddedMysqlTest extends IntegrationTest {
         haveCharsetOf(LATIN1) and
         beAvailableOn(1112, "zeUser", "zePassword", SystemDefaults.SCHEMA) and
         haveServerTimezoneMatching("US/Michigan")
+    }
+
+    def cleanDownloadedFiles() = deleteDirectory(new UserHome(".embedmysql").asFile())
+
+    def withProxyOn[T](port: Int)(f: Int => T): T = {
+      val proxyBootstrap = DefaultHttpProxyServer.bootstrap().withPort(port)
+      var proxyServer: Option[HttpProxyServer] = None
+
+      try {
+        proxyServer = Some(proxyBootstrap.start())
+        f(port)
+      } finally {
+        proxyServer.map(_.stop())
+      }
+    }
+
+    "allow to provide network proxy" in {
+      withProxyOn(3210) { port =>
+        cleanDownloadedFiles()
+
+        val config = aMysqldConfig(Version.v5_7_latest).build
+
+        mysqld = anEmbeddedMysql(config)
+          .withDownloadConfig(aDownloadConfig().withProxy("127.0.0.1", port).build())
+          .addSchema("aschema")
+          .start
+
+        mysqld must beAvailableOn(config, "aschema")
+
+      }
     }
   }
 
@@ -129,7 +170,7 @@ class EmbeddedMysqlTest extends IntegrationTest {
           aMigrationWith("create table t2 (col1 INTEGER);"))
         .withCommands(
           "create table t3 (col1 INTEGER);\n" +
-          "create table t4 (col2 INTEGER)")
+            "create table t4 (col2 INTEGER)")
         .build
 
       mysqld = anEmbeddedMysql(v5_6_latest)
