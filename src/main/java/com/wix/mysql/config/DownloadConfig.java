@@ -22,7 +22,7 @@ public class DownloadConfig {
     public static class Builder {
         IProxyFactory ProxyFactory = new NoProxyFactory();
 
-        public Builder withProxy(final String host, final int port) {
+        public Builder withHttpProxy(final String host, final int port) {
             this.ProxyFactory = new HttpProxyFactory(host, port);
             return this;
         }

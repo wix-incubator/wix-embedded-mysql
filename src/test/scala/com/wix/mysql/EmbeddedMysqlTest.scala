@@ -73,7 +73,7 @@ class EmbeddedMysqlTest extends IntegrationTest {
         val config = aMysqldConfig(Version.v5_7_latest).build
 
         mysqld = anEmbeddedMysql(config)
-          .withDownloadConfig(aDownloadConfig().withProxy("127.0.0.1", port).build())
+          .withDownloadConfig(aDownloadConfig().withHttpProxy("127.0.0.1", port).build())
           .addSchema("aschema")
           .start
 
