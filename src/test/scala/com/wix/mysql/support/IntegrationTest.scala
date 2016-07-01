@@ -30,14 +30,8 @@ abstract class IntegrationTest extends SpecWithJUnit with BeforeAfterEach
   var mysqldInstances: Seq[EmbeddedMysql] = Seq()
   val log = getLogger(this.getClass)
 
-  def before: Any = {
-    println("before")
-    mysqldInstances = Seq()
-  }
-  def after: Any = {
-    println("after")
-    mysqldInstances.foreach(_.stop())
-  }
+  def before: Any = mysqldInstances = Seq()
+  def after: Any = mysqldInstances.foreach(_.stop)
 
   def withStop(mysqld: EmbeddedMysql): EmbeddedMysql = {
     mysqldInstances = mysqldInstances :+ mysqld
