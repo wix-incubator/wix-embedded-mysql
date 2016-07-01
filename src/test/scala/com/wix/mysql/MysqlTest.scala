@@ -8,7 +8,7 @@ import com.wix.mysql.support.IntegrationTest
 class MysqlTest extends IntegrationTest {
 
   "mysql should emit exception info with message from 'mysql' command output'" in {
-    mysqld = anEmbeddedMysql(v5_6_latest).start()
+    val mysqld = start(anEmbeddedMysql(v5_6_latest))
     val mysql = new MysqlClient(mysqld.getConfig, mysqld.executable, "information_schema")
 
     mysql.executeCommands("sele qwe from zz;") must throwA[CommandFailedException].like {

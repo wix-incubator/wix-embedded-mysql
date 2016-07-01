@@ -16,13 +16,12 @@ class EmbeddedMysqlTest extends IntegrationTest {
     "start with default values" in {
       val config = aMysqldConfig(Version.v5_7_latest).build
 
-      mysqld = anEmbeddedMysql(config).start
+      val mysqld = start(anEmbeddedMysql(config))
 
       mysqld must
         haveCharsetOf(UTF8MB4) and
         beAvailableOn(3310, "auser", "sa", SystemDefaults.SCHEMA) and
         haveServerTimezoneMatching("UTC")
-
     }
 
     "use custom values provided via MysqldConfig" in {
@@ -33,7 +32,7 @@ class EmbeddedMysqlTest extends IntegrationTest {
         .withTimeZone("US/Michigan")
         .build
 
-      mysqld = anEmbeddedMysql(config).start
+      val mysqld = start(anEmbeddedMysql(config))
 
       mysqld must
         haveCharsetOf(LATIN1) and
@@ -48,16 +47,14 @@ class EmbeddedMysqlTest extends IntegrationTest {
         .withScripts(aMigrationWith("create table t1 (col1 INTEGER);"))
         .build
 
-      mysqld = anEmbeddedMysql(v5_6_latest)
-        .addSchema(config)
-        .start
+      val mysqld = start(anEmbeddedMysql(v5_6_latest).addSchema(config))
 
-      anUpdate(onSchema = "aSchema", sql = "insert into t1 values(10)") must beSuccessful
-      aSelect[java.lang.Long](onSchema = "aSchema", sql = "select col1 from t1 where col1 = 10;") mustEqual 10
+      anUpdate(mysqld, onSchema = "aSchema", sql = "insert into t1 values(10)") must beSuccessful
+      aSelect[java.lang.Long](mysqld, onSchema = "aSchema", sql = "select col1 from t1 where col1 = 10;") mustEqual 10
 
       mysqld.reloadSchema(config)
 
-      aSelect[java.lang.Long](onSchema = "aSchema", sql = "select col1 from t1 where col1 = 10;") must
+      aSelect[java.lang.Long](mysqld, onSchema = "aSchema", sql = "select col1 from t1 where col1 = 10;") must
         failWith("Incorrect result size: expected 1, actual 0")
     }
   }
@@ -66,9 +63,7 @@ class EmbeddedMysqlTest extends IntegrationTest {
     "use defaults" in {
       val config = aMysqldConfig(v5_6_latest).build
 
-      mysqld = anEmbeddedMysql(config)
-        .addSchema("aSchema")
-        .start
+      val mysqld = start(anEmbeddedMysql(config).addSchema("aSchema"))
 
       mysqld must
         haveSchemaCharsetOf(UTF8MB4, "aSchema") and
@@ -81,9 +76,7 @@ class EmbeddedMysqlTest extends IntegrationTest {
         .withCharset(LATIN1)
         .build
 
-      mysqld = anEmbeddedMysql(config)
-        .addSchema(schema)
-        .start
+      val mysqld = start(anEmbeddedMysql(config).addSchema(schema))
 
       mysqld must
         haveSchemaCharsetOf(LATIN1, "aSchema") and
@@ -94,9 +87,7 @@ class EmbeddedMysqlTest extends IntegrationTest {
       val config = aMysqldConfig(v5_6_latest).withCharset(LATIN1).build
       val schema = aSchemaConfig("aSchema").build
 
-      mysqld = anEmbeddedMysql(config)
-        .addSchema(schema)
-        .start
+      val mysqld = start(anEmbeddedMysql(config).addSchema(schema))
 
       mysqld must
         haveSchemaCharsetOf(LATIN1, "aSchema") and
@@ -104,22 +95,21 @@ class EmbeddedMysqlTest extends IntegrationTest {
     }
 
     "apply migrations when providing single file" in {
-      mysqld = anEmbeddedMysql(v5_6_latest)
-        .addSchema("aSchema", aMigrationWith("create table t1 (col1 INTEGER);"))
-        .start
+      val mysqld = start(anEmbeddedMysql(v5_6_latest)
+        .addSchema("aSchema", aMigrationWith("create table t1 (col1 INTEGER);")))
 
-      aQuery(onSchema = "aSchema", sql = "select count(col1) from t1;") must beSuccessful
+      aQuery(mysqld, onSchema = "aSchema", sql = "select count(col1) from t1;") must beSuccessful
     }
 
     "apply migrations from multiple files" in {
-      mysqld = anEmbeddedMysql(v5_6_latest)
+      val mysqld = start(anEmbeddedMysql(v5_6_latest)
         .addSchema("aSchema",
           aMigrationWith("create table t1 (col1 INTEGER);"),
           aMigrationWith("create table t2 (col1 INTEGER);"))
-        .start
+        )
 
-      aQuery(onSchema = "aSchema", sql = "select count(col1) from t1;") must beSuccessful
-      aQuery(onSchema = "aSchema", sql = "select count(col1) from t2;") must beSuccessful
+      aQuery(mysqld, onSchema = "aSchema", sql = "select count(col1) from t1;") must beSuccessful
+      aQuery(mysqld, onSchema = "aSchema", sql = "select count(col1) from t2;") must beSuccessful
     }
 
     "apply migrations via SchemaConfig" in {
@@ -132,14 +122,12 @@ class EmbeddedMysqlTest extends IntegrationTest {
           "create table t4 (col2 INTEGER)")
         .build
 
-      mysqld = anEmbeddedMysql(v5_6_latest)
-        .addSchema(config)
-        .start
+      val mysqld = start(anEmbeddedMysql(v5_6_latest).addSchema(config))
 
-      aQuery(onSchema = "aSchema", sql = "select count(col1) from t1;") must beSuccessful
-      aQuery(onSchema = "aSchema", sql = "select count(col1) from t2;") must beSuccessful
-      aQuery(onSchema = "aSchema", sql = "select count(col1) from t3;") must beSuccessful
-      aQuery(onSchema = "aSchema", sql = "select count(col2) from t4;") must beSuccessful
+      aQuery(mysqld, onSchema = "aSchema", sql = "select count(col1) from t1;") must beSuccessful
+      aQuery(mysqld, onSchema = "aSchema", sql = "select count(col1) from t2;") must beSuccessful
+      aQuery(mysqld, onSchema = "aSchema", sql = "select count(col1) from t3;") must beSuccessful
+      aQuery(mysqld, onSchema = "aSchema", sql = "select count(col2) from t4;") must beSuccessful
     }
   }
 
@@ -148,9 +136,7 @@ class EmbeddedMysqlTest extends IntegrationTest {
     "drop existing schema" in {
       val schemaConfig = aSchemaConfig("aSchema").build
 
-      mysqld = anEmbeddedMysql(aMysqldConfig(v5_6_latest).build)
-        .addSchema(schemaConfig)
-        .start
+      val mysqld = start(anEmbeddedMysql(aMysqldConfig(v5_6_latest).build).addSchema(schemaConfig))
 
       mysqld must haveSchemaCharsetOf(UTF8MB4, schemaConfig.getName)
 
@@ -162,8 +148,7 @@ class EmbeddedMysqlTest extends IntegrationTest {
     "fail on dropping of non existing schema" in {
       val schemaConfig = aSchemaConfig("aSchema").build
 
-      mysqld = anEmbeddedMysql(aMysqldConfig(v5_6_latest).build)
-        .start
+      val mysqld = start(anEmbeddedMysql(aMysqldConfig(v5_6_latest).build))
 
       mysqld must notHaveSchema(schemaConfig.getName)
 
@@ -173,8 +158,7 @@ class EmbeddedMysqlTest extends IntegrationTest {
     "add schema after mysqld start" in {
       val schemaConfig = aSchemaConfig("aSchema").build
 
-      mysqld = anEmbeddedMysql(aMysqldConfig(v5_6_latest).build)
-        .start
+      val mysqld = start(anEmbeddedMysql(aMysqldConfig(v5_6_latest).build))
 
       mysqld must notHaveSchema(schemaConfig.getName)
 
@@ -186,9 +170,7 @@ class EmbeddedMysqlTest extends IntegrationTest {
     "fail on adding existing schema" in {
       val schemaConfig = aSchemaConfig("aSchema").build
 
-      mysqld = anEmbeddedMysql(aMysqldConfig(v5_6_latest).build)
-        .addSchema(schemaConfig)
-        .start
+      val mysqld = start(anEmbeddedMysql(aMysqldConfig(v5_6_latest).build).addSchema(schemaConfig))
 
       mysqld must haveSchemaCharsetOf(UTF8MB4, schemaConfig.getName)
 

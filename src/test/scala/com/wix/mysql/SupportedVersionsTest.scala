@@ -18,9 +18,7 @@ class SupportedVersionsTest extends IntegrationTest {
     s"$version should work on ${System.getProperty("os.name")}" in new Context {
       val config = aMysqldConfig(version).build
 
-      mysqld = anEmbeddedMysql(config)
-        .addSchema("aschema")
-        .start
+      val mysqld = start(anEmbeddedMysql(config).addSchema("aschema"))
 
       mysqld must beAvailableOn(config, "aschema")
 

@@ -1,34 +1,44 @@
 package com.wix.mysql.support
 
-import java.io.File
+import java.util.UUID
 import javax.sql.DataSource
 
 import ch.qos.logback.classic.Level.INFO
 import ch.qos.logback.classic.spi.ILoggingEvent
 import ch.qos.logback.classic.{Logger, LoggerContext}
 import ch.qos.logback.core.read.ListAppender
-import com.wix.mysql.{EmbeddedMysql, Sources, SqlScriptSource}
 import com.wix.mysql.config.MysqldConfig
+import com.wix.mysql.{EmbeddedMysql, Sources, SqlScriptSource}
+import de.flapdoodle.embed.process.io.directories.UserHome
 import org.apache.commons.dbcp2.BasicDataSource
+import org.apache.commons.io.FileUtils._
 import org.slf4j.LoggerFactory
 import org.slf4j.LoggerFactory.getLogger
 import org.specs2.mutable.SpecWithJUnit
-import org.specs2.specification.AfterEach
+import org.specs2.specification.BeforeAfterEach
 import org.springframework.dao.DataAccessException
 import org.springframework.jdbc.core.JdbcTemplate
 
 import scala.collection.JavaConversions._
 import scala.reflect._
 
-abstract class IntegrationTest extends SpecWithJUnit with AfterEach
+abstract class IntegrationTest extends SpecWithJUnit with BeforeAfterEach
   with InstanceMatchers with TestResourceSupport with JdbcSupport {
 
   sequential
 
-  var mysqld: EmbeddedMysql = _
+  var mysqldInstances: Seq[EmbeddedMysql] = Seq()
   val log = getLogger(this.getClass)
 
-  def after: Any = if (mysqld != null) mysqld.stop()
+  def before: Any = mysqldInstances = Seq()
+  def after: Any = mysqldInstances.foreach(_.stop)
+
+  def start(mysqld: EmbeddedMysql.Builder): EmbeddedMysql = {
+    val instance = mysqld.start
+    mysqldInstances = mysqldInstances :+ instance
+    instance
+  }
+
 
   def aLogFor(app: String): Iterable[String] = {
     val appender: ListAppender[ILoggingEvent] = new ListAppender[ILoggingEvent]
@@ -47,6 +57,20 @@ abstract class IntegrationTest extends SpecWithJUnit with AfterEach
       def iterator = appender.list map (_.getMessage) iterator
     }
   }
+
+  def withCleanRepo[T](f: => T): T = {
+    val repository = new UserHome(".embedmysql").asFile
+    val backupFolder = new UserHome(s".embedmysql-${UUID.randomUUID()}").asFile
+    moveDirectory(repository, backupFolder)
+
+    try {
+      f
+    } finally {
+      deleteDirectory(repository)
+      moveDirectory(backupFolder, repository)
+    }
+  }
+
 }
 
 trait JdbcSupport {
@@ -64,20 +88,20 @@ trait JdbcSupport {
     dataSource
   }
 
-  def aJdbcTemplate(forSchema: String): JdbcTemplate =
+  def aJdbcTemplate(mysqld: EmbeddedMysql, forSchema: String): JdbcTemplate =
     new JdbcTemplate(aDataSource(mysqld.getConfig, forSchema))
 
   def aSelect[T: ClassTag](ds: DataSource, sql: String): T =
     new JdbcTemplate(ds).queryForObject(sql, classTag[T].runtimeClass.asInstanceOf[Class[T]])
 
-  def aSelect[T: ClassTag](onSchema: String, sql: String): T =
-    aJdbcTemplate(onSchema).queryForObject(sql, classTag[T].runtimeClass.asInstanceOf[Class[T]])
+  def aSelect[T: ClassTag](mysqld: EmbeddedMysql, onSchema: String, sql: String): T =
+    aJdbcTemplate(mysqld, onSchema).queryForObject(sql, classTag[T].runtimeClass.asInstanceOf[Class[T]])
 
-  def aQuery(onSchema: String, sql: String): Unit =
-    aJdbcTemplate(forSchema = onSchema).execute(sql)
+  def aQuery(mysqld: EmbeddedMysql, onSchema: String, sql: String): Unit =
+    aJdbcTemplate(mysqld, forSchema = onSchema).execute(sql)
 
-  def anUpdate(onSchema: String, sql: String): Unit =
-    aJdbcTemplate(forSchema = onSchema).execute(sql)
+  def anUpdate(mysqld: EmbeddedMysql, onSchema: String, sql: String): Unit =
+    aJdbcTemplate(mysqld, forSchema = onSchema).execute(sql)
 
   def aMigrationWith(sql: String): SqlScriptSource = Sources.fromFile(createTempFile(sql))
 
