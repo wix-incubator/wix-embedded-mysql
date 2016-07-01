@@ -33,10 +33,12 @@ abstract class IntegrationTest extends SpecWithJUnit with BeforeAfterEach
   def before: Any = mysqldInstances = Seq()
   def after: Any = mysqldInstances.foreach(_.stop)
 
-  def withStop(mysqld: EmbeddedMysql): EmbeddedMysql = {
-    mysqldInstances = mysqldInstances :+ mysqld
-    mysqld
+  def start(mysqld: EmbeddedMysql.Builder): EmbeddedMysql = {
+    val instance = mysqld.start
+    mysqldInstances = mysqldInstances :+ instance
+    instance
   }
+
 
   def aLogFor(app: String): Iterable[String] = {
     val appender: ListAppender[ILoggingEvent] = new ListAppender[ILoggingEvent]
@@ -58,7 +60,7 @@ abstract class IntegrationTest extends SpecWithJUnit with BeforeAfterEach
 
   def withCleanRepo[T](f: => T): T = {
     val repository = new UserHome(".embedmysql").asFile
-    val backupFolder = new UserHome(s".embedmysql-${UUID.randomUUID().toString}").asFile
+    val backupFolder = new UserHome(s".embedmysql-${UUID.randomUUID()}").asFile
     moveDirectory(repository, backupFolder)
 
     try {

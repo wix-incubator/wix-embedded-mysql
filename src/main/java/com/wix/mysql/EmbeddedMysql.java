@@ -22,7 +22,7 @@ import static java.lang.String.format;
 
 public class EmbeddedMysql {
     private final static Logger logger = LoggerFactory.getLogger(EmbeddedMysql.class);
-    private static final ReentrantLock lock = new ReentrantLock();
+    private static final ReentrantLock localRepository = new ReentrantLock();
 
     protected final MysqldConfig config;
     protected final MysqldExecutable executable;
@@ -32,12 +32,13 @@ public class EmbeddedMysql {
         logger.info("Preparing EmbeddedMysql version '{}'...", config.getVersion());
         this.config = config;
         IRuntimeConfig runtimeConfig = new RuntimeConfigBuilder().defaults(config.getVersion()).build();
+        MysqldStarter mysqldStarter = new MysqldStarter(runtimeConfig);
 
-        lock.lock();
+        localRepository.lock();
         try {
-            this.executable = new MysqldStarter(runtimeConfig).prepare(config);
+            this.executable = mysqldStarter.prepare(config);
         } finally {
-            lock.unlock();
+            localRepository.unlock();
         }
 
         try {

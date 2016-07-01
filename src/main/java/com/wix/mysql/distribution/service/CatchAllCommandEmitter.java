@@ -8,6 +8,7 @@ import de.flapdoodle.embed.process.extract.IExtractedFileSet;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.List;
 
 import static java.lang.String.format;
@@ -31,7 +32,7 @@ public class CatchAllCommandEmitter implements CommandEmitter {
                 format("--plugin-dir=%s/lib/plugin", baseDir),
                 format("--lc-messages-dir=%s/share", baseDir),
                 format("--port=%s", config.getPort()),
-                format("--socket=%s", sockFile(exe)),
+                format("--socket=%s", sockFile()),
                 "--console",
                 format("--character-set-server=%s", config.getCharset().getCharset()),
                 format("--collation-server=%s", config.getCharset().getCollate()),
@@ -50,9 +51,7 @@ public class CatchAllCommandEmitter implements CommandEmitter {
      * This is due to possible problems with existing mysql installation and apparmor profiles
      * in linuxes.
      */
-    private String sockFile(IExtractedFileSet exe) throws IOException {
-        String sysTempDir = System.getProperty("java.io.tmpdir");
-        String sockFile = format("%s.sock", exe.baseDir().getName());
-        return new File(sysTempDir, sockFile).getAbsolutePath();
+    private String sockFile() throws IOException {
+        return Files.createTempFile(null, ".sock").toString();
     }
 }

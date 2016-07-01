@@ -26,7 +26,7 @@ public class RuntimeConfigBuilder extends de.flapdoodle.embed.process.config.Run
     }
 
     public RuntimeConfigBuilder defaults(Version version) {
-        String directoryName = String.format("mysql-%s-%s", version.getMajorVersion(), UUID.randomUUID().toString());
+        String directoryName = String.format("mysql-%s-%s", version.getMajorVersion(), UUID.randomUUID());
         defaults().artifactStore().setDefault(artifactStoreBuilderFor(directoryName));
 
         return this;
