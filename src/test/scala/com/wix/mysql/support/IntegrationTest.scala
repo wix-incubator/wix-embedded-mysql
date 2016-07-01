@@ -1,5 +1,6 @@
 package com.wix.mysql.support
 
+import java.util.UUID
 import javax.sql.DataSource
 
 import ch.qos.logback.classic.Level.INFO
@@ -8,7 +9,9 @@ import ch.qos.logback.classic.{Logger, LoggerContext}
 import ch.qos.logback.core.read.ListAppender
 import com.wix.mysql.config.MysqldConfig
 import com.wix.mysql.{EmbeddedMysql, Sources, SqlScriptSource}
+import de.flapdoodle.embed.process.io.directories.UserHome
 import org.apache.commons.dbcp2.BasicDataSource
+import org.apache.commons.io.FileUtils._
 import org.slf4j.LoggerFactory
 import org.slf4j.LoggerFactory.getLogger
 import org.specs2.mutable.SpecWithJUnit
@@ -58,6 +61,20 @@ abstract class IntegrationTest extends SpecWithJUnit with BeforeAfterEach
       def iterator = appender.list map (_.getMessage) iterator
     }
   }
+
+  def withCleanRepo[T](f: => T): T = {
+    val repository = new UserHome(".embedmysql").asFile
+    val backupFolder = new UserHome(s".embedmysql-${UUID.randomUUID().toString}").asFile
+    moveDirectory(repository, backupFolder)
+
+    try {
+      f
+    } finally {
+      deleteDirectory(repository)
+      moveDirectory(backupFolder, repository)
+    }
+  }
+
 }
 
 trait JdbcSupport {
