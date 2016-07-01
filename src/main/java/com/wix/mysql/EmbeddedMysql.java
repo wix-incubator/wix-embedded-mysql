@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.locks.ReentrantLock;
 
 import static com.wix.mysql.config.MysqldConfig.SystemDefaults.SCHEMA;
 import static com.wix.mysql.utils.Utils.or;
@@ -21,6 +22,7 @@ import static java.lang.String.format;
 
 public class EmbeddedMysql {
     private final static Logger logger = LoggerFactory.getLogger(EmbeddedMysql.class);
+    private static final ReentrantLock lock = new ReentrantLock();
 
     protected final MysqldConfig config;
     protected final MysqldExecutable executable;
@@ -30,7 +32,13 @@ public class EmbeddedMysql {
         logger.info("Preparing EmbeddedMysql version '{}'...", config.getVersion());
         this.config = config;
         IRuntimeConfig runtimeConfig = new RuntimeConfigBuilder().defaults(config.getVersion()).build();
-        this.executable = new MysqldStarter(runtimeConfig).prepare(config);
+
+        lock.lock();
+        try {
+            this.executable = new MysqldStarter(runtimeConfig).prepare(config);
+        } finally {
+            lock.unlock();
+        }
 
         try {
             executable.start();

@@ -9,6 +9,8 @@ import de.flapdoodle.embed.process.store.IArtifactStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.UUID;
+
 import static de.flapdoodle.embed.process.io.Processors.logTo;
 import static de.flapdoodle.embed.process.io.Slf4jLevel.DEBUG;
 
@@ -24,7 +26,7 @@ public class RuntimeConfigBuilder extends de.flapdoodle.embed.process.config.Run
     }
 
     public RuntimeConfigBuilder defaults(Version version) {
-        String directoryName = String.format("mysql-%s", version.getMajorVersion());
+        String directoryName = String.format("mysql-%s-%s", version.getMajorVersion(), UUID.randomUUID().toString());
         defaults().artifactStore().setDefault(artifactStoreBuilderFor(directoryName));
 
         return this;
