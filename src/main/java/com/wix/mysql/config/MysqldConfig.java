@@ -34,6 +34,10 @@ public class MysqldConfig extends ExecutableProcessConfig {
             }
         });
 
+        if (user.name.equals("root")) {
+            throw new IllegalArgumentException("Usage of username 'root' is forbidden as it's reserved for system use");
+        }
+
         this.port = port;
         this.charset = charset;
         this.user = user;
