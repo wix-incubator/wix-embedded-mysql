@@ -36,5 +36,13 @@ class MysqldConfigTest extends SpecWithJUnit {
       mysqldConfig.getPassword mustEqual "otherpassword"
       mysqldConfig.getTimeZone mustEqual TimeZone.getTimeZone("Europe/Vilnius")
     }
+
+    "fail if building with user 'root'" in {
+      aMysqldConfig(v5_6_latest)
+        .withUser("root", "doesnotmatter")
+        .build() must throwA[IllegalArgumentException](message = "Usage of username 'root' is forbidden")
+
+    }
+
   }
 }
