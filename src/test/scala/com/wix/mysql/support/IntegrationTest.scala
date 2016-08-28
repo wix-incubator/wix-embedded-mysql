@@ -61,16 +61,19 @@ abstract class IntegrationTest extends SpecWithJUnit with BeforeAfterEach
   def withCleanRepo[T](f: => T): T = {
     val repository = new UserHome(".embedmysql").asFile
     val backupFolder = new UserHome(s".embedmysql-${UUID.randomUUID()}").asFile
-    moveDirectory(repository, backupFolder)
 
-    try {
+    if (repository.exists()) {
+      moveDirectory(repository, backupFolder)
+      try {
+        f
+      } finally {
+        deleteDirectory(repository)
+        moveDirectory(backupFolder, repository)
+      }
+    } else {
       f
-    } finally {
-      deleteDirectory(repository)
-      moveDirectory(backupFolder, repository)
     }
   }
-
 }
 
 trait JdbcSupport {
