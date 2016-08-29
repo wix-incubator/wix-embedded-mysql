@@ -31,6 +31,7 @@ abstract class IntegrationTest extends SpecWithJUnit with BeforeAfterEach
   val log = getLogger(this.getClass)
 
   def before: Any = mysqldInstances = Seq()
+
   def after: Any = mysqldInstances.foreach(_.stop)
 
   def start(mysqld: EmbeddedMysql.Builder): EmbeddedMysql = {
@@ -62,7 +63,9 @@ abstract class IntegrationTest extends SpecWithJUnit with BeforeAfterEach
     val repository = new UserHome(".embedmysql").asFile
     val backupFolder = new UserHome(s".embedmysql-${UUID.randomUUID()}").asFile
 
-    if (repository.exists()) {
+    if (!repository.exists()) {
+      f
+    } else {
       moveDirectory(repository, backupFolder)
       try {
         f
@@ -70,8 +73,6 @@ abstract class IntegrationTest extends SpecWithJUnit with BeforeAfterEach
         deleteDirectory(repository)
         moveDirectory(backupFolder, repository)
       }
-    } else {
-      f
     }
   }
 }
