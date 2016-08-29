@@ -4,6 +4,7 @@ import com.wix.mysql.EmbeddedMysql._
 import com.wix.mysql.config.MysqldConfig.{SystemDefaults, aMysqldConfig}
 import com.wix.mysql.distribution.Version
 import com.wix.mysql.support.IntegrationTest
+import org.specs2.specification.AfterEach
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._

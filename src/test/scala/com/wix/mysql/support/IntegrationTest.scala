@@ -31,6 +31,7 @@ abstract class IntegrationTest extends SpecWithJUnit with BeforeAfterEach
   val log = getLogger(this.getClass)
 
   def before: Any = mysqldInstances = Seq()
+
   def after: Any = mysqldInstances.foreach(_.stop)
 
   def start(mysqld: EmbeddedMysql.Builder): EmbeddedMysql = {
@@ -61,16 +62,19 @@ abstract class IntegrationTest extends SpecWithJUnit with BeforeAfterEach
   def withCleanRepo[T](f: => T): T = {
     val repository = new UserHome(".embedmysql").asFile
     val backupFolder = new UserHome(s".embedmysql-${UUID.randomUUID()}").asFile
-    moveDirectory(repository, backupFolder)
 
-    try {
+    if (!repository.exists()) {
       f
-    } finally {
-      deleteDirectory(repository)
-      moveDirectory(backupFolder, repository)
+    } else {
+      moveDirectory(repository, backupFolder)
+      try {
+        f
+      } finally {
+        deleteDirectory(repository)
+        moveDirectory(backupFolder, repository)
+      }
     }
   }
-
 }
 
 trait JdbcSupport {
