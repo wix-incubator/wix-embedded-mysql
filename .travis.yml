@@ -7,9 +7,6 @@ before_install:
  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then export JAVA_HOME=$(/usr/libexec/java_home); fi
 # linux - installing libaio1
  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo apt-get update -qq && sudo apt-get install -y libaio1; fi
-# linux - fixing hostname issue and jdk segfaulting on linux
-# - sudo hostname "$(hostname | cut -c1-63)"
-# - sed -e "s/^\\(127\\.0\\.0\\.1.*\\)/\\1 $(hostname | cut -c1-63)/" /etc/hosts | sudo tee /etc/hosts
 
 matrix:
     include:
