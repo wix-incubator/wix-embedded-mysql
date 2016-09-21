@@ -16,34 +16,34 @@ class VersionTest extends SpecWithJUnit with AroundEach {
   "platform detection should detect" >> {
     "OS X" in {
       givenPlatformSetTo(OS_X)
-      v5_6_21.asInDownloadPath mustEqual "MySQL-5.6/mysql-5.6.21-osx10.9"
+      v5_7_15.asInDownloadPath mustEqual "MySQL-5.7/mysql-5.7.15-osx10.11"
     }
 
     "Windows" in {
       givenPlatformSetTo(Windows)
-      v5_6_21.asInDownloadPath mustEqual "MySQL-5.6/mysql-5.6.21"
+      v5_7_15.asInDownloadPath mustEqual "MySQL-5.7/mysql-5.7.15"
     }
 
     "Linux" in {
       givenPlatformSetTo(Linux)
-      v5_5_40.asInDownloadPath mustEqual "MySQL-5.5/mysql-5.5.40-linux2.6"
+      v5_7_15.asInDownloadPath mustEqual "MySQL-5.7/mysql-5.7.15-linux-glibc2.5"
     }
   }
 
   "verify that" >> {
     "windows for 5.5.X is not supported" in {
       givenPlatformSetTo(Windows)
-      v5_5_40.asInDownloadPath must throwA[UnsupportedPlatformException]
+      v5_5_latest.asInDownloadPath must throwA[UnsupportedPlatformException]
     }
 
     "solaris is not supported" in {
       givenPlatformSetTo(Solaris)
-      v5_5_40.asInDownloadPath must throwA[UnsupportedPlatformException]
+      v5_5_latest.asInDownloadPath must throwA[UnsupportedPlatformException]
     }
 
     "freebsd is not supported" in {
       givenPlatformSetTo(FreeBSD)
-      v5_5_40.asInDownloadPath must throwA[UnsupportedPlatformException]
+      v5_5_latest.asInDownloadPath must throwA[UnsupportedPlatformException]
     }
   }
 
