@@ -7,6 +7,8 @@ import de.flapdoodle.embed.process.distribution.Platform;
 import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
+import java.io.StringReader;
+import java.nio.charset.Charset;
 import java.nio.file.Paths;
 import java.util.List;
 
@@ -45,14 +47,15 @@ class MysqlClient {
     private void execute(final String sql) {
         String command = (Platform.detect() == Windows) ? format("\"%s\"", sql) : sql;
         try {
-            Process p = Runtime.getRuntime().exec(new String[]{
+            Process p = new ProcessBuilder(new String[]{
                     Paths.get(executable.getBaseDir().getAbsolutePath(), "bin", "mysql").toString(),
                     "--protocol=tcp",
                     format("--user=%s", SystemDefaults.USERNAME),
                     format("--port=%s", config.getPort()),
-                    "-e",
-                    command,
-                    schemaName});
+                    schemaName}).start();
+
+            IOUtils.copy(new StringReader(sql), p.getOutputStream(), Charset.defaultCharset());
+            p.getOutputStream().close();
 
             if (p.waitFor() != 0) {
                 String out = IOUtils.toString(p.getInputStream());
