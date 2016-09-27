@@ -3,7 +3,7 @@
 
     <groupId>com.wix</groupId>
     <artifactId>wix-embedded-mysql</artifactId>
-    <version>2.0.3-SNAPSHOT</version>
+    <version>2.0.3</version>
     <name>Wix Embedded MySql</name>
     <description>Embedded MySql for E2E/IT tests</description>
     <url>https://github.com/wix/wix-embedded-mysql</url>
@@ -23,7 +23,7 @@
         <connection>scm:git:git@github.com:wix/wix-embedded-mysql.git</connection>
         <developerConnection>scm:git:git@github.com:wix/wix-embedded-mysql.git</developerConnection>
         <url>git@github.com:wix/wix-embedded-mysql.git</url>
-        <tag>HEAD</tag>
+        <tag>wix-embedded-mysql-2.0.3</tag>
     </scm>
 
     <licenses>
