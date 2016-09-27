@@ -1,5 +1,6 @@
 package com.wix.mysql.distribution;
 
+import com.wix.mysql.config.MysqldConfig;
 import com.wix.mysql.distribution.setup.FilePermissionsInitializer;
 import com.wix.mysql.distribution.setup.Initializer;
 import com.wix.mysql.distribution.setup.Mysql57Initializer;
@@ -19,10 +20,10 @@ public class Setup {
             new NixBefore57Initializer());
 
 
-    public static void apply(Version version, IExtractedFileSet files, IRuntimeConfig runtimeConfig) throws IOException {
+    public static void apply(MysqldConfig config, IExtractedFileSet files, IRuntimeConfig runtimeConfig) throws IOException {
         for (Initializer initializer : initializers) {
-            if (initializer.matches(version)) {
-                initializer.apply(files, runtimeConfig);
+            if (initializer.matches(config.getVersion())) {
+                initializer.apply(files, runtimeConfig, config);
             }
         }
     }

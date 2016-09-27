@@ -39,7 +39,7 @@ class MysqldExecutable extends Executable<MysqldConfig, MysqldProcess> {
             final MysqldConfig config,
             final IRuntimeConfig runtime) throws IOException {
         logger.info("Preparing mysqld for startup");
-        Setup.apply(config.getVersion(), executable, runtime);
+        Setup.apply(config, executable, runtime);
         logger.info("Starting MysqldProcess");
         return new MysqldProcess(distribution, config, runtime, this);
     }

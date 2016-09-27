@@ -176,5 +176,10 @@ class EmbeddedMysqlTest extends IntegrationTest {
 
       mysqld.addSchema(schemaConfig) must throwA[CommandFailedException]
     }
+
+    "respect provided timeout" in {
+      start(anEmbeddedMysql(aMysqldConfig(v5_6_latest).withTimeout(1).build)) must
+        throwA[RuntimeException].like { case e => e.getMessage must contain("-9")}
+    }
   }
 }

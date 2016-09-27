@@ -17,13 +17,13 @@ import static java.lang.String.format;
 
 final class ProcessRunner {
 
-    static void run(Process p, IRuntimeConfig runtimeConfig) throws IOException {
+    static void run(Process p, IRuntimeConfig runtimeConfig, int timeoutMs) throws IOException {
         IStreamProcessor outputWatch = StreamToLineProcessor.wrap(runtimeConfig.getProcessOutput().getOutput());
         try {
             Processors.connect(new InputStreamReader(p.getInputStream()), outputWatch);
             Processors.connect(new InputStreamReader(p.getErrorStream()), outputWatch);
 
-            int retCode = TimingOutProcessExecutor.waitFor(p, 30, TimeUnit.SECONDS);
+            int retCode = TimingOutProcessExecutor.waitFor(p, timeoutMs, TimeUnit.MILLISECONDS);
 
             if (retCode != 0) {
                 resolveException(retCode, IOUtils.toString(p.getInputStream()) + IOUtils.toString(p.getErrorStream()));

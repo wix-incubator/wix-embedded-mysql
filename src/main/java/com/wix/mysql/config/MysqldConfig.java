@@ -6,20 +6,23 @@ import de.flapdoodle.embed.process.config.ISupportConfig;
 import de.flapdoodle.embed.process.distribution.IVersion;
 
 import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
 
 public class MysqldConfig extends ExecutableProcessConfig {
 
-    private final Integer port;
+    private final int port;
     private final Charset charset;
     private final User user;
     private final TimeZone timeZone;
+    private final int timeoutMs;
 
     protected MysqldConfig(
             final IVersion version,
             final int port,
             final Charset charset,
             final User user,
-            final TimeZone timeZone) {
+            final TimeZone timeZone,
+            final int timeoutMs) {
         super(version, new ISupportConfig() {
             public String getName() {
                 return "mysqld";
@@ -42,6 +45,7 @@ public class MysqldConfig extends ExecutableProcessConfig {
         this.charset = charset;
         this.user = user;
         this.timeZone = timeZone;
+        this.timeoutMs = timeoutMs;
     }
 
     public Version getVersion() {
@@ -57,7 +61,7 @@ public class MysqldConfig extends ExecutableProcessConfig {
     }
 
     public int getTimeout() {
-        return 30000;
+        return timeoutMs;
     }
 
     public String getUsername() {
@@ -82,6 +86,7 @@ public class MysqldConfig extends ExecutableProcessConfig {
         private Charset charset = Charset.defaults();
         private User user = new User("auser", "sa");
         private TimeZone timeZone = TimeZone.getTimeZone("UTC");
+        private int timeoutMs = 60000;
 
         public Builder(IVersion version) {
             this.version = version;
@@ -89,6 +94,11 @@ public class MysqldConfig extends ExecutableProcessConfig {
 
         public Builder withPort(int port) {
             this.port = port;
+            return this;
+        }
+
+        public Builder withTimeout(int timeoutMs) {
+            this.timeoutMs = timeoutMs;
             return this;
         }
 
@@ -112,7 +122,7 @@ public class MysqldConfig extends ExecutableProcessConfig {
         }
 
         public MysqldConfig build() {
-            return new MysqldConfig(version, port, charset, user, timeZone);
+            return new MysqldConfig(version, port, charset, user, timeZone, timeoutMs);
         }
     }
 

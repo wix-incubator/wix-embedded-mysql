@@ -20,7 +20,7 @@ public class TimingOutProcessExecutor {
             }
             rem = unit.toNanos(timeout) - (System.nanoTime() - startTime);
         } while (rem > 0);
-        return -1;
+        return -9;
     }
 
 }
