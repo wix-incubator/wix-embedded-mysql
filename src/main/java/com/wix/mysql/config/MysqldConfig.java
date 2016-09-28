@@ -6,7 +6,6 @@ import de.flapdoodle.embed.process.config.ISupportConfig;
 import de.flapdoodle.embed.process.distribution.IVersion;
 
 import java.util.TimeZone;
-import java.util.concurrent.TimeUnit;
 
 public class MysqldConfig extends ExecutableProcessConfig {
 
@@ -22,7 +21,7 @@ public class MysqldConfig extends ExecutableProcessConfig {
             final Charset charset,
             final User user,
             final TimeZone timeZone,
-            final int timeoutMs) {
+            final int timeoutSec) {
         super(version, new ISupportConfig() {
             public String getName() {
                 return "mysqld";
@@ -45,7 +44,7 @@ public class MysqldConfig extends ExecutableProcessConfig {
         this.charset = charset;
         this.user = user;
         this.timeZone = timeZone;
-        this.timeoutMs = timeoutMs;
+        this.timeoutMs = timeoutSec;
     }
 
     public Version getVersion() {
@@ -86,7 +85,7 @@ public class MysqldConfig extends ExecutableProcessConfig {
         private Charset charset = Charset.defaults();
         private User user = new User("auser", "sa");
         private TimeZone timeZone = TimeZone.getTimeZone("UTC");
-        private int timeoutMs = 60000;
+        private int timemoutSec = 60;
 
         public Builder(IVersion version) {
             this.version = version;
@@ -97,8 +96,8 @@ public class MysqldConfig extends ExecutableProcessConfig {
             return this;
         }
 
-        public Builder withTimeout(int timeoutMs) {
-            this.timeoutMs = timeoutMs;
+        public Builder withTimeout(int timeoutSec) {
+            this.timemoutSec = timeoutSec;
             return this;
         }
 
@@ -122,7 +121,7 @@ public class MysqldConfig extends ExecutableProcessConfig {
         }
 
         public MysqldConfig build() {
-            return new MysqldConfig(version, port, charset, user, timeZone, timeoutMs);
+            return new MysqldConfig(version, port, charset, user, timeZone, timemoutSec);
         }
     }
 

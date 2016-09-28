@@ -13,8 +13,9 @@ class TimingOutProcessExecutorTest extends SpecWithJUnit {
 
   "TimingOutProcessExecutor" should {
 
-    "return -9 if command does not complete within provided timeout" in {
-      TimingOutProcessExecutor.waitFor(new FakeProcess(4000), 2000, TimeUnit.MILLISECONDS) mustEqual -9
+    "throw an exception if command does not complete within provided timeout" in {
+      TimingOutProcessExecutor.waitFor(new FakeProcess(4000), 2000, TimeUnit.MILLISECONDS) must
+        throwA[InterruptedException].like { case e => e.getMessage must contain("Timeout of 2 sec exceeded")}
     }
 
     "return process exit code if command does complete within execution bounds" in {
@@ -39,7 +40,7 @@ class FakeProcess(executionDurationMs: Int) extends Process {
     }
   }
 
-  override def destroy(): Unit = ???
+  override def destroy(): Unit = {}
 
   override def waitFor(): Int = ???
 

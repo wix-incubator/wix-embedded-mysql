@@ -179,7 +179,7 @@ class EmbeddedMysqlTest extends IntegrationTest {
 
     "respect provided timeout" in {
       start(anEmbeddedMysql(aMysqldConfig(v5_6_latest).withTimeout(1).build)) must
-        throwA[RuntimeException].like { case e => e.getMessage must contain("-9")}
+        throwA[RuntimeException].like { case e => e.getMessage must contain("1 sec")}
     }
   }
 }

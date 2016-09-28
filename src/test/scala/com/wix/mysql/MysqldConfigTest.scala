@@ -20,7 +20,7 @@ class MysqldConfigTest extends SpecWithJUnit {
       mysqldConfig.getUsername mustEqual "auser"
       mysqldConfig.getPassword mustEqual "sa"
       mysqldConfig.getTimeZone mustEqual TimeZone.getTimeZone("UTC")
-      mysqldConfig.getTimeout mustEqual 60000
+      mysqldConfig.getTimeout mustEqual 60
     }
 
     "accept custom port, user, charset, timezone" in {
@@ -29,7 +29,7 @@ class MysqldConfigTest extends SpecWithJUnit {
         .withCharset(LATIN1)
         .withUser("otheruser", "otherpassword")
         .withTimeZone("Europe/Vilnius")
-        .withTimeout(10000)
+        .withTimeout(10)
         .build()
 
       mysqldConfig.getPort mustEqual 1111
@@ -37,7 +37,7 @@ class MysqldConfigTest extends SpecWithJUnit {
       mysqldConfig.getUsername mustEqual "otheruser"
       mysqldConfig.getPassword mustEqual "otherpassword"
       mysqldConfig.getTimeZone mustEqual TimeZone.getTimeZone("Europe/Vilnius")
-      mysqldConfig.getTimeout mustEqual 10000
+      mysqldConfig.getTimeout mustEqual 10
     }
 
     "fail if building with user 'root'" in {

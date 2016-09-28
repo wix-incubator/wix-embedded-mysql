@@ -20,7 +20,8 @@ public class TimingOutProcessExecutor {
             }
             rem = unit.toNanos(timeout) - (System.nanoTime() - startTime);
         } while (rem > 0);
-        return -9;
+        p.destroy();
+        throw new InterruptedException(String.format("Timeout of %s sec exceeded while waiting for process to complete", unit.toSeconds(timeout)));
     }
 
 }
