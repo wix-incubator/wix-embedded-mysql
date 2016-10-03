@@ -33,6 +33,7 @@ public class CatchAllCommandEmitter implements CommandEmitter {
                 format("--lc-messages-dir=%s/share", baseDir),
                 format("--port=%s", config.getPort()),
                 format("--socket=%s", sockFile()),
+                format("--user=%s", System.getProperty("user.name")),
                 "--console",
                 format("--character-set-server=%s", config.getCharset().getCharset()),
                 format("--collation-server=%s", config.getCharset().getCollate()),
