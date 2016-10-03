@@ -10,36 +10,48 @@ import java.util.List;
 
 import static java.lang.String.format;
 
-public enum Version implements IVersion {
+public class Version implements IVersion {
 
-    v5_5_40("5.5", "40", Platform.Linux, Platform.OS_X),
-    v5_6_21("5.6", "21"),
-    v5_6_22("5.6", "22"),
-    v5_6_23("5.6", "23"),
-    v5_6_24("5.6", "24"),
-    v5_6_latest(v5_6_24),
-    v5_7_10("5.7", "10"),
-    v5_7_13("5.7", "10"),
-    v5_7_latest(v5_7_13);
+    public static Version v5_5_40 = v5_5(40);
+    public static Version v5_6_21 = v5_6(21);
+    public static Version v5_6_22 = v5_6(22);
+    public static Version v5_6_23 = v5_6(23);
+    public static Version v5_6_24 = v5_7(24);
+    public static Version v5_7_10 = v5_7(10);
+    public static Version v5_7_13 = v5_7(13);
+    public static Version v5_5_latest = v5_5_40;
+    public static Version v5_6_latest = v5_6_24;
+    public static Version v5_7_latest = v5_7_13;
+
+    public static Version[] values() {
+        return new Version[] {v5_5_latest, v5_6_latest, v5_7_latest};
+    }
+
+    public static Version v5_5(int minor) {
+        return new Version("5.5", minor, Platform.Linux, Platform.OS_X);
+    }
+
+    public static Version v5_6(int minor) {
+        return new Version("5.6", minor);
+    }
+
+    public static Version v5_7(int minor) {
+        return new Version("5.7", minor);
+    }
 
     private final String majorVersion;
-    private final String minorVersion;
+    private final int minorVersion;
     private final List<Platform> supportedPlatforms;
 
-    Version(String majorVersion, String minorVersion, Platform... supportedPlatforms) {
+    private Version(String majorVersion, int minorVersion, Platform... supportedPlatforms) {
         this.majorVersion = majorVersion;
         this.minorVersion = minorVersion;
-        this.supportedPlatforms = Arrays.asList(supportedPlatforms);
-    }
 
-    Version(String majorVersion, String minorVersion) {
-        this(majorVersion, minorVersion, Platform.Linux, Platform.Windows, Platform.OS_X);
-    }
-
-    Version(Version other) {
-        this.majorVersion = other.majorVersion;
-        this.minorVersion = other.minorVersion;
-        this.supportedPlatforms = other.supportedPlatforms;
+        if (supportedPlatforms.length > 0) {
+            this.supportedPlatforms = Arrays.asList(supportedPlatforms);
+        } else {
+            this.supportedPlatforms = Arrays.asList(Platform.Linux, Platform.OS_X, Platform.Windows);
+        }
     }
 
     public boolean supportsCurrentPlatform() {
