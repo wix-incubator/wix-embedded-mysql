@@ -14,8 +14,8 @@ import static com.wix.mysql.config.Charset.LATIN1;
 import static com.wix.mysql.config.Charset.UTF8;
 import static com.wix.mysql.config.MysqldConfig.aMysqldConfig;
 import static com.wix.mysql.config.SchemaConfig.aSchemaConfig;
-import static com.wix.mysql.distribution.Version.v5_6_23;
 import static com.wix.mysql.distribution.Version.v5_6_latest;
+import static com.wix.mysql.distribution.Version.v5_7_latest;
 
 @Ignore
 public class JavaUsageExamplesTest {
@@ -44,7 +44,7 @@ public class JavaUsageExamplesTest {
 
     @Test
     public void mysqldConfigAndMultipleSchemas() {
-        MysqldConfig config = aMysqldConfig(v5_6_23)
+        MysqldConfig config = aMysqldConfig(v5_7_latest)
                 .withCharset(UTF8)
                 .withPort(2215)
                 .withUser("differentUser", "anotherPasword")
