@@ -48,11 +48,12 @@ If you need more control in configuring embeded mysql instance, you can use Mysq
 ```java
 import com.wix.mysql.config.MysqldConfig;
 import com.wix.mysql.EmbeddedMysql;
+import static com.wix.mysql.ScriptResolver;
+
+import java.util.concurrent.TimeUnit;
 
 import static com.wix.mysql.config.MysqldConfig.aMysqldConfig;
 import static com.wix.mysql.EmbeddedMysql.anEmbeddedMysql;
-import static com.wix.mysql.ScriptResolver.classPathScript;
-import static com.wix.mysql.ScriptResolver.classPathScripts;
 import static com.wix.mysql.distribution.Version.v5_6_23;
 import static com.wix.mysql.config.Charset.UTF8;
 
@@ -61,11 +62,12 @@ MysqldConfig config = aMysqldConfig(v5_6_23)
     .withPort(2215)
     .withUser("differentUser", "anotherPassword")
     .withTimeZone("Europe/Vilnius")
+    .withTimeout(2, TimeUnit.MINUTES)
     .build();
 
 EmbeddedMysql mysqld = anEmbeddedMysql(config)
-    .addSchema("aschema", classPathScript("db/001_init.sql"))
-    .addSchema("aschema2", classPathScripts("db/*.sql"))
+    .addSchema("aschema", ScriptResolver.classPathScript("db/001_init.sql"))
+    .addSchema("aschema2", ScriptResolver.classPathScripts("db/*.sql"))
     .start();
 
 //do work

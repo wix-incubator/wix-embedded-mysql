@@ -4,6 +4,7 @@ import de.flapdoodle.embed.process.io.IStreamProcessor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class NotifyingStreamProcessor implements IStreamProcessor {
 
@@ -66,9 +67,9 @@ public class NotifyingStreamProcessor implements IStreamProcessor {
             notify();
         }
 
-        public synchronized void waitForResult(long timeout) {
+        public synchronized void waitForResult(long timeoutMs) {
             try {
-                wait(timeout);
+                wait(timeoutMs);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

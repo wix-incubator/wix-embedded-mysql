@@ -1,6 +1,7 @@
 package com.wix.mysql
 
 import java.util.TimeZone
+import java.util.concurrent.TimeUnit
 
 import com.wix.mysql.config.Charset.{LATIN1, defaults}
 import com.wix.mysql.config.MysqldConfig.aMysqldConfig
@@ -20,6 +21,7 @@ class MysqldConfigTest extends SpecWithJUnit {
       mysqldConfig.getUsername mustEqual "auser"
       mysqldConfig.getPassword mustEqual "sa"
       mysqldConfig.getTimeZone mustEqual TimeZone.getTimeZone("UTC")
+      mysqldConfig.getTimeout(TimeUnit.SECONDS) mustEqual 30
     }
 
     "accept custom port, user, charset, timezone" in {
@@ -28,6 +30,7 @@ class MysqldConfigTest extends SpecWithJUnit {
         .withCharset(LATIN1)
         .withUser("otheruser", "otherpassword")
         .withTimeZone("Europe/Vilnius")
+        .withTimeout(20, TimeUnit.SECONDS)
         .build()
 
       mysqldConfig.getPort mustEqual 1111
@@ -35,6 +38,7 @@ class MysqldConfigTest extends SpecWithJUnit {
       mysqldConfig.getUsername mustEqual "otheruser"
       mysqldConfig.getPassword mustEqual "otherpassword"
       mysqldConfig.getTimeZone mustEqual TimeZone.getTimeZone("Europe/Vilnius")
+      mysqldConfig.getTimeout(TimeUnit.MILLISECONDS) mustEqual 20000
     }
 
     "fail if building with user 'root'" in {

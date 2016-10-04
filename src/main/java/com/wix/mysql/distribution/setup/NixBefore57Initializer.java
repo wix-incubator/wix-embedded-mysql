@@ -1,5 +1,6 @@
 package com.wix.mysql.distribution.setup;
 
+import com.wix.mysql.config.MysqldConfig;
 import com.wix.mysql.distribution.Version;
 import de.flapdoodle.embed.process.config.IRuntimeConfig;
 import de.flapdoodle.embed.process.distribution.Platform;
@@ -9,6 +10,7 @@ import java.io.File;
 import java.io.IOException;
 
 import static java.lang.String.format;
+import static java.util.concurrent.TimeUnit.NANOSECONDS;
 
 public class NixBefore57Initializer implements Initializer {
     @Override
@@ -18,7 +20,7 @@ public class NixBefore57Initializer implements Initializer {
     }
 
     @Override
-    public void apply(IExtractedFileSet files, IRuntimeConfig runtimeConfig) throws IOException {
+    public void apply(IExtractedFileSet files, IRuntimeConfig runtimeConfig, MysqldConfig config) throws IOException {
         File baseDir = files.baseDir();
         Process p = Runtime.getRuntime().exec(new String[]{
                         "scripts/mysql_install_db",
@@ -28,6 +30,6 @@ public class NixBefore57Initializer implements Initializer {
                 null,
                 baseDir);
 
-        ProcessRunner.run(p, runtimeConfig);
+        ProcessRunner.run(p, runtimeConfig, config.getTimeout(NANOSECONDS));
     }
 }

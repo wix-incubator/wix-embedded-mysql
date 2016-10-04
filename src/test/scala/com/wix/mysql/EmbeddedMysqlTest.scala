@@ -1,5 +1,7 @@
 package com.wix.mysql
 
+import java.util.concurrent.TimeUnit.SECONDS
+
 import com.wix.mysql.EmbeddedMysql._
 import com.wix.mysql.config.Charset.{LATIN1, UTF8MB4}
 import com.wix.mysql.config.MysqldConfig.{SystemDefaults, aMysqldConfig}
@@ -175,6 +177,11 @@ class EmbeddedMysqlTest extends IntegrationTest {
       mysqld must haveSchemaCharsetOf(UTF8MB4, schemaConfig.getName)
 
       mysqld.addSchema(schemaConfig) must throwA[CommandFailedException]
+    }
+
+    "respect provided timeout" in {
+      start(anEmbeddedMysql(aMysqldConfig(v5_6_latest).withTimeout(1, SECONDS).build)) must
+        throwA[RuntimeException].like { case e => e.getMessage must contain("1 sec")}
     }
   }
 }

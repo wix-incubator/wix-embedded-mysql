@@ -6,20 +6,25 @@ import de.flapdoodle.embed.process.config.ISupportConfig;
 import de.flapdoodle.embed.process.distribution.IVersion;
 
 import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
+
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 public class MysqldConfig extends ExecutableProcessConfig {
 
-    private final Integer port;
+    private final int port;
     private final Charset charset;
     private final User user;
     private final TimeZone timeZone;
+    private final Timeout timeout;
 
     protected MysqldConfig(
             final IVersion version,
             final int port,
             final Charset charset,
             final User user,
-            final TimeZone timeZone) {
+            final TimeZone timeZone,
+            final Timeout timeout) {
         super(version, new ISupportConfig() {
             public String getName() {
                 return "mysqld";
@@ -42,6 +47,7 @@ public class MysqldConfig extends ExecutableProcessConfig {
         this.charset = charset;
         this.user = user;
         this.timeZone = timeZone;
+        this.timeout = timeout;
     }
 
     public Version getVersion() {
@@ -56,8 +62,8 @@ public class MysqldConfig extends ExecutableProcessConfig {
         return port;
     }
 
-    public int getTimeout() {
-        return 30000;
+    public long getTimeout(TimeUnit target) {
+        return this.timeout.to(target);
     }
 
     public String getUsername() {
@@ -82,6 +88,7 @@ public class MysqldConfig extends ExecutableProcessConfig {
         private Charset charset = Charset.defaults();
         private User user = new User("auser", "sa");
         private TimeZone timeZone = TimeZone.getTimeZone("UTC");
+        private Timeout timeout = new Timeout(30, SECONDS);
 
         public Builder(IVersion version) {
             this.version = version;
@@ -89,6 +96,11 @@ public class MysqldConfig extends ExecutableProcessConfig {
 
         public Builder withPort(int port) {
             this.port = port;
+            return this;
+        }
+
+        public Builder withTimeout(long length, TimeUnit unit) {
+            this.timeout = new Timeout(length, unit);
             return this;
         }
 
@@ -112,17 +124,37 @@ public class MysqldConfig extends ExecutableProcessConfig {
         }
 
         public MysqldConfig build() {
-            return new MysqldConfig(version, port, charset, user, timeZone);
+            return new MysqldConfig(
+                    version,
+                    port,
+                    charset,
+                    user,
+                    timeZone,
+                    timeout);
         }
     }
 
-    public static class User {
+    private static class User {
         private final String name;
         private final String password;
 
-        public User(String name, String password) {
+        User(String name, String password) {
             this.name = name;
             this.password = password;
+        }
+    }
+
+    private static class Timeout {
+        private final long length;
+        private final TimeUnit unit;
+
+        Timeout(long length, TimeUnit unit) {
+            this.length = length;
+            this.unit = unit;
+        }
+
+        long to(TimeUnit target) {
+            return target.convert(length, unit);
         }
     }
 

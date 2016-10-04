@@ -1,5 +1,6 @@
 package com.wix.mysql.distribution.setup;
 
+import com.wix.mysql.config.MysqldConfig;
 import com.wix.mysql.distribution.Version;
 import de.flapdoodle.embed.process.config.IRuntimeConfig;
 import de.flapdoodle.embed.process.config.store.FileType;
@@ -16,7 +17,7 @@ public class FilePermissionsInitializer implements Initializer {
     }
 
     @Override
-    public void apply(IExtractedFileSet fileSet, IRuntimeConfig runtimeConfig) throws IOException {
+    public void apply(IExtractedFileSet fileSet, IRuntimeConfig runtimeConfig, MysqldConfig config) throws IOException {
         for (File f : fileSet.files(FileType.Library)) {
             f.setExecutable(true);
         }
