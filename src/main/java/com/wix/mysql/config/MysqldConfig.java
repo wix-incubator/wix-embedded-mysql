@@ -134,7 +134,7 @@ public class MysqldConfig extends ExecutableProcessConfig {
         }
     }
 
-    public static class User {
+    private static class User {
         private final String name;
         private final String password;
 
@@ -144,7 +144,7 @@ public class MysqldConfig extends ExecutableProcessConfig {
         }
     }
 
-    public static class Timeout {
+    private static class Timeout {
         private final long length;
         private final TimeUnit unit;
 
@@ -153,7 +153,7 @@ public class MysqldConfig extends ExecutableProcessConfig {
             this.unit = unit;
         }
 
-        public long to(TimeUnit target) {
+        long to(TimeUnit target) {
             return target.convert(length, unit);
         }
     }
