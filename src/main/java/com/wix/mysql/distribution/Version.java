@@ -11,21 +11,27 @@ import java.util.List;
 
 public enum Version implements IVersion {
 
+    v5_5_40("5.5", 40, MacOsVersion.v10_6, Platform.Linux, Platform.OS_X),
     v5_5_50("5.5", 50, MacOsVersion.v10_9, Platform.Linux, Platform.OS_X),
     v5_5_51("5.5", 51, MacOsVersion.v10_9, Platform.Linux, Platform.OS_X),
     v5_5_52("5.5", 52, MacOsVersion.v10_9, Platform.Linux, Platform.OS_X),
     v5_5_latest(v5_5_52),
+    v5_6_21("5.6", 21, MacOsVersion.v10_9),
+    v5_6_22("5.6", 22, MacOsVersion.v10_9),
+    v5_6_23("5.6", 23, MacOsVersion.v10_9),
+    v5_6_24("5.6", 24, MacOsVersion.v10_9),
     v5_6_31("5.6", 31, MacOsVersion.v10_11),
     v5_6_32("5.6", 32, MacOsVersion.v10_11),
     v5_6_33("5.6", 33, MacOsVersion.v10_11),
     v5_6_latest(v5_6_33),
+    v5_7_10("5.7", 10, MacOsVersion.v10_10),
     v5_7_13("5.7", 13, MacOsVersion.v10_11),
     v5_7_14("5.7", 14, MacOsVersion.v10_11),
     v5_7_15("5.7", 15, MacOsVersion.v10_11),
     v5_7_latest(v5_7_15);
 
     private enum MacOsVersion {
-        v10_6, v10_7, v10_8, v10_9, v10_10, v10_11;
+        v10_6, v10_9, v10_10, v10_11;
 
         @Override
         public String toString() {
