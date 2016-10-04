@@ -5,6 +5,8 @@ import com.wix.mysql.config.SchemaConfig;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import java.util.concurrent.TimeUnit;
+
 import static com.wix.mysql.EmbeddedMysql.anEmbeddedMysql;
 import static com.wix.mysql.ScriptResolver.classPathScript;
 import static com.wix.mysql.ScriptResolver.classPathScripts;
@@ -92,5 +94,21 @@ public class JavaUsageExamplesTest {
 
         mysqld.stop(); //optional, as there is a shutdown hook
     }
+
+    @Test
+    public void customTimeout() {
+        MysqldConfig config = aMysqldConfig(v5_6_latest)
+                .withTimeout(2, TimeUnit.MINUTES)
+                .build();
+
+        EmbeddedMysql mysqld = anEmbeddedMysql(config)
+                .addSchema("aschema", classPathScript("db/001_init.sql"))
+                .start();
+
+        //do work
+
+        mysqld.stop(); //optional, as there is a shutdown hook
+    }
+
 
 }
