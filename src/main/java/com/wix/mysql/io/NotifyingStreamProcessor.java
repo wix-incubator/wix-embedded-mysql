@@ -5,7 +5,6 @@ import de.flapdoodle.embed.process.io.IStreamProcessor;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public class NotifyingStreamProcessor implements IStreamProcessor {
 
@@ -39,7 +38,7 @@ public class NotifyingStreamProcessor implements IStreamProcessor {
         private final String successPattern;
         private final String failurePattern = "[ERROR]";
         private final StringBuilder output = new StringBuilder();
-        private AtomicBoolean initWithSuccess = new AtomicBoolean(false);
+        private boolean initWithSuccess = false;
         private String failureFound = null;
 
         public ResultMatchingListener(String successPattern) {
@@ -63,7 +62,7 @@ public class NotifyingStreamProcessor implements IStreamProcessor {
         }
 
         private synchronized void gotResult(boolean success, String message) {
-            this.initWithSuccess.set(success);
+            this.initWithSuccess = success;
             failureFound = message;
             notify();
         }
@@ -71,7 +70,7 @@ public class NotifyingStreamProcessor implements IStreamProcessor {
         public synchronized void waitForResult(long timeoutMs) {
             try {
                 wait(timeoutMs);
-                if (!initWithSuccess.get()) {
+                if (!initWithSuccess) {
                     throw new RuntimeException(String.format("Timeout of %s sec exceeded while waiting for process to complete", TimeUnit.MILLISECONDS.toSeconds(timeoutMs)));
                 }
             } catch (InterruptedException e) {
@@ -80,7 +79,7 @@ public class NotifyingStreamProcessor implements IStreamProcessor {
         }
 
         public boolean isInitWithSuccess() {
-            return initWithSuccess.get();
+            return initWithSuccess;
         }
 
         public String getFailureFound() {
