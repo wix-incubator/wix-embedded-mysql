@@ -70,6 +70,9 @@ public class NotifyingStreamProcessor implements IStreamProcessor {
         public synchronized void waitForResult(long timeoutMs) {
             try {
                 wait(timeoutMs);
+                if (!initWithSuccess) {
+                    throw new RuntimeException(String.format("Timeout of %s sec exceeded while waiting for process to complete", TimeUnit.MILLISECONDS.toSeconds(timeoutMs)));
+                }
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

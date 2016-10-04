@@ -1,5 +1,6 @@
 package com.wix.mysql
 
+import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeUnit.SECONDS
 
 import com.wix.mysql.EmbeddedMysql._
@@ -40,6 +41,11 @@ class EmbeddedMysqlTest extends IntegrationTest {
         haveCharsetOf(LATIN1) and
         beAvailableOn(1112, "zeUser", "zePassword", SystemDefaults.SCHEMA) and
         haveServerTimezoneMatching("US/Michigan")
+    }
+
+    "respect provided timeout" in {
+      start(anEmbeddedMysql(aMysqldConfig(v5_6_latest).withTimeout(10, TimeUnit.MILLISECONDS).build)) must
+        throwA[RuntimeException].like { case e => e.getMessage must contain("0 sec")}
     }
   }
 
@@ -177,11 +183,6 @@ class EmbeddedMysqlTest extends IntegrationTest {
       mysqld must haveSchemaCharsetOf(UTF8MB4, schemaConfig.getName)
 
       mysqld.addSchema(schemaConfig) must throwA[CommandFailedException]
-    }
-
-    "respect provided timeout" in {
-      start(anEmbeddedMysql(aMysqldConfig(v5_6_latest).withTimeout(1, SECONDS).build)) must
-        throwA[RuntimeException].like { case e => e.getMessage must contain("1 sec")}
     }
   }
 }
