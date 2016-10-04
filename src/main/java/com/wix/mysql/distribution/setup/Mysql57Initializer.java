@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.IOException;
 
 import static java.lang.String.format;
+import static java.util.concurrent.TimeUnit.NANOSECONDS;
 
 public class Mysql57Initializer implements Initializer {
     @Override
@@ -30,6 +31,6 @@ public class Mysql57Initializer implements Initializer {
                         format("--basedir=%s", baseDir),
                         format("--datadir=%s/data", baseDir)});
 
-        ProcessRunner.run(p, runtimeConfig, config.getTimeout());
+        ProcessRunner.run(p, runtimeConfig, config.getTimeout(NANOSECONDS));
     }
 }

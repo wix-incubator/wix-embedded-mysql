@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.IOException;
 
 import static java.lang.String.format;
+import static java.util.concurrent.TimeUnit.NANOSECONDS;
 
 public class NixBefore57Initializer implements Initializer {
     @Override
@@ -29,6 +30,6 @@ public class NixBefore57Initializer implements Initializer {
                 null,
                 baseDir);
 
-        ProcessRunner.run(p, runtimeConfig, config.getTimeout());
+        ProcessRunner.run(p, runtimeConfig, config.getTimeout(NANOSECONDS));
     }
 }

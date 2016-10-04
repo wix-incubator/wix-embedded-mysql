@@ -26,6 +26,7 @@ import static com.wix.mysql.utils.Utils.closeCloseables;
 import static com.wix.mysql.utils.Utils.readToString;
 import static de.flapdoodle.embed.process.distribution.Platform.Windows;
 import static java.lang.String.format;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 public class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutable, MysqldProcess> {
 
@@ -49,7 +50,7 @@ public class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutabl
         ResultMatchingListener startupListener = outputWatch.addListener(new ResultMatchingListener("ready for connections"));
 
         try {
-            startupListener.waitForResult(getConfig().getTimeout());
+            startupListener.waitForResult(getConfig().getTimeout(MILLISECONDS));
 
             if (!startupListener.isInitWithSuccess()) {
                 throw new RuntimeException("mysql start failed with error: " + startupListener.getFailureFound());
@@ -112,7 +113,7 @@ public class MysqldProcess extends AbstractProcess<MysqldConfig, MysqldExecutabl
             stdErr = new InputStreamReader(p.getErrorStream());
 
             if (retValue) {
-                shutdownListener.waitForResult(getConfig().getTimeout());
+                shutdownListener.waitForResult(getConfig().getTimeout(MILLISECONDS));
 
                 //TODO: figure out a better strategy for this. It seems windows does not actually shuts down process after it says it does.
                 if (Platform.detect() == Windows) {

@@ -4,11 +4,11 @@ import java.util.concurrent.TimeUnit;
 
 public class TimingOutProcessExecutor {
 
-    public static int waitFor(Process p, long timeout, TimeUnit unit)
+    public static int waitFor(Process p, long timeoutNanos)
             throws InterruptedException
     {
         long startTime = System.nanoTime();
-        long rem = unit.toNanos(timeout);
+        long rem = timeoutNanos;
 
         do {
             try {
@@ -18,10 +18,10 @@ public class TimingOutProcessExecutor {
                     Thread.sleep(
                             Math.min(TimeUnit.NANOSECONDS.toMillis(rem) + 1, 100));
             }
-            rem = unit.toNanos(timeout) - (System.nanoTime() - startTime);
+            rem = timeoutNanos - (System.nanoTime() - startTime);
         } while (rem > 0);
         p.destroy();
-        throw new InterruptedException(String.format("Timeout of %s sec exceeded while waiting for process to complete", unit.toSeconds(timeout)));
+        throw new InterruptedException(String.format("Timeout of %s sec exceeded while waiting for process to complete", TimeUnit.NANOSECONDS.toSeconds(timeoutNanos)));
     }
 
 }

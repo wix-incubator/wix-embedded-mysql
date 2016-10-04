@@ -67,9 +67,9 @@ public class NotifyingStreamProcessor implements IStreamProcessor {
             notify();
         }
 
-        public synchronized void waitForResult(long timeout) {
+        public synchronized void waitForResult(long timeoutMs) {
             try {
-                wait(TimeUnit.SECONDS.toMillis(timeout));
+                wait(timeoutMs);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

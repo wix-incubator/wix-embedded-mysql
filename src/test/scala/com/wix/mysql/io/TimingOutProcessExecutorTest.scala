@@ -14,12 +14,12 @@ class TimingOutProcessExecutorTest extends SpecWithJUnit {
   "TimingOutProcessExecutor" should {
 
     "throw an exception if command does not complete within provided timeout" in {
-      TimingOutProcessExecutor.waitFor(new FakeProcess(4000), 2000, TimeUnit.MILLISECONDS) must
+      TimingOutProcessExecutor.waitFor(new FakeProcess(4000), TimeUnit.MILLISECONDS.toNanos(2000)) must
         throwA[InterruptedException].like { case e => e.getMessage must contain("Timeout of 2 sec exceeded")}
     }
 
     "return process exit code if command does complete within execution bounds" in {
-      TimingOutProcessExecutor.waitFor(new FakeProcess(200), 2000, TimeUnit.SECONDS) mustEqual 0
+      TimingOutProcessExecutor.waitFor(new FakeProcess(200), TimeUnit.MILLISECONDS.toNanos(2000)) mustEqual 0
     }
   }
 }
