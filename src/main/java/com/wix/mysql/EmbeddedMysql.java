@@ -43,8 +43,14 @@ public class EmbeddedMysql {
 
         try {
             executable.start();
-            getClient(SCHEMA).executeCommands(
-                    format("CREATE USER '%s'@'%%' IDENTIFIED BY '%s';", config.getUsername(), config.getPassword()));
+
+            ArrayList<String> initCommands = new ArrayList<String>();
+            initCommands.add(format("CREATE USER '%s'@'%%' IDENTIFIED BY '%s';", config.getUsername(), config.getPassword()));
+            if (config.getVersion().supportDevXApi()) {
+                initCommands.add("INSTALL PLUGIN mysqlx SONAME 'mysqlx.so';");
+            }
+
+            getClient(SCHEMA).executeCommands(initCommands.toArray(new String[initCommands.size()]));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
