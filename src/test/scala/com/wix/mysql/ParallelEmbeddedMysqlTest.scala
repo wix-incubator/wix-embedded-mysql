@@ -1,5 +1,7 @@
 package com.wix.mysql
 
+import java.util.concurrent.TimeUnit
+
 import com.wix.mysql.EmbeddedMysql._
 import com.wix.mysql.config.MysqldConfig.{SystemDefaults, aMysqldConfig}
 import com.wix.mysql.distribution.Version
@@ -22,7 +24,7 @@ class ParallelEmbeddedMysqlTest extends IntegrationTest {
   }
 
   def runMysql(onPort: Int) = Future {
-    val config = aMysqldConfig(Version.v5_7_latest).withPort(onPort).build
+    val config = aMysqldConfig(Version.v5_7_latest).withPort(onPort).withTimeout(2, TimeUnit.MINUTES).build
     val mysqld = start(anEmbeddedMysql(config))
 
     mysqld must beAvailableOn(onPort, "auser", "sa", SystemDefaults.SCHEMA)
