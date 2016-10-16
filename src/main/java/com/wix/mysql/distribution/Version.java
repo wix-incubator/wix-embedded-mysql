@@ -66,6 +66,11 @@ public enum Version implements IVersion {
         return supportedPlatforms.contains(currentPlatform()) && (!isMacOsSierra() || worksOnMacOsSierra());
     }
 
+    public boolean supportDevXApi() {
+        return !(majorVersion.equals("5.5") || majorVersion.equals("5.6")) &&
+                (majorVersion.equals("5.7") && minorVersion >= 12);
+    }
+
     private boolean isMacOsSierra() {
         return currentPlatform() == Platform.OS_X && System.getProperty("os.version").startsWith("10.12");
     }
@@ -121,5 +126,9 @@ public enum Version implements IVersion {
 
     public String getMajorVersion() {
         return majorVersion;
+    }
+
+    public int getMinorVersion() {
+        return minorVersion;
     }
 }

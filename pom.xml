@@ -41,11 +41,12 @@
 
         <flapdoodle.process.version>1.50.1</flapdoodle.process.version>
         <spring.jdbc.version>4.2.5.RELEASE</spring.jdbc.version>
-        <mysql.connector.version>5.1.38</mysql.connector.version>
+        <mysql.connector.version>6.0.4</mysql.connector.version>
+        <protobuf-java.version>2.6.1</protobuf-java.version>
         <slf4j.version>1.7.10</slf4j.version>
         <logback.version>1.1.6</logback.version>
         <scala.library.version>2.11</scala.library.version>
-        <scala.version>2.11.7</scala.version>
+        <scala.version>2.11.8</scala.version>
         <specs2.version>3.7.1</specs2.version>
     </properties>
 
@@ -75,6 +76,13 @@
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
             <version>${mysql.connector.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.protobuf</groupId>
+            <artifactId>protobuf-java</artifactId>
+            <version>${protobuf-java.version}</version>
             <scope>test</scope>
         </dependency>
 

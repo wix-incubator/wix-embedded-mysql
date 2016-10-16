@@ -45,6 +45,22 @@ class VersionTest extends SpecWithJUnit with AroundEach {
       givenPlatformSetTo(FreeBSD)
       v5_5_latest.asInDownloadPath must throwA[UnsupportedPlatformException]
     }
+
+    "x dev api is supported for version 5.7.12 and higher" in {
+      Version.values.filter( _.getMajorVersion == "5.5" )
+                    .foreach( _.supportDevXApi must beFalse )
+      Version.values.filter( _.getMajorVersion == "5.6" )
+                    .foreach( _.supportDevXApi must beFalse )
+      Version.values.filter( _.getMajorVersion == "5.7" )
+                    .filter( _.getMinorVersion < 12 )
+                    .foreach( _.supportDevXApi must beFalse )
+      Version.values.filter( _.getMajorVersion == "5.7" )
+                    .filter( _.getMinorVersion >= 12 )
+                    .foreach( _.supportDevXApi must beTrue )
+      Version.values.filter( _.getMajorVersion == "5.8" )
+                    .foreach( _.supportDevXApi must beTrue )
+      success
+    }
   }
 
   def givenPlatformSetTo(platform: Platform) = platform match {

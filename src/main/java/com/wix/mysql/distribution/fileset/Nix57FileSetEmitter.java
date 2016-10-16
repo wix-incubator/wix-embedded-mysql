@@ -19,6 +19,7 @@ public class Nix57FileSetEmitter extends Nix implements FileSetEmitter {
         return common()
                 .addEntry(Library, "share/mysql_security_commands.sql")
                 .addEntry(Library, "support-files/my-default.cnf")
+                .addEntry(Library, "lib/plugin/mysqlx.so")
                 .build();
     }
 }

@@ -1,7 +1,6 @@
 package com.wix.mysql
 
 import java.util.concurrent.TimeUnit
-import java.util.concurrent.TimeUnit.SECONDS
 
 import com.wix.mysql.EmbeddedMysql._
 import com.wix.mysql.config.Charset.{LATIN1, UTF8MB4}
@@ -42,6 +41,22 @@ class EmbeddedMysqlTest extends IntegrationTest {
         beAvailableOn(1112, "zeUser", "zePassword", SystemDefaults.SCHEMA) and
         haveServerTimezoneMatching("US/Michigan")
     }
+
+    "support X Dev API" in {
+      val config = aMysqldConfig(Version.v5_7_latest).build
+      val schema = aSchemaConfig("aSchema")
+        .withScripts(aMigrationWith("create table t1 (col1 INTEGER);"))
+        .build
+
+
+      val mysqld = start(anEmbeddedMysql(config).addSchema(schema))
+
+
+      val values = Seq[Integer](1, 2, 3, 4, 5)
+      aDevXInsert(mysqld.getConfig, "aSchema", "t1", "col1", values)
+      aDevXSelect(mysqld.getConfig, "aSchema", "t1", "col1") must containTheSameElementsAs(values)
+    }
+
 
     "respect provided timeout" in {
       start(anEmbeddedMysql(aMysqldConfig(v5_6_latest).withTimeout(10, TimeUnit.MILLISECONDS).build)) must

@@ -1,12 +1,15 @@
 package com.wix.mysql.support
 
 import java.util.UUID
+import java.util.concurrent.CompletableFuture
 import javax.sql.DataSource
 
 import ch.qos.logback.classic.Level.INFO
 import ch.qos.logback.classic.spi.ILoggingEvent
 import ch.qos.logback.classic.{Logger, LoggerContext}
 import ch.qos.logback.core.read.ListAppender
+import com.mysql.cj.api.x.XSession
+import com.mysql.cj.x.MysqlxSessionFactory
 import com.wix.mysql.config.MysqldConfig
 import com.wix.mysql.{EmbeddedMysql, Sources, SqlScriptSource}
 import de.flapdoodle.embed.process.io.directories.UserHome
@@ -86,11 +89,14 @@ trait JdbcSupport {
   def aDataSource(user: String, password: String, port: Int, schema: String): DataSource = {
     val dataSource: BasicDataSource = new BasicDataSource
     dataSource.setDriverClassName("com.mysql.jdbc.Driver")
-    dataSource.setUrl(s"jdbc:mysql://localhost:$port/$schema")
+    dataSource.setUrl(s"jdbc:mysql://localhost:$port/$schema?useSSL=false")
     dataSource.setUsername(user)
     dataSource.setPassword(password)
     dataSource
   }
+
+  def aDevXSession(config: MysqldConfig, schema: String): XSession =
+    new MysqlxSessionFactory().getSession(s"mysqlx://localhost:33060/$schema?user=${config.getUsername}&password=${config.getPassword}")
 
   def aJdbcTemplate(mysqld: EmbeddedMysql, forSchema: String): JdbcTemplate =
     new JdbcTemplate(aDataSource(mysqld.getConfig, forSchema))
@@ -106,6 +112,23 @@ trait JdbcSupport {
 
   def anUpdate(mysqld: EmbeddedMysql, onSchema: String, sql: String): Unit =
     aJdbcTemplate(mysqld, forSchema = onSchema).execute(sql)
+
+  def aDevXInsert(config: MysqldConfig, onSchema: String, table: String, column: String, values: Seq[Integer]) = {
+    val t = aDevXSession(config, onSchema).getSchema(onSchema)
+                                          .getTable(table)
+    CompletableFuture.allOf(
+      values.map( t.insert("col1")
+                   .values(_)
+                   .executeAsync ):_*).get()
+  }
+
+  def aDevXSelect(config: MysqldConfig, onSchema: String, table: String, column: String): Seq[Int] =
+    aDevXSession(config, onSchema).getSchema(onSchema)
+                                  .getTable(table)
+                                  .select(column)
+                                  .execute.iterator
+                                  .map( _.getInt("col1") )
+                                  .toSeq
 
   def aMigrationWith(sql: String): SqlScriptSource = Sources.fromFile(createTempFile(sql))
 
