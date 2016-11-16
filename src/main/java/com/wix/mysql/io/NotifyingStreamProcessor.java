@@ -40,6 +40,7 @@ public class NotifyingStreamProcessor implements IStreamProcessor {
         private final StringBuilder output = new StringBuilder();
         private boolean initWithSuccess = false;
         private String failureFound = null;
+        private boolean completed = false;
 
         public ResultMatchingListener(String successPattern) {
             this.successPattern = successPattern;
@@ -62,15 +63,16 @@ public class NotifyingStreamProcessor implements IStreamProcessor {
         }
 
         private synchronized void gotResult(boolean success, String message) {
-            this.initWithSuccess = success;
+            initWithSuccess = success;
             failureFound = message;
+            completed = true;
             notify();
         }
 
         public synchronized void waitForResult(long timeoutMs) {
             try {
                 wait(timeoutMs);
-                if (!initWithSuccess) {
+                if (!completed) {
                     throw new RuntimeException(String.format("Timeout of %s sec exceeded while waiting for process to complete", TimeUnit.MILLISECONDS.toSeconds(timeoutMs)));
                 }
             } catch (InterruptedException e) {
