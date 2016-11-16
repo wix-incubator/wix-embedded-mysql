@@ -14,18 +14,32 @@ class ResultMatchingListenerTest extends SpecWithJUnit {
       val listener = new ResultMatchingListener("SUCCESS")
       Future {
         Thread.sleep(1000)
-        listener.onMessage("SUCCESS")
+        listener.onMessage("SUCCESS: completed")
       }
 
       listener.waitForResult(4000)
 
       listener.isInitWithSuccess must beTrue
+      listener.getFailureFound must beNull
     }
 
-    "throw an exception if command does not complete within provided timeout" in {
+    "throw a timeout exception if command does not complete within provided timeout" in {
       new ResultMatchingListener("SUCCESS").waitForResult(1000) must
         throwA[RuntimeException].like { case e => e.getMessage must contain("Timeout of 1 sec exceeded") }
     }
-  }
 
+    "should return error output given error expression matched" in {
+      val listener = new ResultMatchingListener("SUCCESS")
+
+      Future {
+        Thread.sleep(500)
+        listener.onMessage("[ERROR] woops")
+      }
+
+      listener.waitForResult(5000)
+
+      listener.isInitWithSuccess must beFalse
+      listener.getFailureFound mustEqual "[ERROR] woops"
+    }
+  }
 }
