@@ -5,6 +5,9 @@ import de.flapdoodle.embed.process.config.ExecutableProcessConfig;
 import de.flapdoodle.embed.process.config.ISupportConfig;
 import de.flapdoodle.embed.process.distribution.IVersion;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
@@ -17,6 +20,7 @@ public class MysqldConfig extends ExecutableProcessConfig {
     private final User user;
     private final TimeZone timeZone;
     private final Timeout timeout;
+    private final List<String> args;
 
     protected MysqldConfig(
             final IVersion version,
@@ -24,7 +28,8 @@ public class MysqldConfig extends ExecutableProcessConfig {
             final Charset charset,
             final User user,
             final TimeZone timeZone,
-            final Timeout timeout) {
+            final Timeout timeout,
+            final List<String> args) {
         super(version, new ISupportConfig() {
             public String getName() {
                 return "mysqld";
@@ -48,6 +53,7 @@ public class MysqldConfig extends ExecutableProcessConfig {
         this.user = user;
         this.timeZone = timeZone;
         this.timeout = timeout;
+        this.args = args;
     }
 
     public Version getVersion() {
@@ -78,6 +84,10 @@ public class MysqldConfig extends ExecutableProcessConfig {
         return timeZone;
     }
 
+    public List<String> getArgs() {
+        return args;
+    }
+
     public static Builder aMysqldConfig(final Version version) {
         return new Builder(version);
     }
@@ -89,6 +99,7 @@ public class MysqldConfig extends ExecutableProcessConfig {
         private User user = new User("auser", "sa");
         private TimeZone timeZone = TimeZone.getTimeZone("UTC");
         private Timeout timeout = new Timeout(30, SECONDS);
+        private List<String> args = new ArrayList<>();
 
         public Builder(IVersion version) {
             this.version = version;
@@ -123,6 +134,11 @@ public class MysqldConfig extends ExecutableProcessConfig {
             return withTimeZone(TimeZone.getTimeZone(timeZoneId));
         }
 
+        public Builder withArgs(String ...args) {
+            this.args.addAll(Arrays.asList(args));
+            return this;
+        }
+
         public MysqldConfig build() {
             return new MysqldConfig(
                     version,
@@ -130,7 +146,8 @@ public class MysqldConfig extends ExecutableProcessConfig {
                     charset,
                     user,
                     timeZone,
-                    timeout);
+                    timeout,
+                    args);
         }
     }
 

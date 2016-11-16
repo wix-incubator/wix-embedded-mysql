@@ -8,6 +8,8 @@ import com.wix.mysql.config.MysqldConfig.aMysqldConfig
 import com.wix.mysql.distribution.Version._
 import org.specs2.mutable.SpecWithJUnit
 
+import scala.collection.JavaConverters._
+
 class MysqldConfigTest extends SpecWithJUnit {
 
   "MysqldConfig" should {
@@ -41,12 +43,27 @@ class MysqldConfigTest extends SpecWithJUnit {
       mysqldConfig.getTimeout(TimeUnit.MILLISECONDS) mustEqual 20000
     }
 
+    "accept custom system variables" in {
+      val mysqldConfig = aMysqldConfig(v5_6_latest)
+        .withArgs("--some-arg=123", "--another-arg")
+        .build
+
+      mysqldConfig.getArgs.asScala must contain("--some-arg=123", "--another-arg")
+    }
+
+    "combine system variables from multiple invocations" in {
+      val mysqldConfig = aMysqldConfig(v5_6_latest)
+        .withArgs("--another-arg")
+        .withArgs("--some-arg=123")
+        .build
+
+      mysqldConfig.getArgs.asScala must contain("--some-arg=123", "--another-arg")
+    }
+
     "fail if building with user 'root'" in {
       aMysqldConfig(v5_6_latest)
         .withUser("root", "doesnotmatter")
         .build() must throwA[IllegalArgumentException](message = "Usage of username 'root' is forbidden")
-
     }
-
   }
 }
