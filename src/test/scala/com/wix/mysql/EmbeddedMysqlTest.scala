@@ -52,15 +52,13 @@ class EmbeddedMysqlTest extends IntegrationTest {
       mysqld must haveSystemVariable("max_connect_errors", "666")
     }
 
-    "override user-provided system variables with the ones defined by library" in {
+    "not allow to override library-managed system variables" in {
       val config = aMysqldConfig(v5_6_latest)
         .withTimeZone("US/Michigan")
-//        .withArgs("--default-time-zone=US/Eastern")
+        .withArgs("--default-time-zone=US/Eastern")
         .build
 
-      val mysqld = start(anEmbeddedMysql(config))
-
-      mysqld must haveServerTimezoneMatching("US/Eastern")
+      start(anEmbeddedMysql(config)) must throwA[RuntimeException]
     }
 
     "respect provided timeout" in {

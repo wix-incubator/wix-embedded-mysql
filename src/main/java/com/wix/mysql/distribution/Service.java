@@ -13,12 +13,14 @@ public class Service {
     private static List<CommandEmitter> emitters = Collections.newArrayList(
             new BaseCommandEmitter(),
             new Pre57CommandEmitter(),
-            new Mysql57CommandEmitter());
+            new Mysql57CommandEmitter(),
+            new UserProvidedArgumentsEmitter());
 
     public static List<String> commandLine(final MysqldConfig config, final IExtractedFileSet exe) throws IOException {
-        ServiceCommandBuilder commandBuilder = new ServiceCommandBuilder(config.getVersion().toString());
+        Version version = config.getVersion();
+        ServiceCommandBuilder commandBuilder = new ServiceCommandBuilder(version.toString());
         for (CommandEmitter emitter : emitters) {
-            if (emitter.matches(config.getVersion())) {
+            if (emitter.matches(version)) {
                 commandBuilder.addAll(emitter.emit(config, exe));
             }
         }
