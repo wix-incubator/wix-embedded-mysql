@@ -20,7 +20,7 @@ Add dependency to your pom.xml:
         <artifactId>wix-embedded-mysql</artifactId>
         <version>x.y.z</version>
         <scope>test</scope>
-    </dependency>        
+    </dependency>
 ```
 
 ## Examples
@@ -63,6 +63,7 @@ MysqldConfig config = aMysqldConfig(v5_6_23)
     .withUser("differentUser", "anotherPassword")
     .withTimeZone("Europe/Vilnius")
     .withTimeout(2, TimeUnit.MINUTES)
+    .withServerVariable("max_connect_errors", 666)
     .build();
 
 EmbeddedMysql mysqld = anEmbeddedMysql(config)

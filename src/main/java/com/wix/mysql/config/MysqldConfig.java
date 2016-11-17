@@ -6,7 +6,6 @@ import de.flapdoodle.embed.process.config.ISupportConfig;
 import de.flapdoodle.embed.process.distribution.IVersion;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
@@ -20,7 +19,7 @@ public class MysqldConfig extends ExecutableProcessConfig {
     private final User user;
     private final TimeZone timeZone;
     private final Timeout timeout;
-    private final List<String> args;
+    private final List<ServerVariable> serverVariables;
 
     protected MysqldConfig(
             final IVersion version,
@@ -29,7 +28,7 @@ public class MysqldConfig extends ExecutableProcessConfig {
             final User user,
             final TimeZone timeZone,
             final Timeout timeout,
-            final List<String> args) {
+            final List<ServerVariable> serverVariables) {
         super(version, new ISupportConfig() {
             public String getName() {
                 return "mysqld";
@@ -53,7 +52,7 @@ public class MysqldConfig extends ExecutableProcessConfig {
         this.user = user;
         this.timeZone = timeZone;
         this.timeout = timeout;
-        this.args = args;
+        this.serverVariables = serverVariables;
     }
 
     public Version getVersion() {
@@ -84,8 +83,8 @@ public class MysqldConfig extends ExecutableProcessConfig {
         return timeZone;
     }
 
-    public List<String> getArgs() {
-        return args;
+    public List<ServerVariable> getServerVariables() {
+        return serverVariables;
     }
 
     public static Builder aMysqldConfig(final Version version) {
@@ -99,7 +98,7 @@ public class MysqldConfig extends ExecutableProcessConfig {
         private User user = new User("auser", "sa");
         private TimeZone timeZone = TimeZone.getTimeZone("UTC");
         private Timeout timeout = new Timeout(30, SECONDS);
-        private List<String> args = new ArrayList<>();
+        private final List<ServerVariable> serverVariables = new ArrayList<>();
 
         public Builder(IVersion version) {
             this.version = version;
@@ -134,20 +133,38 @@ public class MysqldConfig extends ExecutableProcessConfig {
             return withTimeZone(TimeZone.getTimeZone(timeZoneId));
         }
 
-        public Builder withArgs(String ...args) {
-            this.args.addAll(Arrays.asList(args));
+        /**
+         * Provide mysql server option
+         *
+         * See <a href="mysqld-option-tables">http://dev.mysql.com/doc/refman/5.7/en/mysqld-option-tables.html</a>
+         */
+        public Builder withServerVariable(String name, boolean value) {
+            serverVariables.add(new ServerVariable<>(name, value));
+            return this;
+        }
+
+        /**
+         * Provide mysql server int variable
+         *
+         * See <a href="mysqld-option-tables">http://dev.mysql.com/doc/refman/5.7/en/mysqld-option-tables.html</a>
+         */
+        public Builder withServerVariable(String name, int value) {
+            serverVariables.add(new ServerVariable<>(name, value));
+            return this;
+        }
+
+        /**
+         * Provide mysql server string or enum variable
+         *
+         * See <a href="mysqld-option-tables">http://dev.mysql.com/doc/refman/5.7/en/mysqld-option-tables.html</a>
+         */
+        public Builder withServerVariable(String name, String value) {
+            serverVariables.add(new ServerVariable<>(name, value));
             return this;
         }
 
         public MysqldConfig build() {
-            return new MysqldConfig(
-                    version,
-                    port,
-                    charset,
-                    user,
-                    timeZone,
-                    timeout,
-                    args);
+            return new MysqldConfig(version, port, charset, user, timeZone, timeout, serverVariables);
         }
     }
 
@@ -172,6 +189,20 @@ public class MysqldConfig extends ExecutableProcessConfig {
 
         long to(TimeUnit target) {
             return target.convert(length, unit);
+        }
+    }
+
+    public static class ServerVariable<T> {
+        private final String name;
+        private final T value;
+
+        ServerVariable(final String name, final T value) {
+            this.name = name;
+            this.value = value;
+        }
+
+        public String toCommandLineArgument() {
+            return String.format("--%s=%s", name, value);
         }
     }
 

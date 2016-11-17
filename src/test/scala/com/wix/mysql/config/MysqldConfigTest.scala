@@ -1,4 +1,4 @@
-package com.wix.mysql
+package com.wix.mysql.config
 
 import java.util.TimeZone
 import java.util.concurrent.TimeUnit
@@ -45,19 +45,13 @@ class MysqldConfigTest extends SpecWithJUnit {
 
     "accept custom system variables" in {
       val mysqldConfig = aMysqldConfig(v5_6_latest)
-        .withArgs("--some-arg=123", "--another-arg")
+        .withServerVariable("some-int", 123)
+        .withServerVariable("some-string", "one")
+        .withServerVariable("some-boolean", false)
         .build
 
-      mysqldConfig.getArgs.asScala must contain("--some-arg=123", "--another-arg")
-    }
-
-    "combine system variables from multiple invocations" in {
-      val mysqldConfig = aMysqldConfig(v5_6_latest)
-        .withArgs("--another-arg")
-        .withArgs("--some-arg=123")
-        .build
-
-      mysqldConfig.getArgs.asScala must contain("--some-arg=123", "--another-arg")
+      mysqldConfig.getServerVariables.asScala.map(_.toCommandLineArgument) mustEqual
+        Seq("--some-int=123", "--some-string=one", "--some-boolean=false")
     }
 
     "fail if building with user 'root'" in {
