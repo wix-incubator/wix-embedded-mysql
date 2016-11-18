@@ -1,10 +1,9 @@
 package com.wix.mysql
 
 import java.util.concurrent.TimeUnit
-import java.util.concurrent.TimeUnit.SECONDS
 
 import com.wix.mysql.EmbeddedMysql._
-import com.wix.mysql.config.Charset.{LATIN1, UTF8MB4}
+import com.wix.mysql.config.Charset._
 import com.wix.mysql.config.MysqldConfig.{SystemDefaults, aMysqldConfig}
 import com.wix.mysql.config.SchemaConfig.aSchemaConfig
 import com.wix.mysql.distribution.Version
@@ -43,9 +42,28 @@ class EmbeddedMysqlTest extends IntegrationTest {
         haveServerTimezoneMatching("US/Michigan")
     }
 
+    "accept system variables" in {
+      val config = aMysqldConfig(v5_6_latest)
+        .withServerVariable("max_connect_errors", 666)
+        .build
+
+      val mysqld = start(anEmbeddedMysql(config))
+
+      mysqld must haveSystemVariable("max_connect_errors", "666")
+    }
+
+    "not allow to override library-managed system variables" in {
+      val config = aMysqldConfig(v5_6_latest)
+        .withTimeZone("US/Michigan")
+        .withServerVariable("default-time-zone", "US/Eastern")
+        .build
+
+      start(anEmbeddedMysql(config)) must throwA[RuntimeException]
+    }
+
     "respect provided timeout" in {
       start(anEmbeddedMysql(aMysqldConfig(v5_6_latest).withTimeout(10, TimeUnit.MILLISECONDS).build)) must
-        throwA[RuntimeException].like { case e => e.getMessage must contain("0 sec")}
+        throwA[RuntimeException].like { case e => e.getMessage must contain("0 sec") }
     }
   }
 
@@ -114,7 +132,7 @@ class EmbeddedMysqlTest extends IntegrationTest {
         .addSchema("aSchema",
           aMigrationWith("create table t1 (col1 INTEGER);"),
           aMigrationWith("create table t2 (col1 INTEGER);"))
-        )
+      )
 
       aQuery(mysqld, onSchema = "aSchema", sql = "select count(col1) from t1;") must beSuccessful
       aQuery(mysqld, onSchema = "aSchema", sql = "select count(col1) from t2;") must beSuccessful
@@ -127,7 +145,7 @@ class EmbeddedMysqlTest extends IntegrationTest {
           aMigrationWith("create table t2 (col1 INTEGER);"))
         .withCommands(
           "create table t3 (col1 INTEGER);\n" +
-          "create table t4 (col2 INTEGER)")
+            "create table t4 (col2 INTEGER)")
         .build
 
       val mysqld = start(anEmbeddedMysql(v5_6_latest).addSchema(config))

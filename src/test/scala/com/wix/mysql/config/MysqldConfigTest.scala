@@ -1,4 +1,4 @@
-package com.wix.mysql
+package com.wix.mysql.config
 
 import java.util.TimeZone
 import java.util.concurrent.TimeUnit
@@ -7,6 +7,8 @@ import com.wix.mysql.config.Charset.{LATIN1, defaults}
 import com.wix.mysql.config.MysqldConfig.aMysqldConfig
 import com.wix.mysql.distribution.Version._
 import org.specs2.mutable.SpecWithJUnit
+
+import scala.collection.JavaConverters._
 
 class MysqldConfigTest extends SpecWithJUnit {
 
@@ -41,12 +43,21 @@ class MysqldConfigTest extends SpecWithJUnit {
       mysqldConfig.getTimeout(TimeUnit.MILLISECONDS) mustEqual 20000
     }
 
+    "accept custom system variables" in {
+      val mysqldConfig = aMysqldConfig(v5_6_latest)
+        .withServerVariable("some-int", 123)
+        .withServerVariable("some-string", "one")
+        .withServerVariable("some-boolean", false)
+        .build
+
+      mysqldConfig.getServerVariables.asScala.map(_.toCommandLineArgument) mustEqual
+        Seq("--some-int=123", "--some-string=one", "--some-boolean=false")
+    }
+
     "fail if building with user 'root'" in {
       aMysqldConfig(v5_6_latest)
         .withUser("root", "doesnotmatter")
         .build() must throwA[IllegalArgumentException](message = "Usage of username 'root' is forbidden")
-
     }
-
   }
 }

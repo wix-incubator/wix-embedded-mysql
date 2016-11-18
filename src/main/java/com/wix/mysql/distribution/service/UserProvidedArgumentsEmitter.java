@@ -8,14 +8,18 @@ import de.flapdoodle.embed.process.extract.IExtractedFileSet;
 import java.io.IOException;
 import java.util.List;
 
-public class Pre57CommandEmitter implements CommandEmitter {
+public class UserProvidedArgumentsEmitter implements CommandEmitter {
     @Override
     public boolean matches(Version version) {
-        return version.getMajorVersion().equals("5.5") || version.getMajorVersion().equals("5.6");
+        return true;
     }
 
     @Override
     public List<String> emit(MysqldConfig config, IExtractedFileSet exe) throws IOException {
-        return Collections.newArrayList("--skip-name-resolve");
+        List<String> result = Collections.newArrayList();
+        for (MysqldConfig.ServerVariable var: config.getServerVariables()) {
+            result.add(var.toCommandLineArgument());
+        }
+        return result;
     }
 }

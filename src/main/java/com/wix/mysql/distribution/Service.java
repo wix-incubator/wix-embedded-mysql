@@ -1,10 +1,7 @@
 package com.wix.mysql.distribution;
 
 import com.wix.mysql.config.MysqldConfig;
-import com.wix.mysql.distribution.service.CatchAllCommandEmitter;
-import com.wix.mysql.distribution.service.CommandEmitter;
-import com.wix.mysql.distribution.service.Mysql57CommandEmitter;
-import com.wix.mysql.distribution.service.Pre57CommandEmitter;
+import com.wix.mysql.distribution.service.*;
 import de.flapdoodle.embed.process.collections.Collections;
 import de.flapdoodle.embed.process.extract.IExtractedFileSet;
 
@@ -14,17 +11,20 @@ import java.util.List;
 public class Service {
 
     private static List<CommandEmitter> emitters = Collections.newArrayList(
+            new BaseCommandEmitter(),
             new Pre57CommandEmitter(),
             new Mysql57CommandEmitter(),
-            new CatchAllCommandEmitter());
+            new UserProvidedArgumentsEmitter());
 
     public static List<String> commandLine(final MysqldConfig config, final IExtractedFileSet exe) throws IOException {
+        Version version = config.getVersion();
+        ServiceCommandBuilder commandBuilder = new ServiceCommandBuilder(version.toString());
         for (CommandEmitter emitter : emitters) {
-            if (emitter.matches(config.getVersion())) {
-                return emitter.emit(config, exe);
+            if (emitter.matches(version)) {
+                commandBuilder.addAll(emitter.emit(config, exe));
             }
         }
 
-        throw new RuntimeException("Emitter not found for version: " + config.getVersion().toString());
+        return commandBuilder.emit();
     }
 }

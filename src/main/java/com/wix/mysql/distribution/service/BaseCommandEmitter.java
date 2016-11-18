@@ -13,15 +13,14 @@ import java.util.List;
 
 import static java.lang.String.format;
 
-public class CatchAllCommandEmitter implements CommandEmitter {
-
+public class BaseCommandEmitter implements CommandEmitter {
     @Override
     public boolean matches(Version version) {
         return true;
     }
 
     @Override
-    public List<String> emit(final MysqldConfig config, final IExtractedFileSet exe) throws IOException {
+    public List<String> emit(MysqldConfig config, IExtractedFileSet exe) throws IOException {
         File baseDir = exe.baseDir();
         return Collections.newArrayList(
                 exe.executable().getAbsolutePath(),
@@ -38,7 +37,6 @@ public class CatchAllCommandEmitter implements CommandEmitter {
                 format("--character-set-server=%s", config.getCharset().getCharset()),
                 format("--collation-server=%s", config.getCharset().getCollate()),
                 format("--default-time-zone=%s", Utils.asHHmmOffset(config.getTimeZone())));
-
     }
 
     /**

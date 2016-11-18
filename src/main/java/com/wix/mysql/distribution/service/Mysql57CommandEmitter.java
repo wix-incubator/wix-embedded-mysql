@@ -2,6 +2,7 @@ package com.wix.mysql.distribution.service;
 
 import com.wix.mysql.config.MysqldConfig;
 import com.wix.mysql.distribution.Version;
+import de.flapdoodle.embed.process.collections.Collections;
 import de.flapdoodle.embed.process.extract.IExtractedFileSet;
 
 import java.io.IOException;
@@ -15,8 +16,6 @@ public class Mysql57CommandEmitter implements CommandEmitter {
 
     @Override
     public List<String> emit(MysqldConfig config, IExtractedFileSet exe) throws IOException {
-        List<String> pre = new CatchAllCommandEmitter().emit(config, exe);
-        pre.add("--show_compatibility_56=ON");
-        return pre;
+        return Collections.newArrayList("--show_compatibility_56=ON");
     }
 }
