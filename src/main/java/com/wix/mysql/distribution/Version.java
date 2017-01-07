@@ -30,11 +30,10 @@ public enum Version implements IVersion {
     v5_7_14("5.7", 14, MacOsVersion.v10_11),
     v5_7_15("5.7", 15, MacOsVersion.v10_11),
     v5_7_16("5.7", 16, MacOsVersion.v10_11),
-    v5_7_17("5.7", 17, MacOsVersion.v10_12),
-    v5_7_latest(v5_7_17);
+    v5_7_latest(v5_7_16);
 
     private enum MacOsVersion {
-        v10_6, v10_9, v10_10, v10_11, v10_12;
+        v10_6, v10_9, v10_10, v10_11;
 
         @Override
         public String toString() {
