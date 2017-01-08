@@ -1,13 +1,14 @@
 package com.wix.mysql.distribution;
 
-import static java.lang.String.format;
-
 import com.wix.mysql.exceptions.UnsupportedPlatformException;
 import com.wix.mysql.utils.Utils;
 import de.flapdoodle.embed.process.distribution.IVersion;
 import de.flapdoodle.embed.process.distribution.Platform;
+
 import java.util.Arrays;
 import java.util.List;
+
+import static java.lang.String.format;
 
 public enum Version implements IVersion {
 
