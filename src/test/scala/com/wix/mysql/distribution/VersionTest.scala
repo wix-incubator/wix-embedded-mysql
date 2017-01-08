@@ -19,6 +19,14 @@ class VersionTest extends SpecWithJUnit with AroundEach {
       v5_7_15.asInDownloadPath mustEqual "MySQL-5.7/mysql-5.7.15-osx10.11"
     }
 
+    "OS X 5.7.17+, 5.6.35+ and use different file scheme" in {
+      givenPlatformSetTo(OS_X)
+
+      v5_7_17.asInDownloadPath must contain( "macos" )
+      v5_6_35.asInDownloadPath must contain( "macos" )
+    }
+
+
     "Windows" in {
       givenPlatformSetTo(Windows)
       v5_7_15.asInDownloadPath mustEqual "MySQL-5.7/mysql-5.7.15"
@@ -28,6 +36,7 @@ class VersionTest extends SpecWithJUnit with AroundEach {
       givenPlatformSetTo(Linux)
       v5_7_15.asInDownloadPath mustEqual "MySQL-5.7/mysql-5.7.15-linux-glibc2.5"
     }
+
   }
 
   "verify that" >> {
