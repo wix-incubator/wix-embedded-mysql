@@ -23,19 +23,30 @@ public enum Version implements IVersion {
     v5_6_31("5.6", 31, MacOsVersion.v10_11),
     v5_6_32("5.6", 32, MacOsVersion.v10_11),
     v5_6_33("5.6", 33, MacOsVersion.v10_11),
-    v5_6_latest(v5_6_33),
+    v5_6_34("5.6", 34, MacOsVersion.v10_11),
+    v5_6_35("5.6", 35, MacOsVersion.v10_12),
+    v5_6_latest(v5_6_35),
     v5_7_10("5.7", 10, MacOsVersion.v10_10),
     v5_7_13("5.7", 13, MacOsVersion.v10_11),
     v5_7_14("5.7", 14, MacOsVersion.v10_11),
     v5_7_15("5.7", 15, MacOsVersion.v10_11),
-    v5_7_latest(v5_7_15);
+    v5_7_16("5.7", 16, MacOsVersion.v10_11),
+    v5_7_17("5.7", 17, MacOsVersion.v10_12),
+    v5_7_latest(v5_7_17);
 
     private enum MacOsVersion {
-        v10_6, v10_9, v10_10, v10_11;
+        v10_6("osx"), v10_9("osx"), v10_10("osx"), v10_11("osx"),
+        v10_12("macos");
+
+        private final String osName;
+
+        MacOsVersion(String osName) {
+            this.osName = osName;
+        }
 
         @Override
         public String toString() {
-            return name().substring(1).replace('_', '.');
+            return format("%s%s", osName, name().substring(1).replace('_', '.'));
         }
     }
 
@@ -82,7 +93,7 @@ public enum Version implements IVersion {
             case Windows:
                 return format("%s/mysql-%s.%s", path(), majorVersion, minorVersion);
             case OS_X:
-                return format("%s/mysql-%s.%s-osx%s", path(), majorVersion, minorVersion, macOsVersion);
+                return format("%s/mysql-%s.%s-%s", path(), majorVersion, minorVersion, macOsVersion);
             case Linux:
                 return format("%s/mysql-%s.%s-%s", path(), majorVersion, minorVersion, gcLibVersion());
             default:
