@@ -123,7 +123,15 @@ public enum Version implements IVersion {
         return format("MySQL-%s", majorVersion);
     }
 
+    private String toVersionString() { return majorVersion + "." + minorVersion; }
+
     private void assertPlatformIsSupported() {
+        if (isMacOsSierra() && !worksOnMacOsSierra()) {
+            throw new UnsupportedPlatformException(String.format("%s is not supported on Mac OS Sierra. Minimum supported version is %s",
+                    toString(),
+                    v5_7_15.toVersionString()));
+        }
+
         if (!supportsCurrentPlatform()) {
             throw new UnsupportedPlatformException(String.format("Platform %s is not in a supported platform list: %s",
                     currentPlatform().name(),
