@@ -4,11 +4,11 @@ import java.lang.System.{getProperty, setProperty}
 
 import com.wix.mysql.exceptions.UnsupportedPlatformException
 import org.specs2.execute.{AsResult, Result}
-import org.specs2.mutable.SpecWithJUnit
+import org.specs2.mutable.{Around, SpecWithJUnit}
 import org.specs2.specification.AroundEach
 import org.specs2.specification.core.Fragment
 
-class MacOsSierraTest extends SpecWithJUnit with AroundEach {
+class MacOsSierraTest extends SpecWithJUnit with Around with AroundEach {
 
   val unsupportedVersions = Version.values filter (!_.supportsCurrentPlatform)
 
