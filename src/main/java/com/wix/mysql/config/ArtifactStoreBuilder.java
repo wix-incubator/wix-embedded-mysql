@@ -19,8 +19,14 @@ public class ArtifactStoreBuilder extends de.flapdoodle.embed.process.store.Extr
         return this;
     }
 
-    public ArtifactStoreBuilder defaults(String directoryName) {
-        defaults().tempDir().setDefault(new TargetGeneratedFixedPath(directoryName));
+    public ArtifactStoreBuilder directory(String directoryName) {
+        tempDir().setDefault(new TargetGeneratedFixedPath(directoryName));
+
+        return this;
+    }
+
+    public ArtifactStoreBuilder downloadPath(String downloadPath) {
+        download().setDefault(new DownloadConfigBuilder().defaults().downloadPath(downloadPath).build());
 
         return this;
     }
