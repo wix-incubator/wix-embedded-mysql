@@ -10,7 +10,6 @@ public class TimingOutProcessExecutor {
 
         do {
             try {
-                System.out.println("try");
                 return p.exitValue();
             } catch (IllegalThreadStateException ex) {
                 if (rem > 0) {
@@ -22,5 +21,4 @@ public class TimingOutProcessExecutor {
         p.destroy();
         throw new InterruptedException(String.format("Timeout of %s sec exceeded while waiting for process to complete", TimeUnit.NANOSECONDS.toSeconds(timeoutNanos)));
     }
-
 }

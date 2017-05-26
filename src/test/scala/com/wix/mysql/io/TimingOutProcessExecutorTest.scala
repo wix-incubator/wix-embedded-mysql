@@ -25,7 +25,6 @@ class FakeProcess(val completeAfterNumberOfCalls: Int) extends Process {
   val exitValueInvoctionCounter = new AtomicInteger(completeAfterNumberOfCalls)
 
   override def exitValue(): Int = {
-    println("exit " + exitValueInvoctionCounter.get())
     exitValueInvoctionCounter.decrementAndGet() match {
       case 0 => 0
       case _ => throw new IllegalThreadStateException()
