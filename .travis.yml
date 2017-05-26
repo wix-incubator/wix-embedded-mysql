@@ -4,7 +4,8 @@ script: $CMD
 
 env:
   global:
-    - CMD='mvn -q -B verify'
+#    - CMD='mvn -q -B verify'
+    - CMD='mvn -q -B test -Dtest=TimingOutProcessExecutorTest'
 
 before_install:
 # os x - workaround for JAVA_HOME not set and mvn missing
@@ -16,20 +17,20 @@ before_install:
 
 matrix:
     include:
-        - os: linux
-          dist: trusty
-          sudo: required
-          jdk: openjdk7
-        - os: linux
-          dist: trusty
-          sudo: required
-          jdk: oraclejdk7
+#        - os: linux
+#          dist: trusty
+#          sudo: required
+#          jdk: openjdk7
+#        - os: linux
+#          dist: trusty
+#          sudo: required
+#          jdk: oraclejdk7
         - os: linux
           dist: trusty
           sudo: required
           jdk: oraclejdk8
-        - os: osx
-          language: java
+#        - os: osx
+#          language: java
 
 notifications:
   email:
