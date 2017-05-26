@@ -10,6 +10,7 @@ public class TimingOutProcessExecutor {
 
         do {
             try {
+                System.out.println("try");
                 return p.exitValue();
             } catch (IllegalThreadStateException ex) {
                 if (rem > 0)

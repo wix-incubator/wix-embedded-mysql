@@ -14,13 +14,13 @@ class TimingOutProcessExecutorTest extends SpecWithJUnit {
 
   "TimingOutProcessExecutor" should {
 
-//    "throw an exception if command does not complete within provided timeout" in {
-//      TimingOutProcessExecutor.waitFor(new FakeProcess(4000), TimeUnit.MILLISECONDS.toNanos(2000)) must
-//        throwA[InterruptedException].like { case e => e.getMessage must contain("Timeout of 2 sec exceeded")}
-//    }
+    "throw an exception if command does not complete within provided timeout" in {
+      TimingOutProcessExecutor.waitFor(new FakeProcess(4000), TimeUnit.MILLISECONDS.toNanos(2000)) must
+        throwA[InterruptedException].like { case e => e.getMessage must contain("Timeout of 2 sec exceeded")}
+    }
 
     "return process exit code if command does complete within execution bounds" in {
-      TimingOutProcessExecutor.waitFor(new FakeProcess(200), TimeUnit.MILLISECONDS.toNanos(2000)) mustEqual 0
+      TimingOutProcessExecutor.waitFor(new FakeProcess(500), TimeUnit.MILLISECONDS.toNanos(2000)) mustEqual 0
     }
   }
 }
@@ -28,13 +28,13 @@ class TimingOutProcessExecutorTest extends SpecWithJUnit {
 class FakeProcess(executionDurationMs: Int) extends Process {
   @volatile
   var completed: Try[Int] = Failure(new IllegalThreadStateException())
+  Future {
+    Thread.sleep(executionDurationMs)
+    System.out.println("complete")
+    completed = Success(0)
+  }
 
   override def exitValue(): Int = {
-    Future {
-      Thread.sleep(executionDurationMs)
-      completed = Success(0)
-    }
-
     completed.get
   }
 
