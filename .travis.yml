@@ -4,7 +4,7 @@ script: $CMD
 
 env:
   global:
-#    - CMD='mvn -q -B test -Dtest=TimingOutProcessExecutorTest'
+    - CMD='mvn -q -B test -Dtest=TimingOutProcessExecutorTest'
 #    - CMD='mvn -q -B verify'
 
 before_install:
