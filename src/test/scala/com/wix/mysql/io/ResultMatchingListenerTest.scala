@@ -10,14 +10,14 @@ class ResultMatchingListenerTest extends SpecWithJUnit {
 
   "ResultMatchingListenerTest" should {
 
-    "should return given output pattern matched expected expression" in {
+    "should return success given output matched provided pattern" in {
       val listener = new ResultMatchingListener("SUCCESS")
+
       Future {
-        Thread.sleep(1000)
-        listener.onMessage("SUCCESS: completed")
+        listener.waitForResult(4000)
       }
 
-      listener.waitForResult(4000)
+      listener.onMessage("SUCCESS: completed")
 
       listener.isInitWithSuccess must beTrue
       listener.getFailureFound must beNull
