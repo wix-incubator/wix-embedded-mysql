@@ -13,9 +13,9 @@ public class TimingOutProcessExecutor {
                 System.out.println("try");
                 return p.exitValue();
             } catch (IllegalThreadStateException ex) {
-                if (rem > 0)
-                    Thread.sleep(
-                            Math.min(TimeUnit.NANOSECONDS.toMillis(rem) + 1, 100));
+                if (rem > 0) {
+                    Thread.sleep(Math.min(TimeUnit.NANOSECONDS.toMillis(rem) + 1, 100));
+                }
             }
             rem = timeoutNanos - (System.nanoTime() - startTime);
         } while (rem > 0);

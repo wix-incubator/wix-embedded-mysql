@@ -2,40 +2,34 @@ package com.wix.mysql.io
 
 import java.io.{InputStream, OutputStream, StringReader}
 import java.util.concurrent.TimeUnit
-import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicInteger
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import org.specs2.mutable.SpecWithJUnit
-
-import scala.concurrent.Future
-import scala.util.{Failure, Success, Try}
 
 class TimingOutProcessExecutorTest extends SpecWithJUnit {
 
   "TimingOutProcessExecutor" should {
 
     "throw an exception if command does not complete within provided timeout" in {
-      TimingOutProcessExecutor.waitFor(new FakeProcess(4000), TimeUnit.MILLISECONDS.toNanos(2000)) must
-        throwA[InterruptedException].like { case e => e.getMessage must contain("Timeout of 2 sec exceeded")}
+      TimingOutProcessExecutor.waitFor(new FakeProcess(Integer.MAX_VALUE), TimeUnit.MILLISECONDS.toNanos(1000)) must
+        throwA[InterruptedException].like { case e => e.getMessage must contain("Timeout of 1 sec exceeded")}
     }
 
     "return process exit code if command does complete within execution bounds" in {
-      TimingOutProcessExecutor.waitFor(new FakeProcess(500), TimeUnit.MILLISECONDS.toNanos(2000)) mustEqual 0
+      TimingOutProcessExecutor.waitFor(new FakeProcess(3), TimeUnit.MILLISECONDS.toNanos(2000)) mustEqual 0
     }
   }
 }
 
-class FakeProcess(executionDurationMs: Int) extends Process {
-  @volatile
-  var completed: Try[Int] = Failure(new IllegalThreadStateException())
-  Future {
-    Thread.sleep(executionDurationMs)
-    System.out.println("complete")
-    completed = Success(0)
-  }
+class FakeProcess(val completeAfterNumberOfCalls: Int) extends Process {
+  val exitValueInvoctionCounter = new AtomicInteger(completeAfterNumberOfCalls)
 
   override def exitValue(): Int = {
-    completed.get
+    println("exit " + exitValueInvoctionCounter.get())
+    exitValueInvoctionCounter.decrementAndGet() match {
+      case 0 => 0
+      case _ => throw new IllegalThreadStateException()
+    }
   }
 
   override def destroy(): Unit = {}
