@@ -4,8 +4,8 @@ script: $CMD
 
 env:
   global:
-    - CMD='mvn -q -B test -Dtest=TimingOutProcessExecutorTest'
-#    - CMD='mvn -q -B verify'
+    - CMD='mvn -q -B verify'
+#    - CMD='mvn -q -B test -Dtest=TimingOutProcessExecutorTest'
 
 before_install:
 # os x - workaround for JAVA_HOME not set and mvn missing
