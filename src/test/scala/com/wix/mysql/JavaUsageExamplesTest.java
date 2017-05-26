@@ -2,6 +2,7 @@ package com.wix.mysql;
 
 import com.wix.mysql.config.MysqldConfig;
 import com.wix.mysql.config.SchemaConfig;
+import de.flapdoodle.embed.process.exceptions.DistributionException;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -53,6 +54,24 @@ public class JavaUsageExamplesTest {
         EmbeddedMysql mysqld = anEmbeddedMysql(config)
                 .addSchema("aschema", classPathScript("db/001_init.sql"))
                 .addSchema("aschema2", classPathScripts("db/*.sql"))
+                .start();
+
+        //do work
+
+        mysqld.stop(); //optional, as there is a shutdown hook
+    }
+
+    @Test(expected = DistributionException.class)
+    public void mysqldConfigWithCustomDownloadPathAndSingleSchema() {
+        MysqldConfig config = aMysqldConfig(v5_7_latest)
+                .withCharset(UTF8)
+                .withPort(2215)
+                .withUser("differentUser", "anotherPasword")
+                .withDownloadPath("artifactory")
+                .build();
+
+        EmbeddedMysql mysqld = anEmbeddedMysql(config)
+                .addSchema("aschema")
                 .start();
 
         //do work

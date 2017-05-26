@@ -19,6 +19,7 @@ public class MysqldConfig extends ExecutableProcessConfig {
     private final User user;
     private final TimeZone timeZone;
     private final Timeout timeout;
+    private final String downloadPath;
     private final List<ServerVariable> serverVariables;
 
     protected MysqldConfig(
@@ -28,6 +29,7 @@ public class MysqldConfig extends ExecutableProcessConfig {
             final User user,
             final TimeZone timeZone,
             final Timeout timeout,
+            final String downloadPath,
             final List<ServerVariable> serverVariables) {
         super(version, new ISupportConfig() {
             public String getName() {
@@ -52,6 +54,7 @@ public class MysqldConfig extends ExecutableProcessConfig {
         this.user = user;
         this.timeZone = timeZone;
         this.timeout = timeout;
+        this.downloadPath = downloadPath;
         this.serverVariables = serverVariables;
     }
 
@@ -83,6 +86,10 @@ public class MysqldConfig extends ExecutableProcessConfig {
         return timeZone;
     }
 
+    public String getDownloadPath() {
+        return downloadPath;
+    }
+
     public List<ServerVariable> getServerVariables() {
         return serverVariables;
     }
@@ -98,6 +105,7 @@ public class MysqldConfig extends ExecutableProcessConfig {
         private User user = new User("auser", "sa");
         private TimeZone timeZone = TimeZone.getTimeZone("UTC");
         private Timeout timeout = new Timeout(30, SECONDS);
+        private String downloadPath = "https://dev.mysql.com/get/Downloads/";
         private final List<ServerVariable> serverVariables = new ArrayList<>();
 
         public Builder(IVersion version) {
@@ -133,6 +141,11 @@ public class MysqldConfig extends ExecutableProcessConfig {
             return withTimeZone(TimeZone.getTimeZone(timeZoneId));
         }
 
+        public Builder withDownloadPath(String downloadPath) {
+            this.downloadPath = downloadPath;
+            return this;
+        }
+
         /**
          * Provide mysql server option
          *
@@ -164,7 +177,7 @@ public class MysqldConfig extends ExecutableProcessConfig {
         }
 
         public MysqldConfig build() {
-            return new MysqldConfig(version, port, charset, user, timeZone, timeout, serverVariables);
+            return new MysqldConfig(version, port, charset, user, timeZone, timeout, downloadPath, serverVariables);
         }
     }
 

@@ -31,7 +31,9 @@ public class EmbeddedMysql {
     protected EmbeddedMysql(final MysqldConfig config) {
         logger.info("Preparing EmbeddedMysql version '{}'...", config.getVersion());
         this.config = config;
-        IRuntimeConfig runtimeConfig = new RuntimeConfigBuilder().defaults(config.getVersion()).build();
+        IRuntimeConfig runtimeConfig = new RuntimeConfigBuilder().defaults()
+                .withConfig(config)
+                .build();
         MysqldStarter mysqldStarter = new MysqldStarter(runtimeConfig);
 
         localRepository.lock();
