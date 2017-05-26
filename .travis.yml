@@ -28,11 +28,6 @@ matrix:
           dist: trusty
           sudo: required
           jdk: oraclejdk8
-        - os: linux
-          dist: trusty
-          sudo: required
-          jdk: openjdk7
-          env: CMD='sudo -E /usr/local/maven-3.2.5/bin/mvn -q -B clean verify'
         - os: osx
           language: java
 
