@@ -25,6 +25,7 @@ class TimingOutProcessExecutorTest extends SpecWithJUnit {
 }
 
 class FakeProcess(executionDurationMs: Int) extends Process {
+  @volatile
   var completed = new AtomicBoolean(false)
 
   override def exitValue(): Int = {
