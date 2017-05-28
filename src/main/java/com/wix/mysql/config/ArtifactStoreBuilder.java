@@ -9,7 +9,10 @@ import de.flapdoodle.embed.process.store.Downloader;
 public class ArtifactStoreBuilder extends de.flapdoodle.embed.process.store.ExtractedArtifactStoreBuilder {
 
     public ArtifactStoreBuilder defaults() {
-        tempDir().setDefault(new TargetGeneratedFixedPath("mysql"));
+        ArtifactStoreConfig storeConf = ArtifactStoreConfig.anArtifactStoreConfig().build();
+
+
+        tempDir().setDefault(new TargetGeneratedFixedPath(storeConf.getTempDir()));
         executableNaming().setDefault(new PathPrefixingNaming("bin/"));
         download().setDefault(new DownloadConfigBuilder().defaults().build());
         downloader().setDefault(new Downloader());
