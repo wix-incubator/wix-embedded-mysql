@@ -1,10 +1,7 @@
 package com.wix.mysql;
 
-import com.wix.mysql.config.Charset;
-import com.wix.mysql.config.MysqldConfig;
+import com.wix.mysql.config.*;
 import com.wix.mysql.config.MysqldConfig.SystemDefaults;
-import com.wix.mysql.config.RuntimeConfigBuilder;
-import com.wix.mysql.config.SchemaConfig;
 import com.wix.mysql.distribution.Version;
 import de.flapdoodle.embed.process.config.IRuntimeConfig;
 import org.slf4j.Logger;
@@ -16,6 +13,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
 
+import static com.wix.mysql.config.ArtifactStoreConfig.anArtifactStoreConfig;
 import static com.wix.mysql.config.MysqldConfig.SystemDefaults.SCHEMA;
 import static com.wix.mysql.utils.Utils.or;
 import static java.lang.String.format;
@@ -28,10 +26,13 @@ public class EmbeddedMysql {
     protected final MysqldExecutable executable;
     private AtomicBoolean isRunning = new AtomicBoolean(true);
 
-    protected EmbeddedMysql(final MysqldConfig config) {
+    protected EmbeddedMysql(
+            final MysqldConfig config,
+            final ArtifactStoreConfig artifactStoreConfig) {
+
         logger.info("Preparing EmbeddedMysql version '{}'...", config.getVersion());
         this.config = config;
-        IRuntimeConfig runtimeConfig = new RuntimeConfigBuilder().defaults(config.getVersion()).build();
+        IRuntimeConfig runtimeConfig = new RuntimeConfigBuilder().defaults(config.getVersion(), artifactStoreConfig).build();
         MysqldStarter mysqldStarter = new MysqldStarter(runtimeConfig);
 
         localRepository.lock();
@@ -106,10 +107,12 @@ public class EmbeddedMysql {
 
     public static class Builder {
         private final MysqldConfig config;
+        private final ArtifactStoreConfig artifactStoreConfig;
         private List<SchemaConfig> schemas = new ArrayList<>();
 
         public Builder(final MysqldConfig config) {
             this.config = config;
+            this.artifactStoreConfig = anArtifactStoreConfig().build();
         }
 
         public Builder addSchema(final String name, final SqlScriptSource... scripts) {
@@ -128,7 +131,7 @@ public class EmbeddedMysql {
         }
 
         public EmbeddedMysql start() {
-            EmbeddedMysql instance = new EmbeddedMysql(config);
+            EmbeddedMysql instance = new EmbeddedMysql(config, artifactStoreConfig);
 
             for (SchemaConfig schema : schemas) {
                 instance.addSchema(schema);

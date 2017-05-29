@@ -8,9 +8,8 @@ import de.flapdoodle.embed.process.store.Downloader;
 
 public class ArtifactStoreBuilder extends de.flapdoodle.embed.process.store.ExtractedArtifactStoreBuilder {
 
-    public ArtifactStoreBuilder defaults() {
+    public ArtifactStoreBuilder defaults(String directoryName) {
         ArtifactStoreConfig storeConf = ArtifactStoreConfig.anArtifactStoreConfig().build();
-
 
         tempDir().setDefault(new TargetGeneratedFixedPath(storeConf.getTempDir()));
         executableNaming().setDefault(new PathPrefixingNaming("bin/"));
@@ -19,11 +18,7 @@ public class ArtifactStoreBuilder extends de.flapdoodle.embed.process.store.Extr
         extractDir().setDefault(new UserHome(".embedmysql/extracted"));
         extractExecutableNaming().setDefault(new NoopNaming());
 
-        return this;
-    }
-
-    public ArtifactStoreBuilder defaults(String directoryName) {
-        defaults().tempDir().setDefault(new TargetGeneratedFixedPath(directoryName));
+        tempDir().setDefault(new TargetGeneratedFixedPath(directoryName));
 
         return this;
     }
