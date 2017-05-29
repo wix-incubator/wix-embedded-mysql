@@ -1,5 +1,6 @@
 package com.wix.mysql;
 
+import com.wix.mysql.config.ArtifactStoreConfig;
 import com.wix.mysql.config.MysqldConfig;
 import com.wix.mysql.config.SchemaConfig;
 import org.junit.Ignore;
@@ -10,6 +11,7 @@ import java.util.concurrent.TimeUnit;
 import static com.wix.mysql.EmbeddedMysql.anEmbeddedMysql;
 import static com.wix.mysql.ScriptResolver.classPathScript;
 import static com.wix.mysql.ScriptResolver.classPathScripts;
+import static com.wix.mysql.config.ArtifactStoreConfig.anArtifactStoreConfig;
 import static com.wix.mysql.config.Charset.LATIN1;
 import static com.wix.mysql.config.Charset.UTF8;
 import static com.wix.mysql.config.MysqldConfig.aMysqldConfig;
@@ -110,5 +112,19 @@ public class JavaUsageExamplesTest {
         mysqld.stop(); //optional, as there is a shutdown hook
     }
 
+    @Test
+    public void artifactStoreConfig() {
+        ArtifactStoreConfig artifactStoreConfig = anArtifactStoreConfig()
+                .withTempDir(System.getProperty("java.io.tmpdir"))
+                .build();
+
+        EmbeddedMysql mysqld = anEmbeddedMysql(v5_6_latest, artifactStoreConfig)
+                .addSchema("aschema", classPathScript("db/001_init.sql"))
+                .start();
+
+        //do work
+
+        mysqld.stop(); //optional, as there is a shutdown hook
+    }
 
 }

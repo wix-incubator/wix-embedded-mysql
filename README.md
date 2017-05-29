@@ -10,7 +10,6 @@ Wix Embedded MySql library provides a way to run **real** MySql within your inte
 - Provides constantly updated multiple versions of MySql - 5.5, 5.6, 5.7;
 - Testing matrix for all supported OSes (x86/x64) and versions (5.5, 5.6, 5.7).
 
-#Usage
 ## Maven
 Add dependency to your pom.xml:
 
@@ -43,7 +42,7 @@ EmbeddedMysql mysqld = anEmbeddedMysql(v5_6_latest)
 mysqld.stop(); //optional, as there is a shutdown hook
 ```
 
-If you need more control in configuring embeded mysql instance, you can use MysqlConfig builder:
+If you need more control in configuring embeded mysql instance, you can use [MysqldConfig](src/main/java/com/wix/mysql/config/MysqldConfig.java) builder:
 
 ```java
 import com.wix.mysql.config.MysqldConfig;
@@ -76,7 +75,30 @@ EmbeddedMysql mysqld = anEmbeddedMysql(config)
 mysqld.stop(); //optional, as there is a shutdown hook
 ```
 
-EmbeddedMysql supports multiple schemas and additional configuration options provided via SchemaConfig builder:
+In addition you can control additional settings of embedded mysql by providing configs that have base type of [AdditionalConfig](src/main/java/com/wix/mysql/config/AdditionalConfig.java) by providing those to `anEmbeddedMysql` builder:
+
+```java
+import com.wix.mysql.EmbeddedMysql;
+
+import static com.wix.mysql.EmbeddedMysql.anEmbeddedMysql;
+import static com.wix.mysql.ScriptResolver.classPathScript;
+import static com.wix.mysql.distribution.Version.v5_6_latest;
+import static com.wix.mysql.config.ArtifactStoreConfig.anArtifactStoreConfig;
+
+ArtifactStoreConfig artifactStoreConfig = anArtifactStoreConfig
+    .withTempDir(System.getProperty("java.io.tmpdir"))
+    .build()
+
+EmbeddedMysql mysqld = anEmbeddedMysql(v5_6_latest, artifactStoreConfig)
+    .addSchema("aschema", classPathScript("db/001_init.sql"))
+    .start();
+
+//do work
+
+mysqld.stop(); //optional, as there is a shutdown hook
+```
+
+EmbeddedMysql supports multiple schemas and additional configuration options provided via [SchemaConfig](src/main/java/com/wix/mysql/config/SchemaConfig.java) builder:
 
 ```java
 import com.wix.mysql.EmbeddedMysql;
