@@ -7,7 +7,7 @@ import com.wix.mysql.support.IntegrationTest
 
 class ArtifactStoreTest extends IntegrationTest {
 
-  "EmbeddedMysql instance" should {
+  "EmbeddedMysql artifact store" should {
 
     "store runtime files in target/ by default" in {
       val mysqld = start(anEmbeddedMysql(Version.v5_7_latest))
@@ -20,7 +20,7 @@ class ArtifactStoreTest extends IntegrationTest {
       val artifactConfig = anArtifactStoreConfig().withTempDir(tempDir).build()
       val mysqld = start(anEmbeddedMysql(Version.v5_7_latest, artifactConfig))
 
-      mysqld must haveSystemVariable("basedir", contain(s"${tempDir}mysql-5.7-"))
+      mysqld must haveSystemVariable("basedir", contain(tempDir) and contain("/mysql-5.7-"))
     }
   }
 }
