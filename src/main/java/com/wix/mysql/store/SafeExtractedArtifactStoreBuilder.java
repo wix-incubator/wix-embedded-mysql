@@ -7,7 +7,8 @@ import com.wix.mysql.config.extract.NoopNaming;
 import com.wix.mysql.config.extract.PathPrefixingNaming;
 import com.wix.mysql.distribution.Version;
 import de.flapdoodle.embed.process.extract.DirectoryAndExecutableNaming;
-import de.flapdoodle.embed.process.io.directories.UserHome;
+import de.flapdoodle.embed.process.io.directories.FixedPath;
+import de.flapdoodle.embed.process.io.directories.IDirectory;
 import de.flapdoodle.embed.process.store.Downloader;
 import de.flapdoodle.embed.process.store.IArtifactStore;
 
@@ -16,14 +17,18 @@ import java.util.UUID;
 
 public class SafeExtractedArtifactStoreBuilder extends de.flapdoodle.embed.process.store.ExtractedArtifactStoreBuilder {
 
-    public SafeExtractedArtifactStoreBuilder defaults(Version version, ArtifactStoreConfig artifactStoreConfig) {
+    public SafeExtractedArtifactStoreBuilder defaults(
+            final Version version,
+            final ArtifactStoreConfig artifactStoreConfig) {
+
         String tempExtractDir = String.format("mysql-%s-%s", version.getMajorVersion(), UUID.randomUUID());
         String combinedPath = new File(artifactStoreConfig.getTempDir(), tempExtractDir).getPath();
+        IDirectory preExtractDir = new FixedPath(new File(artifactStoreConfig.getDownloadCacheDir(), "extracted").getPath());
 
         executableNaming().setDefault(new PathPrefixingNaming("bin/"));
-        download().setDefault(new DownloadConfigBuilder().defaults().build());
+        download().setDefault(new DownloadConfigBuilder().defaults(artifactStoreConfig).build());
         downloader().setDefault(new Downloader());
-        extractDir().setDefault(new UserHome(".embedmysql/extracted"));
+        extractDir().setDefault(preExtractDir);
         extractExecutableNaming().setDefault(new NoopNaming());
 
         tempDir().setDefault(new TargetGeneratedFixedPath(combinedPath));
