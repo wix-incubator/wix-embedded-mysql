@@ -15,6 +15,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import static com.wix.mysql.config.ArtifactStoreConfig.anArtifactStoreConfig;
 import static com.wix.mysql.config.MysqldConfig.SystemDefaults.SCHEMA;
+import static com.wix.mysql.config.SchemaConfig.aSchemaConfig;
 import static com.wix.mysql.utils.Utils.or;
 import static java.lang.String.format;
 
@@ -56,11 +57,11 @@ public class EmbeddedMysql {
     }
 
     public void reloadSchema(final String schemaName, final SqlScriptSource... scripts) {
-        reloadSchema(SchemaConfig.aSchemaConfig(schemaName).withScripts(scripts).build());
+        reloadSchema(aSchemaConfig(schemaName).withScripts(scripts).build());
     }
 
     public void reloadSchema(final String schemaName, final List<SqlScriptSource> scripts) {
-        reloadSchema(SchemaConfig.aSchemaConfig(schemaName).withScripts(scripts).build());
+        reloadSchema(aSchemaConfig(schemaName).withScripts(scripts).build());
     }
 
     public void reloadSchema(final SchemaConfig config) {
@@ -96,32 +97,52 @@ public class EmbeddedMysql {
         return new MysqlClient(config, executable, schemaName);
     }
 
+    public static Builder anEmbeddedMysql(
+            final Version version,
+            final AdditionalConfig... additionalConfig) {
 
-    public static Builder anEmbeddedMysql(final Version version) {
-        return new Builder(MysqldConfig.aMysqldConfig(version).build());
+        MysqldConfig mysqldConfig = MysqldConfig.aMysqldConfig(version).build();
+        ArtifactStoreConfig artifactStoreConfig = resolveArtifactStoreConfig(additionalConfig);
+        return new Builder(mysqldConfig, artifactStoreConfig);
     }
 
-    public static Builder anEmbeddedMysql(final MysqldConfig config) {
-        return new Builder(config);
+    public static Builder anEmbeddedMysql(
+            final MysqldConfig mysqldConfig,
+            final AdditionalConfig... additionalConfig) {
+
+        ArtifactStoreConfig artifactStoreConfig = resolveArtifactStoreConfig(additionalConfig);
+        return new Builder(mysqldConfig, artifactStoreConfig);
+    }
+
+    private static ArtifactStoreConfig resolveArtifactStoreConfig(AdditionalConfig[] additionalConfig) {
+        AdditionalConfig first = additionalConfig.length > 0 ? additionalConfig[0] : null;
+
+        if (first != null && first instanceof ArtifactStoreConfig) {
+            return (ArtifactStoreConfig)first;
+        } else {
+            return anArtifactStoreConfig().build();
+        }
     }
 
     public static class Builder {
-        private final MysqldConfig config;
+        private final MysqldConfig mysqldConfig;
         private final ArtifactStoreConfig artifactStoreConfig;
         private List<SchemaConfig> schemas = new ArrayList<>();
 
-        public Builder(final MysqldConfig config) {
-            this.config = config;
-            this.artifactStoreConfig = anArtifactStoreConfig().build();
+        public Builder(
+                final MysqldConfig mysqldConfig,
+                final ArtifactStoreConfig artifactStoreConfig) {
+            this.mysqldConfig = mysqldConfig;
+            this.artifactStoreConfig = artifactStoreConfig;
         }
 
         public Builder addSchema(final String name, final SqlScriptSource... scripts) {
-            this.schemas.add(SchemaConfig.aSchemaConfig(name).withScripts(scripts).build());
+            this.schemas.add(aSchemaConfig(name).withScripts(scripts).build());
             return this;
         }
 
         public Builder addSchema(final String name, final List<SqlScriptSource> scripts) {
-            this.schemas.add(SchemaConfig.aSchemaConfig(name).withScripts(scripts).build());
+            this.schemas.add(aSchemaConfig(name).withScripts(scripts).build());
             return this;
         }
 
@@ -131,7 +152,7 @@ public class EmbeddedMysql {
         }
 
         public EmbeddedMysql start() {
-            EmbeddedMysql instance = new EmbeddedMysql(config, artifactStoreConfig);
+            EmbeddedMysql instance = new EmbeddedMysql(mysqldConfig, artifactStoreConfig);
 
             for (SchemaConfig schema : schemas) {
                 instance.addSchema(schema);

@@ -1,5 +1,5 @@
 package com.wix.mysql.config;
 
-interface AdditionalConfig {
+public interface AdditionalConfig {
 
 }
