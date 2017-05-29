@@ -99,18 +99,18 @@ public class EmbeddedMysql {
 
     public static Builder anEmbeddedMysql(
             final Version version,
-            final AdditionalConfig... additionalConfig) {
+            final AdditionalConfig... additionalConfigs) {
 
         MysqldConfig mysqldConfig = MysqldConfig.aMysqldConfig(version).build();
-        ArtifactStoreConfig artifactStoreConfig = resolveArtifactStoreConfig(additionalConfig);
+        ArtifactStoreConfig artifactStoreConfig = resolveArtifactStoreConfig(additionalConfigs);
         return new Builder(mysqldConfig, artifactStoreConfig);
     }
 
     public static Builder anEmbeddedMysql(
             final MysqldConfig mysqldConfig,
-            final AdditionalConfig... additionalConfig) {
+            final AdditionalConfig... additionalConfigs) {
 
-        ArtifactStoreConfig artifactStoreConfig = resolveArtifactStoreConfig(additionalConfig);
+        ArtifactStoreConfig artifactStoreConfig = resolveArtifactStoreConfig(additionalConfigs);
         return new Builder(mysqldConfig, artifactStoreConfig);
     }
 
