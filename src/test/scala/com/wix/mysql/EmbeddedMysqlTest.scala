@@ -49,7 +49,7 @@ class EmbeddedMysqlTest extends IntegrationTest {
 
       val mysqld = start(anEmbeddedMysql(config))
 
-      mysqld must haveSystemVariable("max_connect_errors", "666")
+      mysqld must haveSystemVariable("max_connect_errors", ===("666"))
     }
 
     "not allow to override library-managed system variables" in {

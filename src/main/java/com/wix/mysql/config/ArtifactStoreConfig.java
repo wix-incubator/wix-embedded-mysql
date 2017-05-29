@@ -20,7 +20,7 @@ public class ArtifactStoreConfig implements AdditionalConfig {
         private String tempDir;
 
         Builder() {
-            this.tempDir = "target/mysql";
+            this.tempDir = "target/";
         }
 
         public Builder withTempDir(String tempDir) {
