@@ -83,13 +83,13 @@ import com.wix.mysql.EmbeddedMysql;
 import static com.wix.mysql.EmbeddedMysql.anEmbeddedMysql;
 import static com.wix.mysql.ScriptResolver.classPathScript;
 import static com.wix.mysql.distribution.Version.v5_6_latest;
-import static com.wix.mysql.config.ArtifactStoreConfig.anArtifactStoreConfig;
+import static com.wix.mysql.config.DownloadConfig.aDownloadConfig;
 
-ArtifactStoreConfig artifactStoreConfig = anArtifactStoreConfig
-    .withTempDir(System.getProperty("java.io.tmpdir"))
-    .build()
+DownloadConfig downloadConfig = aDownloadConfig()
+    .withDownloadCacheDir(System.getProperty("java.io.tmpdir"))
+    .build();
 
-EmbeddedMysql mysqld = anEmbeddedMysql(v5_6_latest, artifactStoreConfig)
+EmbeddedMysql mysqld = anEmbeddedMysql(v5_6_latest, downloadConfig)
     .addSchema("aschema", classPathScript("db/001_init.sql"))
     .start();
 

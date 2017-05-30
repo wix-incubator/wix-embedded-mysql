@@ -1,11 +1,11 @@
 package com.wix.mysql.store;
 
-import com.wix.mysql.config.ArtifactStoreConfig;
+import com.wix.mysql.config.DownloadConfig;
 import com.wix.mysql.config.DownloadConfigBuilder;
+import com.wix.mysql.config.MysqldConfig;
 import com.wix.mysql.config.directories.TargetGeneratedFixedPath;
 import com.wix.mysql.config.extract.NoopNaming;
 import com.wix.mysql.config.extract.PathPrefixingNaming;
-import com.wix.mysql.distribution.Version;
 import de.flapdoodle.embed.process.extract.DirectoryAndExecutableNaming;
 import de.flapdoodle.embed.process.io.directories.FixedPath;
 import de.flapdoodle.embed.process.io.directories.IDirectory;
@@ -18,15 +18,15 @@ import java.util.UUID;
 public class SafeExtractedArtifactStoreBuilder extends de.flapdoodle.embed.process.store.ExtractedArtifactStoreBuilder {
 
     public SafeExtractedArtifactStoreBuilder defaults(
-            final Version version,
-            final ArtifactStoreConfig artifactStoreConfig) {
+            final MysqldConfig mysqldConfig,
+            final DownloadConfig downloadConfig) {
 
-        String tempExtractDir = String.format("mysql-%s-%s", version.getMajorVersion(), UUID.randomUUID());
-        String combinedPath = new File(artifactStoreConfig.getTempDir(), tempExtractDir).getPath();
-        IDirectory preExtractDir = new FixedPath(new File(artifactStoreConfig.getDownloadCacheDir(), "extracted").getPath());
+        String tempExtractDir = String.format("mysql-%s-%s", mysqldConfig.getVersion().getMajorVersion(), UUID.randomUUID());
+        String combinedPath = new File(mysqldConfig.getTempDir(), tempExtractDir).getPath();
+        IDirectory preExtractDir = new FixedPath(new File(downloadConfig.getDownloadCacheDir(), "extracted").getPath());
 
         executableNaming().setDefault(new PathPrefixingNaming("bin/"));
-        download().setDefault(new DownloadConfigBuilder().defaults(artifactStoreConfig).build());
+        download().setDefault(new DownloadConfigBuilder().defaults(downloadConfig).build());
         downloader().setDefault(new Downloader());
         extractDir().setDefault(preExtractDir);
         extractExecutableNaming().setDefault(new NoopNaming());

@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
 
-import static com.wix.mysql.config.ArtifactStoreConfig.anArtifactStoreConfig;
+import static com.wix.mysql.config.DownloadConfig.aDownloadConfig;
 import static com.wix.mysql.config.MysqldConfig.SystemDefaults.SCHEMA;
 import static com.wix.mysql.config.SchemaConfig.aSchemaConfig;
 import static com.wix.mysql.utils.Utils.or;
@@ -28,17 +28,17 @@ public class EmbeddedMysql {
     private AtomicBoolean isRunning = new AtomicBoolean(true);
 
     protected EmbeddedMysql(
-            final MysqldConfig config,
-            final ArtifactStoreConfig artifactStoreConfig) {
+            final MysqldConfig mysqldConfig,
+            final DownloadConfig downloadConfig) {
 
-        logger.info("Preparing EmbeddedMysql version '{}'...", config.getVersion());
-        this.config = config;
-        IRuntimeConfig runtimeConfig = new RuntimeConfigBuilder().defaults(config.getVersion(), artifactStoreConfig).build();
+        logger.info("Preparing EmbeddedMysql version '{}'...", mysqldConfig.getVersion());
+        this.config = mysqldConfig;
+        IRuntimeConfig runtimeConfig = new RuntimeConfigBuilder().defaults(mysqldConfig, downloadConfig).build();
         MysqldStarter mysqldStarter = new MysqldStarter(runtimeConfig);
 
         localRepository.lock();
         try {
-            this.executable = mysqldStarter.prepare(config);
+            this.executable = mysqldStarter.prepare(mysqldConfig);
         } finally {
             localRepository.unlock();
         }
@@ -46,7 +46,7 @@ public class EmbeddedMysql {
         try {
             executable.start();
             getClient(SCHEMA).executeCommands(
-                    format("CREATE USER '%s'@'%%' IDENTIFIED BY '%s';", config.getUsername(), config.getPassword()));
+                    format("CREATE USER '%s'@'%%' IDENTIFIED BY '%s';", mysqldConfig.getUsername(), mysqldConfig.getPassword()));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -102,38 +102,38 @@ public class EmbeddedMysql {
             final AdditionalConfig... additionalConfigs) {
 
         MysqldConfig mysqldConfig = MysqldConfig.aMysqldConfig(version).build();
-        ArtifactStoreConfig artifactStoreConfig = resolveArtifactStoreConfig(additionalConfigs);
-        return new Builder(mysqldConfig, artifactStoreConfig);
+        DownloadConfig downloadConfig = resolveDownloadConfig(additionalConfigs);
+        return new Builder(mysqldConfig, downloadConfig);
     }
 
     public static Builder anEmbeddedMysql(
             final MysqldConfig mysqldConfig,
             final AdditionalConfig... additionalConfigs) {
 
-        ArtifactStoreConfig artifactStoreConfig = resolveArtifactStoreConfig(additionalConfigs);
-        return new Builder(mysqldConfig, artifactStoreConfig);
+        DownloadConfig downloadConfig = resolveDownloadConfig(additionalConfigs);
+        return new Builder(mysqldConfig, downloadConfig);
     }
 
-    private static ArtifactStoreConfig resolveArtifactStoreConfig(AdditionalConfig[] additionalConfig) {
+    private static DownloadConfig resolveDownloadConfig(AdditionalConfig[] additionalConfig) {
         AdditionalConfig first = additionalConfig.length > 0 ? additionalConfig[0] : null;
 
-        if (first != null && first instanceof ArtifactStoreConfig) {
-            return (ArtifactStoreConfig)first;
+        if (first != null && first instanceof DownloadConfig) {
+            return (DownloadConfig)first;
         } else {
-            return anArtifactStoreConfig().build();
+            return aDownloadConfig().build();
         }
     }
 
     public static class Builder {
         private final MysqldConfig mysqldConfig;
-        private final ArtifactStoreConfig artifactStoreConfig;
+        private final DownloadConfig downloadConfig;
         private List<SchemaConfig> schemas = new ArrayList<>();
 
         public Builder(
                 final MysqldConfig mysqldConfig,
-                final ArtifactStoreConfig artifactStoreConfig) {
+                final DownloadConfig downloadConfig) {
             this.mysqldConfig = mysqldConfig;
-            this.artifactStoreConfig = artifactStoreConfig;
+            this.downloadConfig = downloadConfig;
         }
 
         public Builder addSchema(final String name, final SqlScriptSource... scripts) {
@@ -152,7 +152,7 @@ public class EmbeddedMysql {
         }
 
         public EmbeddedMysql start() {
-            EmbeddedMysql instance = new EmbeddedMysql(mysqldConfig, artifactStoreConfig);
+            EmbeddedMysql instance = new EmbeddedMysql(mysqldConfig, downloadConfig);
 
             for (SchemaConfig schema : schemas) {
                 instance.addSchema(schema);

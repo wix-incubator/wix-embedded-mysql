@@ -1,5 +1,6 @@
 package com.wix.mysql
 
+import java.io.File
 import java.util.concurrent.TimeUnit
 
 import com.wix.mysql.EmbeddedMysql._
@@ -23,15 +24,18 @@ class EmbeddedMysqlTest extends IntegrationTest {
       mysqld must
         haveCharsetOf(UTF8MB4) and
         beAvailableOn(3310, "auser", "sa", SystemDefaults.SCHEMA) and
-        haveServerTimezoneMatching("UTC")
+        haveServerTimezoneMatching("UTC") and
+        haveSystemVariable("basedir", contain(pathFor("/target/", "/mysql-5.7-")))
     }
 
     "use custom values provided via MysqldConfig" in {
+      val tempDir = System.getProperty("java.io.tmpdir")
       val config = aMysqldConfig(v5_6_latest)
         .withCharset(LATIN1)
         .withUser("zeUser", "zePassword")
         .withPort(1112)
         .withTimeZone("US/Michigan")
+        .withTempDir(tempDir)
         .build
 
       val mysqld = start(anEmbeddedMysql(config))
@@ -39,7 +43,8 @@ class EmbeddedMysqlTest extends IntegrationTest {
       mysqld must
         haveCharsetOf(LATIN1) and
         beAvailableOn(1112, "zeUser", "zePassword", SystemDefaults.SCHEMA) and
-        haveServerTimezoneMatching("US/Michigan")
+        haveServerTimezoneMatching("US/Michigan") and
+        haveSystemVariable("basedir", contain(pathFor(tempDir, "/mysql-5.6-")))
     }
 
     "accept system variables" in {
@@ -203,4 +208,9 @@ class EmbeddedMysqlTest extends IntegrationTest {
       mysqld.addSchema(schemaConfig) must throwA[CommandFailedException]
     }
   }
+
+  def pathFor(basedir: String, subdir: String): String = {
+    new File(basedir, subdir).getPath
+  }
+
 }
