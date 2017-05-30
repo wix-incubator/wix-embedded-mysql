@@ -7,13 +7,16 @@ import de.flapdoodle.embed.process.extract.UUIDTempNaming;
 import de.flapdoodle.embed.process.io.directories.FixedPath;
 import de.flapdoodle.embed.process.io.progress.StandardConsoleProgressListener;
 
+import java.net.URI;
+
 public class DownloadConfigBuilder extends de.flapdoodle.embed.process.config.store.DownloadConfigBuilder {
 
     public DownloadConfigBuilder defaults(
             final DownloadConfig downloadConfig) {
+        String downloadUrl = URI.create(downloadConfig.getBaseUrl()).resolve("/get/Downloads/").toString();
 
         fileNaming().setDefault(new UUIDTempNaming());
-        downloadPath().setDefault(new DownloadPath("https://dev.mysql.com/get/Downloads/"));
+        downloadPath().setDefault(new DownloadPath(downloadUrl));
         progressListener().setDefault(new StandardConsoleProgressListener());
         artifactStorePath().setDefault(new FixedPath(downloadConfig.getDownloadCacheDir()));
         downloadPrefix().setDefault(new DownloadPrefix("embedmysql-download"));
