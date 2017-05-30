@@ -12,8 +12,8 @@ import org.specs2.matcher.{Matcher, Matchers}
 trait InstanceMatchers extends Matchers {
   self: IntegrationTest =>
 
-  def haveSystemVariable(name: String, value: String): Matcher[EmbeddedMysql] =
-    ===(value) ^^ { mySql: EmbeddedMysql =>
+  def haveSystemVariable(name: String, value: Matcher[String]): Matcher[EmbeddedMysql] =
+    value ^^ { mySql: EmbeddedMysql =>
       val ds = aDataSource(mySql.getConfig, SystemDefaults.SCHEMA)
         aSelect[String](ds, sql = s"SELECT variable_value FROM information_schema.global_variables WHERE variable_name = '$name';")
     }
