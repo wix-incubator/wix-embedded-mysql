@@ -9,7 +9,7 @@ class MysqlCacheServingHttpServer extends RouterNanoHTTPD(PORT) {
   val port = PORT
 
   val embeddedMysqlCacheDir: File = new File(System.getProperty("user.home"), ".embedmysql").getAbsoluteFile
-  addRoute("/get/Downloads/(.)+", classOf[StaticPageTestHandler], embeddedMysqlCacheDir)
+  addRoute("/(.)+", classOf[StaticPageTestHandler], embeddedMysqlCacheDir)
 }
 
 class StaticPageTestHandler extends RouterNanoHTTPD.StaticPageHandler {
