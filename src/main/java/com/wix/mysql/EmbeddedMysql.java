@@ -1,10 +1,7 @@
 package com.wix.mysql;
 
-import com.wix.mysql.config.Charset;
-import com.wix.mysql.config.MysqldConfig;
+import com.wix.mysql.config.*;
 import com.wix.mysql.config.MysqldConfig.SystemDefaults;
-import com.wix.mysql.config.RuntimeConfigBuilder;
-import com.wix.mysql.config.SchemaConfig;
 import com.wix.mysql.distribution.Version;
 import de.flapdoodle.embed.process.config.IRuntimeConfig;
 import org.slf4j.Logger;
@@ -16,7 +13,9 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
 
+import static com.wix.mysql.config.DownloadConfig.aDownloadConfig;
 import static com.wix.mysql.config.MysqldConfig.SystemDefaults.SCHEMA;
+import static com.wix.mysql.config.SchemaConfig.aSchemaConfig;
 import static com.wix.mysql.utils.Utils.or;
 import static java.lang.String.format;
 
@@ -28,15 +27,18 @@ public class EmbeddedMysql {
     protected final MysqldExecutable executable;
     private AtomicBoolean isRunning = new AtomicBoolean(true);
 
-    protected EmbeddedMysql(final MysqldConfig config) {
-        logger.info("Preparing EmbeddedMysql version '{}'...", config.getVersion());
-        this.config = config;
-        IRuntimeConfig runtimeConfig = new RuntimeConfigBuilder().defaults(config.getVersion()).build();
+    protected EmbeddedMysql(
+            final MysqldConfig mysqldConfig,
+            final DownloadConfig downloadConfig) {
+
+        logger.info("Preparing EmbeddedMysql version '{}'...", mysqldConfig.getVersion());
+        this.config = mysqldConfig;
+        IRuntimeConfig runtimeConfig = new RuntimeConfigBuilder().defaults(mysqldConfig, downloadConfig).build();
         MysqldStarter mysqldStarter = new MysqldStarter(runtimeConfig);
 
         localRepository.lock();
         try {
-            this.executable = mysqldStarter.prepare(config);
+            this.executable = mysqldStarter.prepare(mysqldConfig);
         } finally {
             localRepository.unlock();
         }
@@ -44,7 +46,7 @@ public class EmbeddedMysql {
         try {
             executable.start();
             getClient(SCHEMA).executeCommands(
-                    format("CREATE USER '%s'@'%%' IDENTIFIED BY '%s';", config.getUsername(), config.getPassword()));
+                    format("CREATE USER '%s'@'%%' IDENTIFIED BY '%s';", mysqldConfig.getUsername(), mysqldConfig.getPassword()));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -55,11 +57,11 @@ public class EmbeddedMysql {
     }
 
     public void reloadSchema(final String schemaName, final SqlScriptSource... scripts) {
-        reloadSchema(SchemaConfig.aSchemaConfig(schemaName).withScripts(scripts).build());
+        reloadSchema(aSchemaConfig(schemaName).withScripts(scripts).build());
     }
 
     public void reloadSchema(final String schemaName, final List<SqlScriptSource> scripts) {
-        reloadSchema(SchemaConfig.aSchemaConfig(schemaName).withScripts(scripts).build());
+        reloadSchema(aSchemaConfig(schemaName).withScripts(scripts).build());
     }
 
     public void reloadSchema(final SchemaConfig config) {
@@ -95,30 +97,52 @@ public class EmbeddedMysql {
         return new MysqlClient(config, executable, schemaName);
     }
 
+    public static Builder anEmbeddedMysql(
+            final Version version,
+            final AdditionalConfig... additionalConfigs) {
 
-    public static Builder anEmbeddedMysql(final Version version) {
-        return new Builder(MysqldConfig.aMysqldConfig(version).build());
+        MysqldConfig mysqldConfig = MysqldConfig.aMysqldConfig(version).build();
+        DownloadConfig downloadConfig = resolveDownloadConfig(additionalConfigs);
+        return new Builder(mysqldConfig, downloadConfig);
     }
 
-    public static Builder anEmbeddedMysql(final MysqldConfig config) {
-        return new Builder(config);
+    public static Builder anEmbeddedMysql(
+            final MysqldConfig mysqldConfig,
+            final AdditionalConfig... additionalConfigs) {
+
+        DownloadConfig downloadConfig = resolveDownloadConfig(additionalConfigs);
+        return new Builder(mysqldConfig, downloadConfig);
+    }
+
+    private static DownloadConfig resolveDownloadConfig(AdditionalConfig[] additionalConfig) {
+        AdditionalConfig first = additionalConfig.length > 0 ? additionalConfig[0] : null;
+
+        if (first != null && first instanceof DownloadConfig) {
+            return (DownloadConfig)first;
+        } else {
+            return aDownloadConfig().build();
+        }
     }
 
     public static class Builder {
-        private final MysqldConfig config;
+        private final MysqldConfig mysqldConfig;
+        private final DownloadConfig downloadConfig;
         private List<SchemaConfig> schemas = new ArrayList<>();
 
-        public Builder(final MysqldConfig config) {
-            this.config = config;
+        public Builder(
+                final MysqldConfig mysqldConfig,
+                final DownloadConfig downloadConfig) {
+            this.mysqldConfig = mysqldConfig;
+            this.downloadConfig = downloadConfig;
         }
 
         public Builder addSchema(final String name, final SqlScriptSource... scripts) {
-            this.schemas.add(SchemaConfig.aSchemaConfig(name).withScripts(scripts).build());
+            this.schemas.add(aSchemaConfig(name).withScripts(scripts).build());
             return this;
         }
 
         public Builder addSchema(final String name, final List<SqlScriptSource> scripts) {
-            this.schemas.add(SchemaConfig.aSchemaConfig(name).withScripts(scripts).build());
+            this.schemas.add(aSchemaConfig(name).withScripts(scripts).build());
             return this;
         }
 
@@ -128,7 +152,7 @@ public class EmbeddedMysql {
         }
 
         public EmbeddedMysql start() {
-            EmbeddedMysql instance = new EmbeddedMysql(config);
+            EmbeddedMysql instance = new EmbeddedMysql(mysqldConfig, downloadConfig);
 
             for (SchemaConfig schema : schemas) {
                 instance.addSchema(schema);

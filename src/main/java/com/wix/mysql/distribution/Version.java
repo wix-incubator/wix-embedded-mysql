@@ -92,11 +92,11 @@ public enum Version implements IVersion {
 
         switch (currentPlatform()) {
             case Windows:
-                return format("%s/mysql-%s.%s", path(), majorVersion, minorVersion);
+                return format("/%s/mysql-%s.%s", path(), majorVersion, minorVersion);
             case OS_X:
-                return format("%s/mysql-%s.%s-%s", path(), majorVersion, minorVersion, macOsVersion);
+                return format("/%s/mysql-%s.%s-%s", path(), majorVersion, minorVersion, macOsVersion);
             case Linux:
-                return format("%s/mysql-%s.%s-%s", path(), majorVersion, minorVersion, gcLibVersion());
+                return format("/%s/mysql-%s.%s-%s", path(), majorVersion, minorVersion, gcLibVersion());
             default:
                 throw new UnsupportedPlatformException("Unrecognized platform, currently not supported");
         }

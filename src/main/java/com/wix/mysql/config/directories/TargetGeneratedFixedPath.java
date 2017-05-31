@@ -9,8 +9,8 @@ public class TargetGeneratedFixedPath implements IDirectory {
 
     private final String baseDir;
 
-    public TargetGeneratedFixedPath(String prefix) {
-        this.baseDir = String.format("target/%s", prefix);
+    public TargetGeneratedFixedPath(String baseDir) {
+        this.baseDir = baseDir;
     }
 
     @Override

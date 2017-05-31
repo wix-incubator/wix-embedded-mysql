@@ -110,5 +110,19 @@ public class JavaUsageExamplesTest {
         mysqld.stop(); //optional, as there is a shutdown hook
     }
 
+    @Test
+    public void customTempDir() {
+        MysqldConfig config = aMysqldConfig(v5_6_latest)
+                .withTempDir(System.getProperty("java.io.tmpdir"))
+                .build();
+
+        EmbeddedMysql mysqld = anEmbeddedMysql(config)
+                .addSchema("aschema", classPathScript("db/001_init.sql"))
+                .start();
+
+        //do work
+
+        mysqld.stop(); //optional, as there is a shutdown hook
+    }
 
 }

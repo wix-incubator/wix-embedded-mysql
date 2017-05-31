@@ -20,6 +20,7 @@ public class MysqldConfig extends ExecutableProcessConfig {
     private final TimeZone timeZone;
     private final Timeout timeout;
     private final List<ServerVariable> serverVariables;
+    private final String tempDir;
 
     protected MysqldConfig(
             final IVersion version,
@@ -28,7 +29,8 @@ public class MysqldConfig extends ExecutableProcessConfig {
             final User user,
             final TimeZone timeZone,
             final Timeout timeout,
-            final List<ServerVariable> serverVariables) {
+            final List<ServerVariable> serverVariables,
+            final String tempDir) {
         super(version, new ISupportConfig() {
             public String getName() {
                 return "mysqld";
@@ -53,6 +55,7 @@ public class MysqldConfig extends ExecutableProcessConfig {
         this.timeZone = timeZone;
         this.timeout = timeout;
         this.serverVariables = serverVariables;
+        this.tempDir = tempDir;
     }
 
     public Version getVersion() {
@@ -87,6 +90,10 @@ public class MysqldConfig extends ExecutableProcessConfig {
         return serverVariables;
     }
 
+    public String getTempDir() {
+        return tempDir;
+    }
+
     public static Builder aMysqldConfig(final Version version) {
         return new Builder(version);
     }
@@ -99,6 +106,7 @@ public class MysqldConfig extends ExecutableProcessConfig {
         private TimeZone timeZone = TimeZone.getTimeZone("UTC");
         private Timeout timeout = new Timeout(30, SECONDS);
         private final List<ServerVariable> serverVariables = new ArrayList<>();
+        private String tempDir = "target/";
 
         public Builder(IVersion version) {
             this.version = version;
@@ -163,8 +171,14 @@ public class MysqldConfig extends ExecutableProcessConfig {
             return this;
         }
 
+        public Builder withTempDir(String tempDir) {
+            this.tempDir = tempDir;
+            return this;
+        }
+
+
         public MysqldConfig build() {
-            return new MysqldConfig(version, port, charset, user, timeZone, timeout, serverVariables);
+            return new MysqldConfig(version, port, charset, user, timeZone, timeout, serverVariables, tempDir);
         }
     }
 
