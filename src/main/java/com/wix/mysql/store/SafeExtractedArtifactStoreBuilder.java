@@ -23,7 +23,7 @@ public class SafeExtractedArtifactStoreBuilder extends de.flapdoodle.embed.proce
 
         String tempExtractDir = String.format("mysql-%s-%s", mysqldConfig.getVersion().getMajorVersion(), UUID.randomUUID());
         String combinedPath = new File(mysqldConfig.getTempDir(), tempExtractDir).getPath();
-        IDirectory preExtractDir = new FixedPath(new File(downloadConfig.getDownloadCacheDir(), "extracted").getPath());
+        IDirectory preExtractDir = new FixedPath(new File(downloadConfig.getCacheDir(), "extracted").getPath());
 
         executableNaming().setDefault(new PathPrefixingNaming("bin/"));
         download().setDefault(new DownloadConfigBuilder().defaults(downloadConfig).build());
