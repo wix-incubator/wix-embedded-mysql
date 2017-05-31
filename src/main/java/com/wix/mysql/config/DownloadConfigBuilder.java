@@ -14,7 +14,7 @@ public class DownloadConfigBuilder extends de.flapdoodle.embed.process.config.st
     public DownloadConfigBuilder defaults(
             final DownloadConfig downloadConfig) {
         fileNaming().setDefault(new UUIDTempNaming());
-        downloadPath().setDefault(new DownloadPath(URI.create(downloadConfig.getBaseUrl()).resolve("/").toString()));
+        downloadPath().setDefault(new DownloadPath(downloadConfig.getBaseUrl()));
         progressListener().setDefault(new StandardConsoleProgressListener());
         artifactStorePath().setDefault(new FixedPath(downloadConfig.getDownloadCacheDir()));
         downloadPrefix().setDefault(new DownloadPrefix("embedmysql-download"));

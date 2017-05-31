@@ -18,6 +18,7 @@ public class DownloadConfig implements AdditionalConfig {
     public String getDownloadCacheDir() {
         return downloadCacheDir;
     }
+
     public String getBaseUrl() {
         return baseUrl;
     }

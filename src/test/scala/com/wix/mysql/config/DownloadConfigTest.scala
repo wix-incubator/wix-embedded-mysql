@@ -6,14 +6,11 @@ import java.nio.file.Files
 import com.wix.mysql.EmbeddedMysql.anEmbeddedMysql
 import com.wix.mysql.config.DownloadConfig.aDownloadConfig
 import com.wix.mysql.distribution.Version
-import com.wix.mysql.support.{MysqlCacheServingHttpServer, IntegrationTest}
+import com.wix.mysql.support.{IntegrationTest, MysqlCacheServingHttpServer}
+import de.flapdoodle.embed.process.exceptions.DistributionException
 import org.apache.commons.io.FileUtils.deleteDirectory
-import org.nanohttpd.router.RouterNanoHTTPD
 import org.specs2.matcher.FileMatchers
 import org.specs2.mutable.BeforeAfter
-import org.nanohttpd.router.RouterNanoHTTPD.StaticPageHandler
-import java.io.BufferedInputStream
-import java.io.IOException
 
 class DownloadConfigTest extends IntegrationTest with FileMatchers {
 
@@ -26,12 +23,24 @@ class DownloadConfigTest extends IntegrationTest with FileMatchers {
         val mysqld = start(anEmbeddedMysql(Version.v5_7_latest, downloadConfig))
 
         tempDir must not(beEqualToIgnoringSep(defaultCachePath))
-        new File(pathFor(tempDir, "extracted")) must beADirectory and exist
+        aPath(tempDir, "extracted") must beADirectory and exist
       }
     }
 
-    "support custom download base url" in new context {
+    "uses custom download base url" in {
+      withTempDir { tempDir =>
+        val downloadConfig = aDownloadConfig()
+          .withDownloadCacheDir(tempDir)
+          .withBaseUrl(s"http://localhost:2222")
+          .build()
 
+        start(anEmbeddedMysql(Version.v5_7_latest, downloadConfig)) must throwA[DistributionException].like {
+          case e => e.getMessage must contain("Could not open inputStream for http://localhost:2222/MySQL-5.7")
+        }
+      }
+    }
+
+    "uses custom download base url" in new context {
       withTempDir { tempDir =>
         val downloadConfig = aDownloadConfig()
           .withDownloadCacheDir(tempDir)
@@ -40,9 +49,10 @@ class DownloadConfigTest extends IntegrationTest with FileMatchers {
 
         start(anEmbeddedMysql(Version.v5_7_latest, downloadConfig))
 
-        new File(pathFor(tempDir, "extracted")) must beADirectory and exist
+        aPath(tempDir, "extracted") must beADirectory and exist
       }
     }
+
   }
 
   class context extends BeforeAfter {
@@ -61,8 +71,8 @@ class DownloadConfigTest extends IntegrationTest with FileMatchers {
     }
   }
 
-  def pathFor(basedir: String, subdir: String): String = {
-    new File(basedir, subdir).getPath
+  def aPath(basedir: String, subdir: String): File = {
+    new File(basedir, subdir)
   }
 
   def withTempDir[T](f: String => T): T = {
