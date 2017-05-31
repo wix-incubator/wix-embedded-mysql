@@ -3,7 +3,7 @@ package com.wix.mysql.support
 import java.io.{BufferedInputStream, File}
 
 import com.wix.mysql.support.MysqlCacheServingHttpServer.PORT
-import org.nanohttpd.router.RouterNanoHTTPD
+import fi.iki.elonen.router.RouterNanoHTTPD
 
 class MysqlCacheServingHttpServer extends RouterNanoHTTPD(PORT) {
   val port = PORT
