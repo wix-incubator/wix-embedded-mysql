@@ -22,7 +22,14 @@ Add dependency to your pom.xml:
     </dependency>
 ```
 
-## Examples
+## Usage
+ - [Basic usage example](#basic-usage-example)
+ - [Customizing mysqld settings](#customizing-mysqld-settings)
+ - [Customizing download settings](#customizing-download-settings)
+ - [Multiple schemas/databases](#multiple-schemas-databases)
+ - [Resetting schemas between tests](#resetting-schemas-between-tests)
+
+### Basic usage example
 
 You can start an embedded mysql with defaults and a single schema:
 
@@ -31,9 +38,9 @@ import com.wix.mysql.EmbeddedMysql;
 
 import static com.wix.mysql.EmbeddedMysql.anEmbeddedMysql;
 import static com.wix.mysql.ScriptResolver.classPathScript;
-import static com.wix.mysql.distribution.Version.v5_6_latest;
+import static com.wix.mysql.distribution.Version.v5_7_latest;
 
-EmbeddedMysql mysqld = anEmbeddedMysql(v5_6_latest)
+EmbeddedMysql mysqld = anEmbeddedMysql(v5_7_latest)
     .addSchema("aschema", classPathScript("db/001_init.sql"))
     .start();
 
@@ -41,6 +48,8 @@ EmbeddedMysql mysqld = anEmbeddedMysql(v5_6_latest)
 
 mysqld.stop(); //optional, as there is a shutdown hook
 ```
+
+### Customizing mysqld settings
 
 If you need more control in configuring embeded mysql instance, you can use [MysqldConfig](src/main/java/com/wix/mysql/config/MysqldConfig.java) builder:
 
@@ -75,6 +84,8 @@ EmbeddedMysql mysqld = anEmbeddedMysql(config)
 mysqld.stop(); //optional, as there is a shutdown hook
 ```
 
+### Customizing download settings
+
 In addition you can control additional settings of embedded mysql by providing configs that have base type of [AdditionalConfig](src/main/java/com/wix/mysql/config/AdditionalConfig.java) by providing those to `anEmbeddedMysql` builder:
 
 ```java
@@ -82,14 +93,14 @@ import com.wix.mysql.EmbeddedMysql;
 
 import static com.wix.mysql.EmbeddedMysql.anEmbeddedMysql;
 import static com.wix.mysql.ScriptResolver.classPathScript;
-import static com.wix.mysql.distribution.Version.v5_6_latest;
+import static com.wix.mysql.distribution.Version.v5_7_latest;
 import static com.wix.mysql.config.DownloadConfig.aDownloadConfig;
 
 DownloadConfig downloadConfig = aDownloadConfig()
-    .withDownloadCacheDir(System.getProperty("java.io.tmpdir"))
+    .withCacheDir(System.getProperty("java.io.tmpdir"))
     .build();
 
-EmbeddedMysql mysqld = anEmbeddedMysql(v5_6_latest, downloadConfig)
+EmbeddedMysql mysqld = anEmbeddedMysql(v5_7_latest, downloadConfig)
     .addSchema("aschema", classPathScript("db/001_init.sql"))
     .start();
 
@@ -97,6 +108,8 @@ EmbeddedMysql mysqld = anEmbeddedMysql(v5_6_latest, downloadConfig)
 
 mysqld.stop(); //optional, as there is a shutdown hook
 ```
+
+### Multiple schemas/databases
 
 EmbeddedMysql supports multiple schemas and additional configuration options provided via [SchemaConfig](src/main/java/com/wix/mysql/config/SchemaConfig.java) builder:
 
@@ -125,6 +138,8 @@ EmbeddedMysql mysqld = anEmbeddedMysql(v5_6_latest)
 
 mysqld.stop(); //optional, as there is a shutdown hook
 ```
+
+### Resetting schemas between tests
 
 It is intended to be started once per test-suite, but you can reset schema in between tests which recreates database and applies provided migrations:
 
