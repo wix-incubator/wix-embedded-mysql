@@ -26,7 +26,7 @@ Add dependency to your pom.xml:
  - [Basic usage example](#basic-usage-example)
  - [Customizing mysqld settings](#customizing-mysqld-settings)
  - [Customizing download settings](#customizing-download-settings)
- - [Multiple schemas/databases](#multiple-schemas-databases)
+ - [Multiple schemas/databases](multiple-schemasdatabases)
  - [Resetting schemas between tests](#resetting-schemas-between-tests)
 
 ### Basic usage example
