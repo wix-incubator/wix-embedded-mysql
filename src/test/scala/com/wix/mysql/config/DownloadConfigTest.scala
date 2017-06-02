@@ -42,7 +42,7 @@ class DownloadConfigTest extends IntegrationTest with FileMatchers {
       }
     }
 
-    "uses custom download base url" in new context {
+    "downloads via custom download base url" in new context {
       ensureVersionPresentInCache(version)
 
       withTempDir { tempDir =>
