@@ -8,10 +8,12 @@ import ch.qos.logback.classic.spi.ILoggingEvent
 import ch.qos.logback.classic.{Logger, LoggerContext}
 import ch.qos.logback.core.read.ListAppender
 import com.wix.mysql.config.MysqldConfig
+import com.wix.mysql.distribution.Version
 import com.wix.mysql.{EmbeddedMysql, Sources, SqlScriptSource}
 import de.flapdoodle.embed.process.io.directories.UserHome
 import org.apache.commons.dbcp2.BasicDataSource
 import org.apache.commons.io.FileUtils._
+import org.slf4j
 import org.slf4j.LoggerFactory
 import org.slf4j.LoggerFactory.getLogger
 import org.specs2.mutable.SpecWithJUnit
@@ -28,7 +30,7 @@ abstract class IntegrationTest extends SpecWithJUnit with BeforeAfterEach
   sequential
 
   var mysqldInstances: Seq[EmbeddedMysql] = Seq()
-  val log = getLogger(this.getClass)
+  val log: slf4j.Logger = getLogger(this.getClass)
 
   def before: Any = mysqldInstances = Seq()
 
@@ -75,6 +77,10 @@ abstract class IntegrationTest extends SpecWithJUnit with BeforeAfterEach
       }
     }
   }
+}
+
+object IntegrationTest {
+  val testVersion: Version = Version.v5_7_latest
 }
 
 trait JdbcSupport {

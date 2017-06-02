@@ -56,7 +56,7 @@ class VersionTest extends SpecWithJUnit with AroundEach {
     }
   }
 
-  def givenPlatformSetTo(platform: Platform) = platform match {
+  def givenPlatformSetTo(platform: Platform): String = platform match {
     case Windows => setProperty("os.name", "Windows")
     case OS_X => setProperty("os.name", "Mac OS X")
     case Linux => setProperty("os.name", "Linux")
