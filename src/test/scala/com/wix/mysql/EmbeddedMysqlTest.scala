@@ -7,8 +7,6 @@ import com.wix.mysql.EmbeddedMysql._
 import com.wix.mysql.config.Charset._
 import com.wix.mysql.config.MysqldConfig.{SystemDefaults, aMysqldConfig}
 import com.wix.mysql.config.SchemaConfig.aSchemaConfig
-import com.wix.mysql.distribution.Version
-import com.wix.mysql.distribution.Version.v5_6_latest
 import com.wix.mysql.exceptions.CommandFailedException
 import com.wix.mysql.support.IntegrationTest
 import com.wix.mysql.support.IntegrationTest.testVersion
@@ -45,7 +43,7 @@ class EmbeddedMysqlTest extends IntegrationTest {
         haveCharsetOf(LATIN1) and
         beAvailableOn(1112, "zeUser", "zePassword", SystemDefaults.SCHEMA) and
         haveServerTimezoneMatching("US/Michigan") and
-        haveSystemVariable("basedir", contain(pathFor(tempDir, "/mysql-5.6-")))
+        haveSystemVariable("basedir", contain(pathFor(tempDir, "/mysql-5.7-")))
     }
 
     "accept system variables" in {
