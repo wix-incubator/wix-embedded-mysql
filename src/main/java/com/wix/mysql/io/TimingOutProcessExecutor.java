@@ -1,16 +1,20 @@
 package com.wix.mysql.io;
 
+import org.apache.commons.io.IOUtils;
+
+import java.io.IOException;
+
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
 
 public class TimingOutProcessExecutor {
 
-    final String cmd;
+    private final String cmd;
 
     public TimingOutProcessExecutor(String cmd) {
         this.cmd = cmd;
     }
 
-    public int waitFor(Process p, long timeoutNanos) throws InterruptedException {
+    public int waitFor(Process p, long timeoutNanos) throws InterruptedException, IOException {
         long startTime = System.nanoTime();
         long rem = timeoutNanos;
 
@@ -25,6 +29,6 @@ public class TimingOutProcessExecutor {
             rem = timeoutNanos - (System.nanoTime() - startTime);
         } while (rem > 0);
         p.destroy();
-        throw new InterruptedException(String.format("Timeout of %s sec exceeded while waiting for '%s' to complete", NANOSECONDS.toSeconds(timeoutNanos), this.cmd));
+        throw new InterruptedException(String.format("Timeout of %s sec exceeded while waiting for '%s' to complete. Collected output: %s", NANOSECONDS.toSeconds(timeoutNanos), this.cmd, IOUtils.toString(p.getInputStream()) + IOUtils.toString(p.getErrorStream())));
     }
 }
