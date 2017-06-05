@@ -73,16 +73,20 @@ class EmbeddedMysqlTest extends IntegrationTest {
 
   "EmbeddedMysql schema reload" should {
     "reset schema" in {
-      val config = aSchemaConfig("aSchema")
+      val mysqldConfig = aMysqldConfig(testVersion)
+        .withTimeout(60, TimeUnit.SECONDS)
+        .build
+
+      val schemaConfig = aSchemaConfig("aSchema")
         .withScripts(aMigrationWith("create table t1 (col1 INTEGER);"))
         .build
 
-      val mysqld = start(anEmbeddedMysql(testVersion).addSchema(config))
+      val mysqld = start(anEmbeddedMysql(mysqldConfig).addSchema(schemaConfig))
 
       anUpdate(mysqld, onSchema = "aSchema", sql = "insert into t1 values(10)") must beSuccessful
       aSelect[java.lang.Long](mysqld, onSchema = "aSchema", sql = "select col1 from t1 where col1 = 10;") mustEqual 10
 
-      mysqld.reloadSchema(config)
+      mysqld.reloadSchema(schemaConfig)
 
       aSelect[java.lang.Long](mysqld, onSchema = "aSchema", sql = "select col1 from t1 where col1 = 10;") must
         failWith("Incorrect result size: expected 1, actual 0")
@@ -91,9 +95,7 @@ class EmbeddedMysqlTest extends IntegrationTest {
 
   "EmbeddedMysql schema creation" should {
     "use defaults" in {
-      val config = aMysqldConfig(testVersion)
-        .withTimeout(60, TimeUnit.SECONDS)
-        .build
+      val config = aMysqldConfig(testVersion).build
 
       val mysqld = start(anEmbeddedMysql(config).addSchema("aSchema"))
 
