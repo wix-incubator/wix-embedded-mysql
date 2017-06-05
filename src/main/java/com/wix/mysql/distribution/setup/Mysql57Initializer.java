@@ -28,6 +28,7 @@ public class Mysql57Initializer implements Initializer {
                         files.executable().getAbsolutePath(),
                         "--no-defaults",
                         "--initialize-insecure",
+                        "--ignore-db-dir",
                         format("--basedir=%s", baseDir),
                         format("--datadir=%s/data", baseDir)});
 

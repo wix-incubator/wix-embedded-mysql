@@ -92,7 +92,7 @@ trait JdbcSupport {
   def aDataSource(user: String, password: String, port: Int, schema: String): DataSource = {
     val dataSource: BasicDataSource = new BasicDataSource
     dataSource.setDriverClassName("com.mysql.jdbc.Driver")
-    dataSource.setUrl(s"jdbc:mysql://localhost:$port/$schema")
+    dataSource.setUrl(s"jdbc:mysql://localhost:$port/$schema?useSSL=false")
     dataSource.setUsername(user)
     dataSource.setPassword(password)
     dataSource
