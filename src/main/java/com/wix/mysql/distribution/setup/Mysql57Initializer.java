@@ -31,6 +31,6 @@ public class Mysql57Initializer implements Initializer {
                         format("--basedir=%s", baseDir),
                         format("--datadir=%s/data", baseDir)});
 
-        ProcessRunner.run(p, runtimeConfig, config.getTimeout(NANOSECONDS));
+        new ProcessRunner(files.executable().getAbsolutePath()).run(p, runtimeConfig, config.getTimeout(NANOSECONDS));
     }
 }
