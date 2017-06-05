@@ -91,7 +91,9 @@ class EmbeddedMysqlTest extends IntegrationTest {
 
   "EmbeddedMysql schema creation" should {
     "use defaults" in {
-      val config = aMysqldConfig(testVersion).build
+      val config = aMysqldConfig(testVersion)
+        .withTimeout(60, TimeUnit.SECONDS)
+        .build
 
       val mysqld = start(anEmbeddedMysql(config).addSchema("aSchema"))
 
