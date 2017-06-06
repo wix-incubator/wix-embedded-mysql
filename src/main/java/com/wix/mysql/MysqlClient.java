@@ -50,6 +50,8 @@ class MysqlClient {
             Process p = new ProcessBuilder(new String[]{
                     Paths.get(executable.getBaseDir().getAbsolutePath(), "bin", "mysql").toString(),
                     "--protocol=tcp",
+                    "--host=localhost",
+                    "--password=",
                     format("--user=%s", SystemDefaults.USERNAME),
                     format("--port=%s", config.getPort()),
                     schemaName}).start();

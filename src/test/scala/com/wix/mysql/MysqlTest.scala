@@ -13,7 +13,7 @@ class MysqlTest extends IntegrationTest {
 
     mysql.executeCommands("sele qwe from zz;") must throwA[CommandFailedException].like {
       case e: CommandFailedException => e.getMessage must contain(
-        "output 'ERROR 1064 (42000) at line 1: You have an error in your SQL syntax;")
+        "ERROR 1064 (42000) at line 1: You have an error in your SQL syntax;")
     }
   }
 }
