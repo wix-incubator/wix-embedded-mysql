@@ -25,4 +25,7 @@ install:
   - cmd: SET PATH=C:\maven\apache-maven-3.3.9\bin;%JAVA_HOME%\bin;%PATH%
 
 test_script:
-  - mvn -q -B clean verify
+  - mvn -q -B verify -Dsurefire.rerunFailingTestsCount=2
+
+matrix:
+  fast_finish: true

@@ -4,7 +4,7 @@ script: $CMD
 
 env:
   global:
-    - CMD='mvn -q -B verify'
+    - CMD='mvn -q -B verify -Dsurefire.rerunFailingTestsCount=2'
 
 before_install:
 # os x - workaround for JAVA_HOME not set and mvn missing
@@ -15,6 +15,7 @@ before_install:
  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo hostname "$(hostname | cut -c1-63)"; fi
 
 matrix:
+    fast_finish: true
     include:
         - os: linux
           dist: trusty

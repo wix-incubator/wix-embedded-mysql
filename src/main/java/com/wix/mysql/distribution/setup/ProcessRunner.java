@@ -17,13 +17,19 @@ import static java.lang.String.format;
 
 final class ProcessRunner {
 
-    static void run(Process p, IRuntimeConfig runtimeConfig, long timeoutNanos) throws IOException {
+    final TimingOutProcessExecutor tope;
+
+    ProcessRunner(String cmd) {
+        this.tope = new TimingOutProcessExecutor(cmd);
+    }
+
+    void run(Process p, IRuntimeConfig runtimeConfig, long timeoutNanos) throws IOException {
         IStreamProcessor outputWatch = StreamToLineProcessor.wrap(runtimeConfig.getProcessOutput().getOutput());
         try {
             Processors.connect(new InputStreamReader(p.getInputStream()), outputWatch);
             Processors.connect(new InputStreamReader(p.getErrorStream()), outputWatch);
 
-            int retCode = TimingOutProcessExecutor.waitFor(p, timeoutNanos);
+            int retCode = tope.waitFor(p, timeoutNanos);
 
             if (retCode != 0) {
                 resolveException(retCode, IOUtils.toString(p.getInputStream()) + IOUtils.toString(p.getErrorStream()));

@@ -2,9 +2,9 @@ package com.wix.mysql
 
 import com.wix.mysql.EmbeddedMysql.anEmbeddedMysql
 import com.wix.mysql.config.MysqldConfig
-import com.wix.mysql.config.MysqldConfig.aMysqldConfig
 import com.wix.mysql.distribution.Version
 import com.wix.mysql.support.IntegrationTest
+import com.wix.mysql.support.IntegrationTest.testConfigBuilder
 import org.specs2.matcher.Scope
 import org.specs2.specification.core.Fragment
 
@@ -17,7 +17,7 @@ class SupportedVersionsTest extends IntegrationTest {
   Fragment.foreach(versionsToTest()) { version =>
 
     s"$version should work on ${System.getProperty("os.name")}" in new Context {
-      val config: MysqldConfig = aMysqldConfig(version).build
+      val config: MysqldConfig = testConfigBuilder.build
 
       val mysqld: EmbeddedMysql = start(anEmbeddedMysql(config).addSchema("aschema"))
 

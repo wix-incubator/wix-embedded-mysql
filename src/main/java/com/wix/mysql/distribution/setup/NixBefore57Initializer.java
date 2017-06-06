@@ -30,6 +30,6 @@ public class NixBefore57Initializer implements Initializer {
                 null,
                 baseDir);
 
-        ProcessRunner.run(p, runtimeConfig, config.getTimeout(NANOSECONDS));
+        new ProcessRunner("scripts/mysql_install_db").run(p, runtimeConfig, config.getTimeout(NANOSECONDS));
     }
 }
