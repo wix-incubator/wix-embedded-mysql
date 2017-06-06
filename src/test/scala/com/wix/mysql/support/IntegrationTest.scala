@@ -1,6 +1,7 @@
 package com.wix.mysql.support
 
 import java.util.UUID
+import java.util.concurrent.TimeUnit
 import javax.sql.DataSource
 
 import ch.qos.logback.classic.Level.INFO
@@ -8,10 +9,12 @@ import ch.qos.logback.classic.spi.ILoggingEvent
 import ch.qos.logback.classic.{Logger, LoggerContext}
 import ch.qos.logback.core.read.ListAppender
 import com.wix.mysql.config.MysqldConfig
+import com.wix.mysql.distribution.Version
 import com.wix.mysql.{EmbeddedMysql, Sources, SqlScriptSource}
 import de.flapdoodle.embed.process.io.directories.UserHome
 import org.apache.commons.dbcp2.BasicDataSource
 import org.apache.commons.io.FileUtils._
+import org.slf4j
 import org.slf4j.LoggerFactory
 import org.slf4j.LoggerFactory.getLogger
 import org.specs2.mutable.SpecWithJUnit
@@ -28,7 +31,7 @@ abstract class IntegrationTest extends SpecWithJUnit with BeforeAfterEach
   sequential
 
   var mysqldInstances: Seq[EmbeddedMysql] = Seq()
-  val log = getLogger(this.getClass)
+  val log: slf4j.Logger = getLogger(this.getClass)
 
   def before: Any = mysqldInstances = Seq()
 
@@ -77,6 +80,13 @@ abstract class IntegrationTest extends SpecWithJUnit with BeforeAfterEach
   }
 }
 
+object IntegrationTest {
+  val targetTestVersion: Version = Version.v5_7_latest
+  def testConfigBuilder: MysqldConfig.Builder = MysqldConfig
+    .aMysqldConfig(targetTestVersion)
+    .withTimeout(60, TimeUnit.SECONDS)
+}
+
 trait JdbcSupport {
   self: IntegrationTest =>
 
@@ -86,7 +96,7 @@ trait JdbcSupport {
   def aDataSource(user: String, password: String, port: Int, schema: String): DataSource = {
     val dataSource: BasicDataSource = new BasicDataSource
     dataSource.setDriverClassName("com.mysql.jdbc.Driver")
-    dataSource.setUrl(s"jdbc:mysql://localhost:$port/$schema")
+    dataSource.setUrl(s"jdbc:mysql://localhost:$port/$schema?useSSL=false")
     dataSource.setUsername(user)
     dataSource.setPassword(password)
     dataSource
