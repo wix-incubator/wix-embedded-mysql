@@ -86,7 +86,7 @@ class EmbeddedMysqlTest extends IntegrationTest {
       anUpdate(mysqld, onSchema = "aSchema", sql = "insert into t1 values(10)") must beSuccessful
       aSelect[java.lang.Long](mysqld, onSchema = "aSchema", sql = "select col1 from t1 where col1 = 10;") mustEqual 10
 
-      mysqld.reloadSchema(mysqldConfig)
+      mysqld.reloadSchema(schemaConfig)
 
       aSelect[java.lang.Long](mysqld, onSchema = "aSchema", sql = "select col1 from t1 where col1 = 10;") must
         failWith("Incorrect result size: expected 1, actual 0")
