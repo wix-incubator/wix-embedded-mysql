@@ -24,13 +24,14 @@ public class Mysql57Initializer implements Initializer {
         // TODO: wait until https://github.com/flapdoodle-oss/de.flapdoodle.embed.process/pull/41 is merged
         FileUtils.deleteDirectory(new File(baseDir, "data"));
 
-        Process p = Runtime.getRuntime().exec(new String[]{
+        Process p = Runtime.getRuntime().exec(new String[] {
                         files.executable().getAbsolutePath(),
                         "--no-defaults",
                         "--initialize-insecure",
+                        "--ignore-db-dir",
                         format("--basedir=%s", baseDir),
                         format("--datadir=%s/data", baseDir)});
 
-        ProcessRunner.run(p, runtimeConfig, config.getTimeout(NANOSECONDS));
+        new ProcessRunner(files.executable().getAbsolutePath()).run(p, runtimeConfig, config.getTimeout(NANOSECONDS));
     }
 }
