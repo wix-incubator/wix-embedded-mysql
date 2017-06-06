@@ -1,6 +1,7 @@
 package com.wix.mysql.support
 
 import java.util.UUID
+import java.util.concurrent.TimeUnit
 import javax.sql.DataSource
 
 import ch.qos.logback.classic.Level.INFO
@@ -80,7 +81,10 @@ abstract class IntegrationTest extends SpecWithJUnit with BeforeAfterEach
 }
 
 object IntegrationTest {
-  val testVersion: Version = Version.v5_7_latest
+  val targetTestVersion: Version = Version.v5_7_latest
+  def testConfigBuilder: MysqldConfig.Builder = MysqldConfig
+    .aMysqldConfig(targetTestVersion)
+    .withTimeout(60, TimeUnit.SECONDS)
 }
 
 trait JdbcSupport {

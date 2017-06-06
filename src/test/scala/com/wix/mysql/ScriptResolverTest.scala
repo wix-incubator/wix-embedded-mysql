@@ -1,7 +1,9 @@
 package com.wix.mysql
 
+import java.util
+
 import com.wix.mysql.ScriptResolver._
-import org.specs2.matcher.FileMatchers
+import org.specs2.matcher.{FileMatchers, Matcher}
 import org.specs2.mutable.SpecificationWithJUnit
 
 import scala.collection.convert.decorateAsScala._
@@ -89,15 +91,15 @@ class ScriptResolverTest extends SpecificationWithJUnit with FileMatchers {
     }
   }
 
-  def aScriptWith(fragment: String) =
+  def aScriptWith(fragment: String): Matcher[SqlScriptSource] =
     beAScriptWith(fragment)
 
-  def beAScriptWith(fragment: String) =
+  def beAScriptWith(fragment: String): Matcher[SqlScriptSource] =
     startWith(fragment) ^^ {
       (_: SqlScriptSource).read aka "script fragment mismatch"
     }
 
-  def containScripts(fragments: String*) =
+  def containScripts(fragments: String*): Matcher[util.List[SqlScriptSource]] =
     contain(exactly(fragments.map(aScriptWith): _*)).inOrder ^^ {
       (_: java.util.List[SqlScriptSource]).asScala
     }
