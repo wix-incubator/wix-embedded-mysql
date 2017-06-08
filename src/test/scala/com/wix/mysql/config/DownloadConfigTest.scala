@@ -5,8 +5,7 @@ import java.nio.file.Files
 
 import com.wix.mysql.EmbeddedMysql.anEmbeddedMysql
 import com.wix.mysql.config.DownloadConfig.aDownloadConfig
-import com.wix.mysql.distribution.Version
-import com.wix.mysql.support.IntegrationTest.{targetTestVersion, testConfigBuilder}
+import com.wix.mysql.support.IntegrationTest.testConfigBuilder
 import com.wix.mysql.support.{IntegrationTest, MysqlCacheServingHttpServer}
 import de.flapdoodle.embed.process.exceptions.DistributionException
 import org.apache.commons.io.FileUtils.deleteDirectory
