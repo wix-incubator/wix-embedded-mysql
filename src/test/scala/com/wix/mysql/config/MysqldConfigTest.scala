@@ -54,10 +54,19 @@ class MysqldConfigTest extends SpecWithJUnit {
         Seq("--some-int=123", "--some-string=one", "--some-boolean=false")
     }
 
+    "accept free port" in {
+      val mysqldConfig = aMysqldConfig(v5_6_latest)
+        .withFreePort()
+        .build()
+
+      mysqldConfig.getPort mustNotEqual 3310
+    }
+
     "fail if building with user 'root'" in {
       aMysqldConfig(v5_6_latest)
         .withUser("root", "doesnotmatter")
         .build() must throwA[IllegalArgumentException](message = "Usage of username 'root' is forbidden")
     }
+
   }
 }

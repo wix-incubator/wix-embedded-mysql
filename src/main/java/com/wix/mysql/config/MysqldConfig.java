@@ -5,6 +5,8 @@ import de.flapdoodle.embed.process.config.ExecutableProcessConfig;
 import de.flapdoodle.embed.process.config.ISupportConfig;
 import de.flapdoodle.embed.process.distribution.IVersion;
 
+import java.io.IOException;
+import java.net.ServerSocket;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.TimeZone;
@@ -115,6 +117,13 @@ public class MysqldConfig extends ExecutableProcessConfig {
         public Builder withPort(int port) {
             this.port = port;
             return this;
+        }
+
+        public Builder withFreePort() throws IOException {
+            try (ServerSocket socket = new ServerSocket(0)) {
+                socket.setReuseAddress(true);
+                return withPort(socket.getLocalPort());
+            }
         }
 
         public Builder withTimeout(long length, TimeUnit unit) {
