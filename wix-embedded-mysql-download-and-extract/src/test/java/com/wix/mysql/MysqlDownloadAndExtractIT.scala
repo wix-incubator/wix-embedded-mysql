@@ -50,7 +50,7 @@ class MysqlDownloadAndExtractIT extends SpecWithJUnit with Matchers with FileMat
   }
   private val Success = 0
   private def findMajorVersionDir(basedir: String, majorVersion: String): Either[String, File] =
-    findMajorVersionDir(installersContainerFolder(basedir), majorVersion)
+    installersContainerFolder(basedir).right.map(findMajorVersionDir(_, majorVersion)).joinRight
 
   private def findMajorVersionDir(installersContainerFolder: File, majorVersion: String) = {
     val installersFolders = installersContainerFolder.listFiles()
@@ -59,10 +59,11 @@ class MysqlDownloadAndExtractIT extends SpecWithJUnit with Matchers with FileMat
       s"did not contain a folder for *major* version ($majorVersion), children = ${installersFolders.toList}")
   }
 
-  private def installersContainerFolder(basedir: String): File =
+  private def installersContainerFolder(basedir: String) =
     osSpecificChildFolder(extractedInstallersFolder(basedir))
 
-  private def osSpecificChildFolder(downloadFolder: File) = downloadFolder.listFiles()(0)
+  private def osSpecificChildFolder(downloadFolder: File) =
+    downloadFolder.listFiles().toList.headOption.toRight(s"expected a file under ${downloadFolder.getAbsolutePath} but got none")
 
   private def extractedInstallersFolder(basedir: String): File = new File(basedir, "extracted")
 
