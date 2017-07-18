@@ -17,7 +17,7 @@ class MysqlDownloadAndExtractIT extends SpecWithJUnit with Matchers with FileMat
       val someVersion = "5.6"
       withTempDir { tempDir =>
 
-        run(mysqlDownloadAndExtractDeployable, tempDir, someVersion)
+        run(mysqlDownloadAndExtractDeployable, tempDir, someVersion) == Success
 
         extractedInstallersFolder(tempDir) must beADirectory and exist
       }
@@ -26,21 +26,21 @@ class MysqlDownloadAndExtractIT extends SpecWithJUnit with Matchers with FileMat
     "download-and-extract artifact according to input version" >> {
 
       "uses the major version" in {
-        val majorVersion = "5.5"
+        val majorVersion = "5.7"
         withTempDir { tempDir =>
 
-          run(mysqlDownloadAndExtractDeployable, tempDir, s"$majorVersion")
+          run(mysqlDownloadAndExtractDeployable, tempDir, s"$majorVersion") == Success
 
           findMajorVersionDir(tempDir, majorVersion) must beRight[File]
         }
       }
 
       "uses the minor version" in {
-        val someMajorVersion = "5.5"
-        val minorVersion = "40"
+        val someMajorVersion = "5.6"
+        val minorVersion = "35"
         withTempDir { tempDir =>
 
-          run(mysqlDownloadAndExtractDeployable, tempDir, someMajorVersion, minorVersion)
+          run(mysqlDownloadAndExtractDeployable, tempDir, someMajorVersion, minorVersion) == Success
 
           findMinorVersionDir(tempDir, someMajorVersion, minorVersion) must beRight[File]
         }
@@ -48,7 +48,7 @@ class MysqlDownloadAndExtractIT extends SpecWithJUnit with Matchers with FileMat
     }
 
   }
-
+  private val Success = 0
   private def findMajorVersionDir(basedir: String, majorVersion: String): Either[String, File] =
     findMajorVersionDir(installersContainerFolder(basedir), majorVersion)
 
@@ -85,7 +85,7 @@ class MysqlDownloadAndExtractIT extends SpecWithJUnit with Matchers with FileMat
     }
   }
 
-  private def run(runnable: Path, args: String*): Unit = {
+  private def run(runnable: Path, args: String*): Int = {
     import sys.process._
     ("java" +: "-jar" +: runnable.toAbsolutePath.toString +: args).mkString(" ").!
   }
