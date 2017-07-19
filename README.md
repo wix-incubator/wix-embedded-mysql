@@ -28,6 +28,7 @@ Add dependency to your pom.xml:
  - [Customizing download settings](#customizing-download-settings)
  - [Multiple schemas/databases](multiple-schemasdatabases)
  - [Resetting schemas between tests](#resetting-schemas-between-tests)
+ - [Using in a hermetic environment](#using-in-a-hermetic-environment)
 
 ### Basic usage example
 
@@ -51,7 +52,7 @@ mysqld.stop(); //optional, as there is a shutdown hook
 
 ### Customizing mysqld settings
 
-If you need more control in configuring embeded mysql instance, you can use [MysqldConfig](src/main/java/com/wix/mysql/config/MysqldConfig.java) builder:
+If you need more control in configuring embeded mysql instance, you can use [MysqldConfig](wix-embedded-mysql/src/main/java/com/wix/mysql/config/MysqldConfig.java) builder:
 
 ```java
 import com.wix.mysql.config.MysqldConfig;
@@ -86,7 +87,7 @@ mysqld.stop(); //optional, as there is a shutdown hook
 
 ### Customizing download settings
 
-In addition you can control additional settings of embedded mysql by providing configs that have base type of [AdditionalConfig](src/main/java/com/wix/mysql/config/AdditionalConfig.java) by providing those to `anEmbeddedMysql` builder:
+In addition you can control additional settings of embedded mysql by providing configs that have base type of [AdditionalConfig](wix-embedded-mysql/src/main/java/com/wix/mysql/config/AdditionalConfig.java) by providing those to `anEmbeddedMysql` builder:
 
 ```java
 import com.wix.mysql.EmbeddedMysql;
@@ -111,7 +112,7 @@ mysqld.stop(); //optional, as there is a shutdown hook
 
 ### Multiple schemas/databases
 
-EmbeddedMysql supports multiple schemas and additional configuration options provided via [SchemaConfig](src/main/java/com/wix/mysql/config/SchemaConfig.java) builder:
+EmbeddedMysql supports multiple schemas and additional configuration options provided via [SchemaConfig](wix-embedded-mysql/src/main/java/com/wix/mysql/config/SchemaConfig.java) builder:
 
 ```java
 import com.wix.mysql.EmbeddedMysql;
@@ -163,7 +164,14 @@ mysqld.reloadSchema("aschema", classPathScript("db/001_init.sql"));
 mysqld.stop(); //optional, as there is a shutdown hook
 ```
 
-Source for examples can be found [here](https://github.com/wix/wix-embedded-mysql/blob/master/src/test/scala/com/wix/mysql/JavaUsageExamplesTest.java)
+Source for examples can be found [here](https://github.com/wix/wix-embedded-mysql/blob/master/wix-embedded-mysql/src/test/scala/com/wix/mysql/JavaUsageExamplesTest.java)
+
+### Using in a hermetic environment
+
+Some build tools strongly encourages you to have tests which are isolated from the internet.  
+To support such a use-case you can use the `wix-embedded-mysql-download-and-extract` utility.  
+It produces a runnable jar (`wix-embedded-mysql-download-and-extract-2.2.7-SNAPSHOT-jar-with-dependencies.jar`) which you can call with `java -jar wix-embedded-mysql-download-and-extract-2.2.7-SNAPSHOT-jar-with-dependencies.jar $majorVersion $minorVersion` and it will download and extract the needed installer for you.  
+Additionally you should pass the download directory to your test so that it can configure your `DownloadConfig#withCacheDir` to use that directory instead of downloading it from the internet.
 
 # Dependencies
 Build on top of [de.flapdoodle.embed.process](https://github.com/flapdoodle-oss/de.flapdoodle.embed.process)
