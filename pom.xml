@@ -1,10 +1,9 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.wix</groupId>
     <artifactId>wix-embedded-mysql-modules</artifactId>
-    <version>2.2.7-SNAPSHOT</version>
+    <version>2.2.7</version>
     <name>Wix Embedded MySql Modules aggregator</name>
     <packaging>pom</packaging>
     
@@ -28,7 +27,7 @@
         <connection>scm:git:git@github.com:wix/wix-embedded-mysql.git</connection>
         <developerConnection>scm:git:git@github.com:wix/wix-embedded-mysql.git</developerConnection>
         <url>git@github.com:wix/wix-embedded-mysql.git</url>
-        <tag>HEAD</tag>
+        <tag>wix-embedded-mysql-modules-2.2.7</tag>
     </scm>
 
     <licenses>
