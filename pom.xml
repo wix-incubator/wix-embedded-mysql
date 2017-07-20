@@ -5,8 +5,10 @@
     <artifactId>wix-embedded-mysql-modules</artifactId>
     <version>2.2.9-SNAPSHOT</version>
     <name>Wix Embedded MySql Modules aggregator</name>
+    <description>Wix Embedded MySql Modules aggregator</description>
+    <url>https://github.com/wix/wix-embedded-mysql</url>
     <packaging>pom</packaging>
-    
+
     <modules>
         <module>wix-embedded-mysql</module>
         <module>wix-embedded-mysql-download-and-extract</module>

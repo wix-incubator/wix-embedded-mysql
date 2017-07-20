@@ -6,7 +6,7 @@
     <version>2.2.9-SNAPSHOT</version>
     <name>Wix Embedded MySql</name>
     <description>Embedded MySql for E2E/IT tests</description>
-    <url>https://github.com/wix/wix-embedded-mysql</url>
+    <url>https://github.com/wix/wix-embedded-mysql/tree/master/wix-embedded-mysql</url>
 
     <parent>
         <groupId>com.wix</groupId>
