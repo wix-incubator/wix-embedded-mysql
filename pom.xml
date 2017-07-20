@@ -1,12 +1,17 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.wix</groupId>
-    <artifactId>wix-embedded-mysql</artifactId>
+    <artifactId>wix-embedded-mysql-modules</artifactId>
     <version>2.2.7-SNAPSHOT</version>
-    <name>Wix Embedded MySql</name>
-    <description>Embedded MySql for E2E/IT tests</description>
-    <url>https://github.com/wix/wix-embedded-mysql</url>
+    <name>Wix Embedded MySql Modules aggregator</name>
+    <packaging>pom</packaging>
+    
+    <modules>
+        <module>wix-embedded-mysql</module>
+        <module>wix-embedded-mysql-download-and-extract</module>
+    </modules>
 
     <developers>
         <developer>
@@ -40,94 +45,10 @@
         <encoding>UTF-8</encoding>
 
         <flapdoodle.process.version>1.50.1</flapdoodle.process.version>
-        <spring.jdbc.version>4.2.5.RELEASE</spring.jdbc.version>
-        <mysql.connector.version>5.1.38</mysql.connector.version>
-        <slf4j.version>1.7.10</slf4j.version>
-        <logback.version>1.1.6</logback.version>
         <scala.library.version>2.11</scala.library.version>
         <scala.version>2.11.7</scala.version>
         <specs2.version>3.7.1</specs2.version>
     </properties>
-
-    <dependencies>
-
-        <dependency>
-            <groupId>de.flapdoodle.embed</groupId>
-            <artifactId>de.flapdoodle.embed.process</artifactId>
-            <version>${flapdoodle.process.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-            <version>${logback.version}</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-jdbc</artifactId>
-            <version>${spring.jdbc.version}</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-            <version>${mysql.connector.version}</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-dbcp2</artifactId>
-            <version>2.1.1</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.scala-lang</groupId>
-            <artifactId>scala-library</artifactId>
-            <version>${scala.version}</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.specs2</groupId>
-            <artifactId>specs2-core_${scala.library.version}</artifactId>
-            <version>${specs2.version}</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.specs2</groupId>
-            <artifactId>specs2-junit_${scala.library.version}</artifactId>
-            <version>${specs2.version}</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.specs2</groupId>
-            <artifactId>specs2-matcher-extra_${scala.library.version}</artifactId>
-            <version>${specs2.version}</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.nanohttpd</groupId>
-            <artifactId>nanohttpd-nanolets</artifactId>
-            <version>2.3.1</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>jar</groupId>
-            <artifactId>external-jar-with-schemas</artifactId>
-            <version>1.0.1</version>
-            <scope>test</scope>
-        </dependency>
-
-    </dependencies>
 
     <build>
         <plugins>
@@ -155,6 +76,27 @@
                     </systemPropertyVariables>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>2.19.1</version>
+                <configuration>
+                    <skipAfterFailureCount>1</skipAfterFailureCount>
+                    <systemPropertyVariables>
+                        <!-- appveyor ci has old version of jna (3.5) which clashes with one shipped with a library (4.0) -->
+                        <jna.nosys>true</jna.nosys>
+                    </systemPropertyVariables>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
@@ -259,3 +201,4 @@
     </repositories>
 
 </project>
+
