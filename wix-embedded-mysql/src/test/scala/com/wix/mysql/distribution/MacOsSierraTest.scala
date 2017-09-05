@@ -26,7 +26,7 @@ class MacOsSierraTest extends SpecWithJUnit with Around with AroundEach {
     val currentOsName = getProperty("os.name")
     val currentOsVersion = getProperty("os.version")
 
-    setProperty("os.name", "Mac OS X");
+    setProperty("os.name", "Mac OS X")
     setProperty("os.version", "10.12")
 
     try AsResult(r)
