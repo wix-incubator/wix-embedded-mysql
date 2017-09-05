@@ -17,10 +17,10 @@ before_install:
 matrix:
     fast_finish: true
     include:
-        - os: linux
-          dist: trusty
-          sudo: required
-          jdk: openjdk7
+#        - os: linux
+#          dist: trusty
+#          sudo: required
+#          jdk: openjdk7
 # disabling due to crypting travis failure out of nowhere
 #        - os: linux
 #          dist: trusty
