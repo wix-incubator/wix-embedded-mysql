@@ -81,6 +81,7 @@ class DownloadConfigTest extends IntegrationTest with FileMatchers {
 
   def withTempDir[T](f: String => T): T = {
     val tempDir = Files.createTempDirectory("embed-mysql-test").toFile
+    println(tempDir.getAbsolutePath)
 
     try {
       f(tempDir.getAbsolutePath)
