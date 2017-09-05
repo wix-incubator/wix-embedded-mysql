@@ -41,14 +41,14 @@
     </licenses>
 
     <properties>
-        <maven.compiler.source>1.7</maven.compiler.source>
-        <maven.compiler.target>1.7</maven.compiler.target>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
         <encoding>UTF-8</encoding>
 
-        <flapdoodle.process.version>1.50.1</flapdoodle.process.version>
-        <scala.library.version>2.11</scala.library.version>
-        <scala.version>2.11.7</scala.version>
-        <specs2.version>3.7.1</specs2.version>
+        <flapdoodle.process.version>2.0.1</flapdoodle.process.version>
+        <scala.library.version>2.12</scala.library.version>
+        <scala.version>2.12.3</scala.version>
+        <specs2.version>3.9.5</specs2.version>
     </properties>
 
     <build>
