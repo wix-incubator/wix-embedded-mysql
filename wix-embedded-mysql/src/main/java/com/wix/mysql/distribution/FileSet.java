@@ -12,7 +12,8 @@ public class FileSet {
             new Win57FileSetEmitter(),
             new Nix55FileSetEmitter(),
             new Nix56FileSetEmitter(),
-            new Nix57FileSetEmitter());
+            new Nix57FileSetEmitter(),
+            new Nix57_18_AndUpFileSetEmitter());
 
     public static de.flapdoodle.embed.process.config.store.FileSet emit(
             final Platform platform,
