@@ -85,6 +85,11 @@ class DownloadConfigTest extends IntegrationTest with FileMatchers {
 
     try {
       f(tempDir.getAbsolutePath)
+    } catch {
+      case e: Throwable => {
+        println(e)
+        throw e
+      }
     } finally {
       deleteDirectory(tempDir)
     }
