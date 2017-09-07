@@ -9,20 +9,18 @@ import java.util.Objects;
 import static de.flapdoodle.embed.process.config.store.FileType.Executable;
 import static de.flapdoodle.embed.process.config.store.FileType.Library;
 
-public class Win57FileSetEmitter implements FileSetEmitter {
+public class Win57_18_UpFileSetEmitter implements FileSetEmitter {
     @Override
     public boolean matches(Platform platform, Version version) {
-        return !platform.isUnixLike() &&
-                Objects.equals(version.getMajorVersion(), "5.7") &&
-                version.getMinorVersion() <= 17;
+        return !platform.isUnixLike()
+                && Objects.equals(version.getMajorVersion(), "5.7")
+                && version.getMinorVersion() > 17;
     }
 
     @Override
     public FileSet emit() {
         return FileSet.builder()
                 .addEntry(Executable, "bin/mysqld.exe")
-                .addEntry(Library, "bin/msvcp120.dll")
-                .addEntry(Library, "bin/msvcr120.dll")
                 .addEntry(Library, "bin/mysql.exe")
                 .addEntry(Library, "bin/mysqladmin.exe")
                 .addEntry(Library, "share/english/errmsg.sys")

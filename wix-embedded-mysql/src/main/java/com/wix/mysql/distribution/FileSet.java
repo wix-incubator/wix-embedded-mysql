@@ -10,6 +10,7 @@ public class FileSet {
     private static List<FileSetEmitter> emitters = Collections.newArrayList(
             new Win56FileSetEmitter(),
             new Win57FileSetEmitter(),
+            new Win57_18_UpFileSetEmitter(),
             new Nix55FileSetEmitter(),
             new Nix56FileSetEmitter(),
             new Nix57FileSetEmitter(),
