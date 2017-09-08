@@ -35,6 +35,8 @@ class VersionTest extends SpecWithJUnit with AroundEach {
     "Linux" in {
       givenPlatformSetTo(Linux)
       v5_7_15.asInDownloadPath mustEqual "/MySQL-5.7/mysql-5.7.15-linux-glibc2.5"
+      v5_7_18.asInDownloadPath mustEqual "/MySQL-5.7/mysql-5.7.18-linux-glibc2.5"
+      v5_7_19.asInDownloadPath mustEqual  "/MySQL-5.7/mysql-5.7.19-linux-glibc2.12"
     }
 
   }
