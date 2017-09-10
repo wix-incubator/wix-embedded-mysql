@@ -86,7 +86,7 @@ public enum Version implements IVersion {
     }
 
     private boolean worksOnMacOsSierra() {
-        return !majorVersion.equals("5.7") || minorVersion >= 15;
+        return currentPlatform() == Platform.OS_X && !majorVersion.equals("5.7") || minorVersion >= 15;
     }
 
     @Override
