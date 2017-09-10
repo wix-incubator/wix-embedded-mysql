@@ -9,8 +9,9 @@ import org.specs2.specification.AroundEach
 import org.specs2.specification.core.Fragment
 
 class MacOsSierraTest extends SpecWithJUnit with Around with AroundEach {
+  sequential
 
-  val unsupportedVersions = Version.values filter (!_.supportsCurrentPlatform)
+  val unsupportedVersions: Array[Version] = Version.values filter (!_.supportsCurrentPlatform)
 
   Fragment.foreach(unsupportedVersions) { version =>
 
