@@ -9,9 +9,8 @@ import org.specs2.specification.AroundEach
 import org.specs2.specification.core.Fragment
 
 class MacOsSierraTest extends SpecWithJUnit with Around with AroundEach {
-  sequential
 
-  val unsupportedVersions: Array[Version] = Version.values filter (!_.supportsCurrentPlatform)
+  val unsupportedVersions = Version.values filter (!_.supportsCurrentPlatform)
 
   Fragment.foreach(unsupportedVersions) { version =>
 
@@ -27,7 +26,7 @@ class MacOsSierraTest extends SpecWithJUnit with Around with AroundEach {
     val currentOsName = getProperty("os.name")
     val currentOsVersion = getProperty("os.version")
 
-    setProperty("os.name", "Mac OS X")
+    setProperty("os.name", "Mac OS X");
     setProperty("os.version", "10.12")
 
     try AsResult(r)
