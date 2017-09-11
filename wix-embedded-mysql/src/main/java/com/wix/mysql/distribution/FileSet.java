@@ -10,9 +10,11 @@ public class FileSet {
     private static List<FileSetEmitter> emitters = Collections.newArrayList(
             new Win56FileSetEmitter(),
             new Win57FileSetEmitter(),
+            new Win57_18_UpFileSetEmitter(),
             new Nix55FileSetEmitter(),
             new Nix56FileSetEmitter(),
-            new Nix57FileSetEmitter());
+            new Nix57FileSetEmitter(),
+            new Nix57_18_AndUpFileSetEmitter());
 
     public static de.flapdoodle.embed.process.config.store.FileSet emit(
             final Platform platform,
