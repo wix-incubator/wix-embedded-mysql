@@ -4,7 +4,7 @@
 
     <groupId>com.wix</groupId>
     <artifactId>wix-embedded-mysql-download-and-extract</artifactId>
-    <version>2.2.10-SNAPSHOT</version>
+    <version>2.2.11-SNAPSHOT</version>
     <name>Wix Embedded Mysql Download and Extract</name>
     <description>Cli tool to predownload/precache mysql artifacts for wix-embedded-mysql</description>
     <url>https://github.com/wix/wix-embedded-mysql/tree/master/wix-embedded-mysql-download-and-extract</url>
@@ -12,7 +12,7 @@
     <parent>
         <groupId>com.wix</groupId>
         <artifactId>wix-embedded-mysql-modules</artifactId>
-        <version>2.2.10-SNAPSHOT</version>
+        <version>2.2.11-SNAPSHOT</version>
     </parent>
 
     <dependencies>
@@ -20,7 +20,7 @@
         <dependency>
             <groupId>com.wix</groupId>
             <artifactId>wix-embedded-mysql</artifactId>
-            <version>2.2.10-SNAPSHOT</version>
+            <version>2.2.11-SNAPSHOT</version>
         </dependency>
 
         <dependency>
