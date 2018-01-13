@@ -193,5 +193,8 @@ Build on top of [de.flapdoodle.embed.process](https://github.com/flapdoodle-oss/
 sudo apt-get install libaio1
 ```
 
-#License
+# License
 Use of this source code is governed by a [BSD License](LICENSE.md), which basically means you can use and modify it freely.
+
+# Similar project
+[MariaDB4j](https://github.com/vorburger/MariaDB4j) is an unrelated similar project.
