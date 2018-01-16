@@ -10,14 +10,10 @@ import com.wix.mysql.config.MysqldConfig.{SystemDefaults, aMysqldConfig}
 import com.wix.mysql.config.SchemaConfig.aSchemaConfig
 import com.wix.mysql.distribution.Version
 import com.wix.mysql.exceptions.CommandFailedException
-import com.wix.mysql.support.IntegrationTest
 import com.wix.mysql.support.IntegrationTest._
-import de.flapdoodle.embed.process.io.directories.UserHome
-import org.apache.commons.io.FileUtils.deleteDirectory
-import org.littleshoot.proxy.HttpProxyServer
-import org.littleshoot.proxy.impl.DefaultHttpProxyServer
+import com.wix.mysql.support.{HttpProxyServerSupport, IntegrationTest}
 
-class EmbeddedMysqlTest extends IntegrationTest {
+class EmbeddedMysqlTest extends IntegrationTest with HttpProxyServerSupport {
 
   "EmbeddedMysql instance" should {
 
@@ -52,33 +48,17 @@ class EmbeddedMysqlTest extends IntegrationTest {
         haveSystemVariable("basedir", contain(pathFor(tempDir, "/mysql-5.7-")))
     }
 
-    def cleanDownloadedFiles() = deleteDirectory(new UserHome(".embedmysql").asFile())
-
-    def withProxyOn[T](port: Int)(f: Int => T): T = {
-      val proxyBootstrap = DefaultHttpProxyServer.bootstrap().withPort(port)
-      var proxyServer: Option[HttpProxyServer] = None
-
-      try {
-        proxyServer = Some(proxyBootstrap.start())
-        f(port)
-      } finally {
-        proxyServer.map(_.stop())
-      }
-    }
 
     "allow to provide network proxy" in {
-      withProxyOn(3210) { port =>
-        cleanDownloadedFiles()
-
+      withProxyOn(3210) { (proxy, port) =>
         val config = aMysqldConfig(Version.v5_7_latest).build
 
-        val mysqld = anEmbeddedMysql(config)
+        val mysqld = start(anEmbeddedMysql(config)
           .withDownloadConfig(aDownloadConfig().withHttpProxy("127.0.0.1", port).build())
-          .addSchema("aschema")
-          .start
+          .addSchema("aschema"))
 
         mysqld must beAvailableOn(config, "aschema")
-
+        proxy.wasDownloaded must beTrue
       }
     }
 
@@ -249,5 +229,4 @@ class EmbeddedMysqlTest extends IntegrationTest {
   def pathFor(basedir: String, subdir: String): String = {
     new File(basedir, subdir).getPath
   }
-
 }
