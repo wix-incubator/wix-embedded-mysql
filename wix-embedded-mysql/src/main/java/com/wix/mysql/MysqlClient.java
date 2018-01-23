@@ -58,7 +58,7 @@ class MysqlClient {
                     "--protocol=tcp",
                     "--host=localhost",
                     "--password=",
-                    format("--default-character-set=$s", effectiveCharset.getCharset()),
+                    format("--default-character-set=%s", effectiveCharset.getCharset()),
                     format("--user=%s", SystemDefaults.USERNAME),
                     format("--port=%s", config.getPort()),
                     schemaName}).start();
