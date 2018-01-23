@@ -16,6 +16,6 @@ public class Mysql57CommandEmitter implements CommandEmitter {
 
     @Override
     public List<String> emit(MysqldConfig config, IExtractedFileSet exe) throws IOException {
-        return Collections.newArrayList("--show_compatibility_56=ON");
+        return Collections.newArrayList("--show_compatibility_56=ON", "--log_syslog=0");
     }
 }
