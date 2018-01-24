@@ -16,7 +16,7 @@ before_install:
 # to work-around jvm buffer overflow
  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo hostname "$(hostname | cut -c1-63)"; fi
 # to simulate https://github.com/wix/wix-embedded-mysql/issues/104
- - cp wix-embedded-mysql/src/test/resources/.my.cnf ~/
+ - cp wix-embedded-mysql/src/test/resources/my.cnf ~/
 
 matrix:
     fast_finish: true
