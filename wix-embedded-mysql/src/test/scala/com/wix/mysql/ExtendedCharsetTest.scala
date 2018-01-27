@@ -13,6 +13,7 @@ class ExtendedCharsetTest extends IntegrationTest {
 
 //    "support non-latin characters" in {
 //      val config = testConfigBuilder
+//        .withCharset(Charset.UTF8MB4)
 //        .withUser("你", "好").build
 //
 //      val mysqld = start(anEmbeddedMysql(config))

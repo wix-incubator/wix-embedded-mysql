@@ -1,6 +1,7 @@
 package com.wix.mysql.support
 
 import java.io.{File => JFile}
+import java.nio.charset.Charset
 import java.util.UUID
 
 import org.apache.commons.io.FileUtils
@@ -12,7 +13,7 @@ trait TestResourceSupport {
   def createTempFile(content: String): JFile = {
     testResourceDirExists()
     val file = new JFile(s"$targetDir/classes/${UUID.randomUUID}")
-    FileUtils.writeStringToFile(file, content)
+    FileUtils.writeStringToFile(file, content, Charset.forName("UTF-8"))
     file
   }
 
