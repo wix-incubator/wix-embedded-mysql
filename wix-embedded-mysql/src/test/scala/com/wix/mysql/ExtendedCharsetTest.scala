@@ -11,15 +11,15 @@ class ExtendedCharsetTest extends IntegrationTest {
 
   "EmbeddedMysql instance" should {
 
-//    "support non-latin characters" in {
-//      val config = testConfigBuilder
-//        .withCharset(Charset.UTF8MB4)
-//        .withUser("你", "好").build
-//
-//      val mysqld = start(anEmbeddedMysql(config))
-//
-//      mysqld must beAvailableOn(3310, "你", "好", SystemDefaults.SCHEMA)
-//    }
+    "support non-latin characters" in {
+      val config = testConfigBuilder
+        .withCharset(Charset.UTF8MB4)
+        .withUser("你", "好").build
+
+      val mysqld = start(anEmbeddedMysql(config))
+
+      mysqld must beAvailableOn(3310, "你", "好", SystemDefaults.SCHEMA)
+    }
 
     "support migration from file with extended charset" in {
       val mysqld = start(anEmbeddedMysql(testConfigBuilder.withCharset(Charset.UTF8MB4).build)
