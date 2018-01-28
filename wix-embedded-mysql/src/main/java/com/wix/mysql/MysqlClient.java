@@ -63,7 +63,7 @@ class MysqlClient {
                     format("--port=%s", config.getPort()),
                     schemaName}).start();
 
-            IOUtils.copy(new StringReader(sql), p.getOutputStream(), java.nio.charset.Charset.forName("UTF-8"));
+            IOUtils.copy(new StringReader(sql), p.getOutputStream(), java.nio.charset.Charset.defaultCharset());
             p.getOutputStream().close();
 
             if (p.waitFor() != 0) {
