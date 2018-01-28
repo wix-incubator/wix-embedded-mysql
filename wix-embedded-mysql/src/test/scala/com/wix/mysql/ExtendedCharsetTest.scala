@@ -11,7 +11,7 @@ class ExtendedCharsetTest extends IntegrationTest {
 
   "EmbeddedMysql instance" should {
 
-    "support non-latin characters for login/password" in {
+    "support non-latin characters" in {
       val config = testConfigBuilder
         .withCharset(Charset.UTF8MB4)
         .withUser("你", "好").build
