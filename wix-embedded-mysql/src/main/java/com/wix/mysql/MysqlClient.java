@@ -1,5 +1,6 @@
 package com.wix.mysql;
 
+import com.wix.mysql.config.Charset;
 import com.wix.mysql.config.MysqldConfig;
 import com.wix.mysql.config.MysqldConfig.SystemDefaults;
 import com.wix.mysql.exceptions.CommandFailedException;
@@ -8,7 +9,6 @@ import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.nio.charset.Charset;
 import java.nio.file.Paths;
 import java.util.List;
 
@@ -21,11 +21,17 @@ class MysqlClient {
     private final MysqldConfig config;
     private final MysqldExecutable executable;
     private final String schemaName;
+    private final Charset effectiveCharset;
 
-    public MysqlClient(final MysqldConfig config, final MysqldExecutable executable, final String schemaName) {
+    public MysqlClient(
+            final MysqldConfig config,
+            final MysqldExecutable executable,
+            final String schemaName,
+            final Charset effectiveCharset) {
         this.config = config;
         this.executable = executable;
         this.schemaName = schemaName;
+        this.effectiveCharset = effectiveCharset;
     }
 
     void executeScripts(final List<SqlScriptSource> sqls) {
@@ -52,11 +58,12 @@ class MysqlClient {
                     "--protocol=tcp",
                     "--host=localhost",
                     "--password=",
+                    format("--default-character-set=%s", effectiveCharset.getCharset()),
                     format("--user=%s", SystemDefaults.USERNAME),
                     format("--port=%s", config.getPort()),
                     schemaName}).start();
 
-            IOUtils.copy(new StringReader(sql), p.getOutputStream(), Charset.defaultCharset());
+            IOUtils.copy(new StringReader(sql), p.getOutputStream(), java.nio.charset.Charset.defaultCharset());
             p.getOutputStream().close();
 
             if (p.waitFor() != 0) {
