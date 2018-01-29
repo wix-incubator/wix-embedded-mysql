@@ -12,6 +12,7 @@ class ScriptResolverTest extends SpecificationWithJUnit with FileMatchers {
   val contentsOf001Init = "create table t1 "
   val contentsOf002Update = "create table t2 "
   val contentsOf003Update = "create table t3 "
+  val contentsOf004Update = "create table t1 "
   val contentsOf001InitInJar = "create table t1_jar"
   val contentsOf002UpdateInJar = "create table t2_jar"
 
@@ -33,11 +34,19 @@ class ScriptResolverTest extends SpecificationWithJUnit with FileMatchers {
   "classPathFiles" should {
 
     "resolve multiple classPath files" in {
-      classPathFiles("/db/*.sql") must containScripts(contentsOf001Init, contentsOf002Update, contentsOf003Update)
+      classPathFiles("/db/*.sql") must containScripts(
+        contentsOf001Init,
+        contentsOf002Update,
+        contentsOf003Update,
+        contentsOf004Update)
     }
 
     "resolve multiple classPath files without preceding '/'" in {
-      classPathFiles("db/*.sql") must containScripts(contentsOf001Init, contentsOf002Update, contentsOf003Update)
+      classPathFiles("db/*.sql") must containScripts(
+        contentsOf001Init,
+        contentsOf002Update,
+        contentsOf003Update,
+        contentsOf004Update)
     }
 
     "throw a ScriptResolutionException if no classPathFiles are found" in {
@@ -71,11 +80,19 @@ class ScriptResolverTest extends SpecificationWithJUnit with FileMatchers {
   "classPathScripts" should {
 
     "resolve multiple classPath files" in {
-      classPathScripts("/db/*.sql") must containScripts(contentsOf001Init, contentsOf002Update, contentsOf003Update)
+      classPathScripts("/db/*.sql") must containScripts(
+        contentsOf001Init,
+        contentsOf002Update,
+        contentsOf003Update,
+        contentsOf004Update)
     }
 
     "resolve multiple classPath files without preceding '/'" in {
-      classPathScripts("db/*.sql") must containScripts(contentsOf001Init, contentsOf002Update, contentsOf003Update)
+      classPathScripts("db/*.sql") must containScripts(
+        contentsOf001Init,
+        contentsOf002Update,
+        contentsOf003Update,
+        contentsOf004Update)
     }
 
     "resolve multiple classPath scripts within jar in classpath" in {

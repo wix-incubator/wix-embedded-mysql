@@ -44,7 +44,7 @@ public class EmbeddedMysql {
 
         try {
             executable.start();
-            getClient(SCHEMA).executeCommands(
+            getClient(SCHEMA, mysqldConfig.getCharset()).executeCommands(
                     format("CREATE USER '%s'@'%%' IDENTIFIED BY '%s';", mysqldConfig.getUsername(), mysqldConfig.getPassword()));
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -68,19 +68,20 @@ public class EmbeddedMysql {
         addSchema(config);
     }
 
-    public void dropSchema(final SchemaConfig config) {
-        getClient(SystemDefaults.SCHEMA).executeCommands(format("DROP DATABASE %s", config.getName()));
+    public void dropSchema(final SchemaConfig schema) {
+        Charset effectiveCharset = or(schema.getCharset(), config.getCharset());
+        getClient(SystemDefaults.SCHEMA, effectiveCharset).executeCommands(format("DROP DATABASE %s", schema.getName()));
     }
 
     public EmbeddedMysql addSchema(final SchemaConfig schema) {
         Charset effectiveCharset = or(schema.getCharset(), config.getCharset());
 
-        getClient(SystemDefaults.SCHEMA).executeCommands(
+        getClient(SystemDefaults.SCHEMA, effectiveCharset).executeCommands(
                 format("CREATE DATABASE %s CHARACTER SET = %s COLLATE = %s;",
                         schema.getName(), effectiveCharset.getCharset(), effectiveCharset.getCollate()),
                 format("GRANT ALL ON %s.* TO '%s'@'%%';", schema.getName(), config.getUsername()));
 
-        MysqlClient client = getClient(schema.getName());
+        MysqlClient client = getClient(schema.getName(), effectiveCharset);
         client.executeScripts(schema.getScripts());
 
         return this;
@@ -92,8 +93,8 @@ public class EmbeddedMysql {
         }
     }
 
-    private MysqlClient getClient(final String schemaName) {
-        return new MysqlClient(config, executable, schemaName);
+    private MysqlClient getClient(final String schemaName, final Charset charset) {
+        return new MysqlClient(config, executable, schemaName, charset);
     }
 
     public static Builder anEmbeddedMysql(
