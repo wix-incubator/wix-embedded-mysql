@@ -87,8 +87,8 @@ public class DownloadConfig implements AdditionalConfig {
             return this;
         }
 
-        public Builder withHttpProxy(final String host, final int port) {
-            this.proxyFactory = new HttpProxyFactory(host, port);
+        public Builder withProxy(final IProxyFactory proxy) {
+            this.proxyFactory = proxy;
             return this;
         }
 

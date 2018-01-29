@@ -7,6 +7,8 @@ import com.wix.mysql.EmbeddedMysql._
 import com.wix.mysql.config.Charset._
 import com.wix.mysql.config.DownloadConfig.aDownloadConfig
 import com.wix.mysql.config.MysqldConfig.{SystemDefaults, aMysqldConfig}
+import com.wix.mysql.config.ProxyFactory
+import com.wix.mysql.config.ProxyFactory.aHttpProxy
 import com.wix.mysql.config.SchemaConfig.aSchemaConfig
 import com.wix.mysql.distribution.Version
 import com.wix.mysql.exceptions.CommandFailedException
@@ -54,7 +56,7 @@ class EmbeddedMysqlTest extends IntegrationTest with HttpProxyServerSupport {
         val config = aMysqldConfig(Version.v5_7_latest).build
 
         val mysqld = start(anEmbeddedMysql(config)
-          .withDownloadConfig(aDownloadConfig().withHttpProxy("127.0.0.1", port).build())
+          .withDownloadConfig(aDownloadConfig().withProxy(aHttpProxy("127.0.0.1", port)).build())
           .addSchema("aschema"))
 
         mysqld must beAvailableOn(config, "aschema")
