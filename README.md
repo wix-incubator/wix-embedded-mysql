@@ -96,8 +96,10 @@ import static com.wix.mysql.EmbeddedMysql.anEmbeddedMysql;
 import static com.wix.mysql.ScriptResolver.classPathScript;
 import static com.wix.mysql.distribution.Version.v5_7_latest;
 import static com.wix.mysql.config.DownloadConfig.aDownloadConfig;
+import static com.wix.mysql.config.ProxyFactory.aHttpProxy;
 
 DownloadConfig downloadConfig = aDownloadConfig()
+    .withProxy(aHttpProxy("remote.host", 8080))
     .withCacheDir(System.getProperty("java.io.tmpdir"))
     .build();
 

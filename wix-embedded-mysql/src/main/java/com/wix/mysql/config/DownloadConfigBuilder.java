@@ -19,6 +19,7 @@ public class DownloadConfigBuilder extends de.flapdoodle.embed.process.config.st
         userAgent().setDefault(new UserAgent("Mozilla/5.0 (compatible; Embedded MySql; +https://github.com/wix/wix-embedded-mysql)"));
         packageResolver().setDefault(new PackagePaths());
         timeoutConfig().setDefault(new TimeoutConfigBuilder().connectionTimeout(10000).readTimeout(60000).build());
+        proxyFactory().setDefault(downloadConfig.getProxyFactory());
         return this;
     }
 }

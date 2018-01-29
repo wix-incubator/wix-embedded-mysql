@@ -1,5 +1,6 @@
 package com.wix.mysql;
 
+import com.wix.mysql.config.DownloadConfig;
 import com.wix.mysql.config.MysqldConfig;
 import com.wix.mysql.config.SchemaConfig;
 import org.junit.Ignore;
@@ -12,7 +13,9 @@ import static com.wix.mysql.ScriptResolver.classPathScript;
 import static com.wix.mysql.ScriptResolver.classPathScripts;
 import static com.wix.mysql.config.Charset.LATIN1;
 import static com.wix.mysql.config.Charset.UTF8;
+import static com.wix.mysql.config.DownloadConfig.aDownloadConfig;
 import static com.wix.mysql.config.MysqldConfig.aMysqldConfig;
+import static com.wix.mysql.config.ProxyFactory.aHttpProxy;
 import static com.wix.mysql.config.SchemaConfig.aSchemaConfig;
 import static com.wix.mysql.distribution.Version.v5_6_latest;
 import static com.wix.mysql.distribution.Version.v5_7_latest;
@@ -124,5 +127,21 @@ public class JavaUsageExamplesTest {
 
         mysqld.stop(); //optional, as there is a shutdown hook
     }
+
+    @Test
+    public void httpProxy() {
+        DownloadConfig downloadConfig = aDownloadConfig()
+                .withProxy(aHttpProxy("remote.host", 8080))
+                .build();
+
+        EmbeddedMysql mysqld = anEmbeddedMysql(v5_6_latest, downloadConfig)
+                .addSchema("aschema", classPathScript("db/001_init.sql"))
+                .start();
+
+        //do work
+
+        mysqld.stop(); //optional, as there is a shutdown hook
+    }
+
 
 }

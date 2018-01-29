@@ -5,13 +5,17 @@ import java.util.concurrent.TimeUnit
 
 import com.wix.mysql.EmbeddedMysql._
 import com.wix.mysql.config.Charset._
+import com.wix.mysql.config.DownloadConfig.aDownloadConfig
 import com.wix.mysql.config.MysqldConfig.{SystemDefaults, aMysqldConfig}
+import com.wix.mysql.config.ProxyFactory
+import com.wix.mysql.config.ProxyFactory.aHttpProxy
 import com.wix.mysql.config.SchemaConfig.aSchemaConfig
+import com.wix.mysql.distribution.Version
 import com.wix.mysql.exceptions.CommandFailedException
-import com.wix.mysql.support.IntegrationTest
 import com.wix.mysql.support.IntegrationTest._
+import com.wix.mysql.support.{HttpProxyServerSupport, IntegrationTest}
 
-class EmbeddedMysqlTest extends IntegrationTest {
+class EmbeddedMysqlTest extends IntegrationTest with HttpProxyServerSupport {
 
   "EmbeddedMysql instance" should {
 
@@ -45,6 +49,21 @@ class EmbeddedMysqlTest extends IntegrationTest {
         haveServerTimezoneMatching("US/Michigan") and
         haveSystemVariable("basedir", contain(pathFor(tempDir, "/mysql-5.7-")))
     }
+
+
+    "allow to provide network proxy" in {
+      withProxyOn(3210) { (proxy, port) =>
+        val config = aMysqldConfig(Version.v5_7_latest).build
+
+        val mysqld = start(anEmbeddedMysql(config)
+          .withDownloadConfig(aDownloadConfig().withProxy(aHttpProxy("127.0.0.1", port)).build())
+          .addSchema("aschema"))
+
+        mysqld must beAvailableOn(config, "aschema")
+        proxy.wasDownloaded must beTrue
+      }
+    }
+
 
     "accept system variables" in {
       val config = testConfigBuilder
@@ -212,5 +231,4 @@ class EmbeddedMysqlTest extends IntegrationTest {
   def pathFor(basedir: String, subdir: String): String = {
     new File(basedir, subdir).getPath
   }
-
 }

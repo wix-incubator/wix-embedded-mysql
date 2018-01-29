@@ -30,7 +30,6 @@ public class EmbeddedMysql {
     protected EmbeddedMysql(
             final MysqldConfig mysqldConfig,
             final DownloadConfig downloadConfig) {
-
         logger.info("Preparing EmbeddedMysql version '{}'...", mysqldConfig.getVersion());
         this.config = mysqldConfig;
         IRuntimeConfig runtimeConfig = new RuntimeConfigBuilder().defaults(mysqldConfig, downloadConfig).build();
@@ -127,7 +126,7 @@ public class EmbeddedMysql {
 
     public static class Builder {
         private final MysqldConfig mysqldConfig;
-        private final DownloadConfig downloadConfig;
+        private DownloadConfig downloadConfig;
         private List<SchemaConfig> schemas = new ArrayList<>();
 
         public Builder(
@@ -135,6 +134,11 @@ public class EmbeddedMysql {
                 final DownloadConfig downloadConfig) {
             this.mysqldConfig = mysqldConfig;
             this.downloadConfig = downloadConfig;
+        }
+
+        public Builder withDownloadConfig(final DownloadConfig downloadConfig) {
+            this.downloadConfig = downloadConfig;
+            return this;
         }
 
         public Builder addSchema(final String name, final SqlScriptSource... scripts) {

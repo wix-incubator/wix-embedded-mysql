@@ -1,15 +1,27 @@
 package com.wix.mysql.config;
 
+import de.flapdoodle.embed.process.config.store.HttpProxyFactory;
+import de.flapdoodle.embed.process.config.store.IProxyFactory;
+import de.flapdoodle.embed.process.config.store.NoProxyFactory;
+
 import java.io.File;
 
 public class DownloadConfig implements AdditionalConfig {
-
     private final String cacheDir;
-    private String baseUrl;
+    private final String baseUrl;
+    private final IProxyFactory proxyFactory;
 
-    DownloadConfig(final String cacheDir, final String baseUrl) {
+    private DownloadConfig(
+            final String cacheDir,
+            final String baseUrl,
+            final IProxyFactory proxy) {
         this.cacheDir = cacheDir;
         this.baseUrl = baseUrl;
+        this.proxyFactory = proxy;
+    }
+
+    public IProxyFactory getProxyFactory() {
+        return proxyFactory;
     }
 
     /**
@@ -19,10 +31,10 @@ public class DownloadConfig implements AdditionalConfig {
     public String getDownloadCacheDir() {
         return cacheDir;
     }
+
     public String getCacheDir() {
         return cacheDir;
     }
-
 
     public String getBaseUrl() {
         return baseUrl;
@@ -33,6 +45,7 @@ public class DownloadConfig implements AdditionalConfig {
     }
 
     public static class Builder {
+        private IProxyFactory proxyFactory = new NoProxyFactory();
         private String cacheDir = new File(System.getProperty("user.home"), ".embedmysql").getPath();
         private String baseUrl = "https://dev.mysql.com/get/Downloads/";
 
@@ -74,9 +87,14 @@ public class DownloadConfig implements AdditionalConfig {
             return this;
         }
 
+        public Builder withProxy(final IProxyFactory proxy) {
+            this.proxyFactory = proxy;
+            return this;
+        }
 
         public DownloadConfig build() {
-            return new DownloadConfig(cacheDir, baseUrl);
+            return new DownloadConfig(cacheDir, baseUrl, proxyFactory);
+
         }
     }
 }
