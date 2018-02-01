@@ -10,17 +10,21 @@ import org.slf4j.LoggerFactory;
 
 import static de.flapdoodle.embed.process.io.Processors.logTo;
 import static de.flapdoodle.embed.process.io.Slf4jLevel.DEBUG;
+import static de.flapdoodle.embed.process.io.Slf4jLevel.ERROR;
 
 public class RuntimeConfigBuilder extends de.flapdoodle.embed.process.config.RuntimeConfigBuilder {
 
     private Logger logger = LoggerFactory.getLogger(MysqldProcess.class);
-    private IStreamProcessor log = logTo(logger, DEBUG);
+    private IStreamProcessor output = logTo(logger, DEBUG);
+    private IStreamProcessor error = logTo(logger, ERROR);
+    private IStreamProcessor commands = logTo(logger, DEBUG);
+
 
     public RuntimeConfigBuilder defaults(
             final MysqldConfig mysqldConfig,
             final DownloadConfig downloadConfig) {
 
-        processOutput().setDefault(new ProcessOutput(log, log, log));
+        processOutput().setDefault(new ProcessOutput(output, error, commands));
         commandLinePostProcessor().setDefault(new ICommandLinePostProcessor.Noop());
         artifactStore().setDefault(new SafeExtractedArtifactStoreBuilder().defaults(mysqldConfig, downloadConfig).build());
 
