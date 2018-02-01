@@ -7,7 +7,6 @@ import de.flapdoodle.embed.process.io.IStreamProcessor;
 import de.flapdoodle.embed.process.io.Processors;
 import de.flapdoodle.embed.process.io.ReaderProcessor;
 import de.flapdoodle.embed.process.io.StreamToLineProcessor;
-import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -36,7 +35,7 @@ final class ProcessRunner {
             if (retCode != 0) {
                 processorOne.join(10000);
                 processorTwo.join(10000);
-                resolveException(retCode, IOUtils.toString(p.getInputStream()) + IOUtils.toString(p.getErrorStream()));
+                resolveException(retCode, wrapped.getOutput());
             }
 
         } catch (InterruptedException e) {
