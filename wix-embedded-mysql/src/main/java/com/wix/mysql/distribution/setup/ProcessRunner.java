@@ -1,38 +1,41 @@
 package com.wix.mysql.distribution.setup;
 
 import com.wix.mysql.exceptions.MissingDependencyException;
-import com.wix.mysql.io.NotifyingStreamProcessor;
 import com.wix.mysql.io.TimingOutProcessExecutor;
 import de.flapdoodle.embed.process.config.IRuntimeConfig;
 import de.flapdoodle.embed.process.io.IStreamProcessor;
 import de.flapdoodle.embed.process.io.Processors;
+import de.flapdoodle.embed.process.io.ReaderProcessor;
 import de.flapdoodle.embed.process.io.StreamToLineProcessor;
-import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.concurrent.TimeUnit;
 
 import static java.lang.String.format;
 
 final class ProcessRunner {
 
-    final TimingOutProcessExecutor tope;
+    private final TimingOutProcessExecutor tope;
 
     ProcessRunner(String cmd) {
         this.tope = new TimingOutProcessExecutor(cmd);
     }
 
     void run(Process p, IRuntimeConfig runtimeConfig, long timeoutNanos) throws IOException {
-        IStreamProcessor outputWatch = StreamToLineProcessor.wrap(runtimeConfig.getProcessOutput().getOutput());
+        CollectingAndForwardingStreamProcessor wrapped =
+                new CollectingAndForwardingStreamProcessor(runtimeConfig.getProcessOutput().getOutput());
+        IStreamProcessor loggingWatch = StreamToLineProcessor.wrap(wrapped);
+
         try {
-            Processors.connect(new InputStreamReader(p.getInputStream()), outputWatch);
-            Processors.connect(new InputStreamReader(p.getErrorStream()), outputWatch);
+            ReaderProcessor processorOne = Processors.connect(new InputStreamReader(p.getInputStream()), loggingWatch);
+            ReaderProcessor processorTwo = Processors.connect(new InputStreamReader(p.getErrorStream()), loggingWatch);
 
             int retCode = tope.waitFor(p, timeoutNanos);
 
             if (retCode != 0) {
-                resolveException(retCode, IOUtils.toString(p.getInputStream()) + IOUtils.toString(p.getErrorStream()));
+                processorOne.join(10000);
+                processorTwo.join(10000);
+                resolveException(retCode, wrapped.getOutput());
             }
 
         } catch (InterruptedException e) {
@@ -48,6 +51,28 @@ final class ProcessRunner {
                             "For details see: http://bugs.mysql.com/bug.php?id=60544");
         } else {
             throw new RuntimeException(format("Command exited with error code: '%s' and output: '%s'", retCode, output));
+        }
+    }
+
+    public static class CollectingAndForwardingStreamProcessor implements IStreamProcessor {
+        volatile String output = "";
+        final IStreamProcessor forwardTo;
+
+        CollectingAndForwardingStreamProcessor(IStreamProcessor forwardTo) {
+            this.forwardTo = forwardTo;
+        }
+
+        public void process(String block) {
+            output = output + block;
+            forwardTo.process(block);
+        }
+
+        public void onProcessed() {
+            forwardTo.onProcessed();
+        }
+
+        String getOutput() {
+            return output;
         }
     }
 }
