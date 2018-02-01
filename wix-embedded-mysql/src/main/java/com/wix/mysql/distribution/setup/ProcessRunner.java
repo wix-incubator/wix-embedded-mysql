@@ -55,8 +55,8 @@ final class ProcessRunner {
     }
 
     public static class CollectingAndForwardingStreamProcessor implements IStreamProcessor {
-        String output = "";
-        boolean processed = false;
+        volatile String output = "";
+        volatile boolean processed = false;
         final IStreamProcessor forwardTo;
 
         CollectingAndForwardingStreamProcessor(IStreamProcessor forwardTo) {
@@ -64,7 +64,7 @@ final class ProcessRunner {
         }
 
         public void process(String block) {
-            output += block;
+            output = output + block;
             forwardTo.process(block);
         }
 
@@ -73,7 +73,7 @@ final class ProcessRunner {
             forwardTo.onProcessed();
         }
 
-        public boolean isProcessed() {
+        boolean isProcessed() {
             return processed;
         }
 
