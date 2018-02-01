@@ -32,6 +32,7 @@ final class ProcessRunner {
             int retCode = tope.waitFor(p, timeoutNanos);
 
             if (retCode != 0) {
+                System.out.println("retCode " + retCode);
                 resolveException(retCode, wrapped.getOutput());
             }
 
@@ -70,7 +71,7 @@ final class ProcessRunner {
         }
 
         String getOutput() {
-            System.out.println("outout" + output);
+            System.out.println("outout " + output);
             return output;
         }
     }
