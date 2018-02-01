@@ -32,9 +32,6 @@ final class ProcessRunner {
 
             if (retCode != 0) {
                 System.out.println("retCode " + retCode);
-                while (!wrapped.isProcessed()) {
-                  Thread.sleep(100);
-                }
                 resolveException(retCode, wrapped.getOutput());
             }
 
