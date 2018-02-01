@@ -29,6 +29,7 @@ public class TimingOutProcessExecutor {
             }
             rem = timeoutNanos - (System.nanoTime() - startTime);
         } while (rem > 0);
+        //TODO: this might be incorrect altogether - need to connect sooner
         String collectedOutput = IOUtils.toString(p.getInputStream()) + IOUtils.toString(p.getErrorStream());
         p.destroy();
         throw new InterruptedException(format("Timeout of %s sec exceeded while waiting for '%s' to complete. Collected output: %s",
