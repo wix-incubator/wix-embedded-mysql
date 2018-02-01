@@ -27,35 +27,7 @@ class DownloadConfigTest extends IntegrationTest with FileMatchers {
       }
     }
 
-    "uses custom download base url" in {
-      withTempDir { tempDir =>
-        val downloadConfig = aDownloadConfig()
-          .withCacheDir(tempDir)
-          .withBaseUrl(s"http://localhost:2222")
-          .build()
 
-        start(anEmbeddedMysql(testConfigBuilder.build, downloadConfig)) must throwA[DistributionException].like {
-          case e => e.getMessage must contain("Could not open inputStream for http://localhost:2222/MySQL-5.7")
-        }
-      }
-    }
-
-    "downloads via custom download base url" in new context {
-      val mysqldConfig = testConfigBuilder.build
-
-      ensureVersionPresentInCache(mysqldConfig)
-
-      withTempDir { tempDir =>
-        val downloadConfig = aDownloadConfig()
-          .withDownloadCacheDir(tempDir)
-          .withBaseUrl(s"http://localhost:${httpServer.port}")
-          .build()
-
-        start(anEmbeddedMysql(mysqldConfig, downloadConfig))
-
-        aPath(tempDir, "extracted") must beADirectory and exist
-      }
-    }
 
   }
 
