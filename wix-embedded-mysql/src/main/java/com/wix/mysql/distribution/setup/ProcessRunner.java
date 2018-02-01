@@ -5,6 +5,7 @@ import com.wix.mysql.io.TimingOutProcessExecutor;
 import de.flapdoodle.embed.process.config.IRuntimeConfig;
 import de.flapdoodle.embed.process.io.IStreamProcessor;
 import de.flapdoodle.embed.process.io.Processors;
+import de.flapdoodle.embed.process.io.ReaderProcessor;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -25,12 +26,14 @@ final class ProcessRunner {
         IStreamProcessor loggingWatch = runtimeConfig.getProcessOutput().getOutput();
 
         try {
-            Processors.connect(new InputStreamReader(p.getInputStream()), loggingWatch);
-            Processors.connect(new InputStreamReader(p.getErrorStream()), loggingWatch);
+            ReaderProcessor processorOne = Processors.connect(new InputStreamReader(p.getInputStream()), loggingWatch);
+            ReaderProcessor processorTwo = Processors.connect(new InputStreamReader(p.getErrorStream()), loggingWatch);
 
             int retCode = tope.waitFor(p, timeoutNanos);
 
             if (retCode != 0) {
+                processorOne.join(10000);
+                processorTwo.join(10000);
                 System.out.println("retCode " + retCode);
                 resolveException(retCode, wrapped.getOutput());
             }
