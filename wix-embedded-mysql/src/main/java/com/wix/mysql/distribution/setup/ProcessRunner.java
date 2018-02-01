@@ -70,6 +70,7 @@ final class ProcessRunner {
         }
 
         String getOutput() {
+            System.out.println("outout" + output);
             return output;
         }
     }
