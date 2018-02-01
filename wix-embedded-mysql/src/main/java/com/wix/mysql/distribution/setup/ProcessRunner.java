@@ -29,12 +29,11 @@ final class ProcessRunner {
         CollectingOutputStreamProcessor collectingWatch = new CollectingOutputStreamProcessor();
 
         try {
-            Processors.connect(new InputStreamReader(p.getInputStream()), loggingWatch);
-            Processors.connect(new InputStreamReader(p.getErrorStream()), loggingWatch);
+//            Processors.connect(new InputStreamReader(p.getInputStream()), loggingWatch);
+//            Processors.connect(new InputStreamReader(p.getErrorStream()), loggingWatch);
 
             Processors.connect(new InputStreamReader(p.getInputStream()), collectingWatch);
             Processors.connect(new InputStreamReader(p.getErrorStream()), collectingWatch);
-
 
             int retCode = tope.waitFor(p, timeoutNanos);
 
