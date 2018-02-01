@@ -23,7 +23,7 @@ final class ProcessRunner {
     void run(Process p, IRuntimeConfig runtimeConfig, long timeoutNanos) throws IOException {
         CollectingAndForwardingOutputStreamProcessor wrapped =
                 new CollectingAndForwardingOutputStreamProcessor(runtimeConfig.getProcessOutput().getOutput());
-        IStreamProcessor loggingWatch = StreamToLineProcessor.wrap(wrapped);
+        IStreamProcessor loggingWatch = wrapped;
 
         try {
             Processors.connect(new InputStreamReader(p.getInputStream()), loggingWatch);
