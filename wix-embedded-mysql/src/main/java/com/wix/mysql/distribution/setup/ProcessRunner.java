@@ -4,6 +4,7 @@ import com.wix.mysql.exceptions.MissingDependencyException;
 import com.wix.mysql.io.NotifyingStreamProcessor;
 import com.wix.mysql.io.TimingOutProcessExecutor;
 import de.flapdoodle.embed.process.config.IRuntimeConfig;
+import de.flapdoodle.embed.process.config.io.ProcessOutput;
 import de.flapdoodle.embed.process.io.IStreamProcessor;
 import de.flapdoodle.embed.process.io.Processors;
 import de.flapdoodle.embed.process.io.StreamToLineProcessor;
@@ -24,15 +25,21 @@ final class ProcessRunner {
     }
 
     void run(Process p, IRuntimeConfig runtimeConfig, long timeoutNanos) throws IOException {
-        IStreamProcessor outputWatch = StreamToLineProcessor.wrap(runtimeConfig.getProcessOutput().getOutput());
+        IStreamProcessor loggingWatch = StreamToLineProcessor.wrap(runtimeConfig.getProcessOutput().getOutput());
+        CollectingOutputStreamProcessor collectingWatch = new CollectingOutputStreamProcessor();
+
         try {
-            Processors.connect(new InputStreamReader(p.getInputStream()), outputWatch);
-            Processors.connect(new InputStreamReader(p.getErrorStream()), outputWatch);
+            Processors.connect(new InputStreamReader(p.getInputStream()), loggingWatch);
+            Processors.connect(new InputStreamReader(p.getErrorStream()), loggingWatch);
+
+            Processors.connect(new InputStreamReader(p.getInputStream()), collectingWatch);
+            Processors.connect(new InputStreamReader(p.getErrorStream()), collectingWatch);
+
 
             int retCode = tope.waitFor(p, timeoutNanos);
 
             if (retCode != 0) {
-                resolveException(retCode, IOUtils.toString(p.getInputStream()) + IOUtils.toString(p.getErrorStream()));
+                resolveException(retCode, collectingWatch.getOutput());
             }
 
         } catch (InterruptedException e) {
@@ -48,6 +55,21 @@ final class ProcessRunner {
                             "For details see: http://bugs.mysql.com/bug.php?id=60544");
         } else {
             throw new RuntimeException(format("Command exited with error code: '%s' and output: '%s'", retCode, output));
+        }
+    }
+
+    public static class CollectingOutputStreamProcessor implements IStreamProcessor {
+        String output = "";
+
+        public void process(String block) {
+            output += block;
+        }
+
+        public void onProcessed() {
+        }
+
+        public String getOutput() {
+            return output;
         }
     }
 }
