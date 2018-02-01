@@ -5,7 +5,6 @@ import com.wix.mysql.io.TimingOutProcessExecutor;
 import de.flapdoodle.embed.process.config.IRuntimeConfig;
 import de.flapdoodle.embed.process.io.IStreamProcessor;
 import de.flapdoodle.embed.process.io.Processors;
-import de.flapdoodle.embed.process.io.StreamToLineProcessor;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -21,8 +20,8 @@ final class ProcessRunner {
     }
 
     void run(Process p, IRuntimeConfig runtimeConfig, long timeoutNanos) throws IOException {
-        CollectingAndForwardingOutputStreamProcessor wrapped =
-                new CollectingAndForwardingOutputStreamProcessor(runtimeConfig.getProcessOutput().getOutput());
+        CollectingAndForwardingStreamProcessor wrapped =
+                new CollectingAndForwardingStreamProcessor(runtimeConfig.getProcessOutput().getOutput());
         IStreamProcessor loggingWatch = runtimeConfig.getProcessOutput().getOutput();
 
         try {
@@ -33,6 +32,9 @@ final class ProcessRunner {
 
             if (retCode != 0) {
                 System.out.println("retCode " + retCode);
+                while (!wrapped.isProcessed()) {
+                  Thread.sleep(100);
+                }
                 resolveException(retCode, wrapped.getOutput());
             }
 
@@ -52,28 +54,34 @@ final class ProcessRunner {
         }
     }
 
-    public static class CollectingAndForwardingOutputStreamProcessor implements IStreamProcessor {
+    public static class CollectingAndForwardingStreamProcessor implements IStreamProcessor {
         String output = "";
+        boolean processed = false;
         final IStreamProcessor forwardTo;
 
-        CollectingAndForwardingOutputStreamProcessor(IStreamProcessor forwardTo) {
+        CollectingAndForwardingStreamProcessor(IStreamProcessor forwardTo) {
             this.forwardTo = forwardTo;
         }
 
         public void process(String block) {
-            System.out.println("qwe" + block);
             output += block;
             forwardTo.process(block);
         }
 
         public void onProcessed() {
-            System.out.println("processed");
+            this.processed = true;
             forwardTo.onProcessed();
         }
 
+        public boolean isProcessed() {
+            return processed;
+        }
+
+
         String getOutput() {
-            System.out.println("outout " + output);
             return output;
         }
+
+
     }
 }
