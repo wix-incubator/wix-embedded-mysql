@@ -29,8 +29,8 @@ final class ProcessRunner {
         CollectingOutputStreamProcessor collectingWatch = new CollectingOutputStreamProcessor();
 
         try {
-//            Processors.connect(new InputStreamReader(p.getInputStream()), loggingWatch);
-//            Processors.connect(new InputStreamReader(p.getErrorStream()), loggingWatch);
+            Processors.connect(new InputStreamReader(p.getInputStream()), loggingWatch);
+            Processors.connect(new InputStreamReader(p.getErrorStream()), loggingWatch);
 
             Processors.connect(new InputStreamReader(p.getInputStream()), collectingWatch);
             Processors.connect(new InputStreamReader(p.getErrorStream()), collectingWatch);
@@ -61,6 +61,7 @@ final class ProcessRunner {
         String output = "";
 
         public void process(String block) {
+            System.out.println("qwe" + block);
             output += block;
         }
 
