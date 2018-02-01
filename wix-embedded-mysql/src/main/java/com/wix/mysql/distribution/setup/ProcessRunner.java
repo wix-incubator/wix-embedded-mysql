@@ -69,6 +69,7 @@ final class ProcessRunner {
         }
 
         public void onProcessed() {
+            System.out.println("processed");
             this.processed = true;
             forwardTo.onProcessed();
         }
