@@ -6,6 +6,7 @@ import de.flapdoodle.embed.process.config.IRuntimeConfig;
 import de.flapdoodle.embed.process.io.IStreamProcessor;
 import de.flapdoodle.embed.process.io.Processors;
 import de.flapdoodle.embed.process.io.ReaderProcessor;
+import de.flapdoodle.embed.process.io.StreamToLineProcessor;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -23,7 +24,7 @@ final class ProcessRunner {
     void run(Process p, IRuntimeConfig runtimeConfig, long timeoutNanos) throws IOException {
         CollectingAndForwardingStreamProcessor wrapped =
                 new CollectingAndForwardingStreamProcessor(runtimeConfig.getProcessOutput().getOutput());
-        IStreamProcessor loggingWatch = runtimeConfig.getProcessOutput().getOutput();
+        IStreamProcessor loggingWatch = StreamToLineProcessor.wrap(wrapped);
 
         try {
             ReaderProcessor processorOne = Processors.connect(new InputStreamReader(p.getInputStream()), loggingWatch);
