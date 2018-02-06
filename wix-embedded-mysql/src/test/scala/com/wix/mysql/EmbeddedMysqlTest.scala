@@ -179,6 +179,17 @@ class EmbeddedMysqlTest extends IntegrationTest with HttpProxyServerSupport {
       aQuery(mysqld, onSchema = "aSchema", sql = "select count(col1) from t3;") must beSuccessful
       aQuery(mysqld, onSchema = "aSchema", sql = "select count(col2) from t4;") must beSuccessful
     }
+
+    "quote created table name" in {
+      val config = aSchemaConfig("a-table")
+        .withScripts(aMigrationWith("create table t1 (col1 INTEGER);"))
+        .build
+
+      val mysqld = start(anEmbeddedMysql(testConfigBuilder.build).addSchema(config))
+
+      aQuery(mysqld, onSchema = "a-table", sql = "select count(col1) from t1;") must beSuccessful
+    }
+
   }
 
   "EmbeddedMysql schema modification" should {

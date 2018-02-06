@@ -77,9 +77,9 @@ public class EmbeddedMysql {
         Charset effectiveCharset = or(schema.getCharset(), config.getCharset());
 
         getClient(SystemDefaults.SCHEMA, effectiveCharset).executeCommands(
-                format("CREATE DATABASE %s CHARACTER SET = %s COLLATE = %s;",
+                format("CREATE DATABASE `%s` CHARACTER SET = %s COLLATE = %s;",
                         schema.getName(), effectiveCharset.getCharset(), effectiveCharset.getCollate()),
-                format("GRANT ALL ON %s.* TO '%s'@'%%';", schema.getName(), config.getUsername()));
+                format("GRANT ALL ON `%s`.* TO '%s'@'%%';", schema.getName(), config.getUsername()));
 
         MysqlClient client = getClient(schema.getName(), effectiveCharset);
         client.executeScripts(schema.getScripts());
