@@ -24,6 +24,7 @@ public class NixBefore57Initializer implements Initializer {
         File baseDir = files.baseDir();
         Process p = Runtime.getRuntime().exec(new String[]{
                         "scripts/mysql_install_db",
+                        "--force",
                         "--no-defaults",
                         format("--basedir=%s", baseDir),
                         format("--datadir=%s/data", baseDir)},
