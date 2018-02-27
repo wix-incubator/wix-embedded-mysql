@@ -3,7 +3,7 @@
 
     <groupId>com.wix</groupId>
     <artifactId>wix-embedded-mysql</artifactId>
-    <version>4.0.1</version>
+    <version>4.0.2-SNAPSHOT</version>
     <name>Wix Embedded MySql</name>
     <description>Embedded MySql for E2E/IT tests</description>
     <url>https://github.com/wix/wix-embedded-mysql/tree/master/wix-embedded-mysql</url>
@@ -11,7 +11,7 @@
     <parent>
         <groupId>com.wix</groupId>
         <artifactId>wix-embedded-mysql-modules</artifactId>
-        <version>4.0.1</version>
+        <version>4.0.2-SNAPSHOT</version>
     </parent>
 
     <properties>
