@@ -4,10 +4,10 @@ import java.io.File
 import java.util.concurrent.TimeUnit
 
 import com.wix.mysql.EmbeddedMysql._
+import com.wix.mysql.ScriptResolver.classPathScript
 import com.wix.mysql.config.Charset._
 import com.wix.mysql.config.DownloadConfig.aDownloadConfig
 import com.wix.mysql.config.MysqldConfig.{SystemDefaults, aMysqldConfig}
-import com.wix.mysql.config.ProxyFactory
 import com.wix.mysql.config.ProxyFactory.aHttpProxy
 import com.wix.mysql.config.SchemaConfig.aSchemaConfig
 import com.wix.mysql.distribution.Version
@@ -236,6 +236,32 @@ class EmbeddedMysqlTest extends IntegrationTest with HttpProxyServerSupport {
       mysqld must haveSchemaCharsetOf(UTF8MB4, schemaConfig.getName)
 
       mysqld.addSchema(schemaConfig) must throwA[CommandFailedException]
+    }
+  }
+  
+  "EmbeddedMysql sql execution" should {
+    
+    "Execute arbitrary scripts without dropping existing data" in {
+      val schemaName = "aSchema"
+      
+      val config = aSchemaConfig(schemaName)
+        .withScripts(aMigrationWith("create table t1 (col1 INTEGER);"))
+        .build
+
+      val mysqld = start(anEmbeddedMysql(testConfigBuilder.build))
+        .addSchema(config)
+
+      def rowCountInTable() = aSelect[java.lang.Long](mysqld, onSchema = schemaName, sql = "select count(*) from t1;")
+      
+      rowCountInTable() mustEqual 0
+      
+      mysqld.executeScripts(schemaName, classPathScript("data/arbitrary_script.sql"))
+
+      rowCountInTable() mustEqual 1
+      
+      mysqld.executeScripts(schemaName, classPathScript("data/arbitrary_script.sql"))
+
+      rowCountInTable() mustEqual 2
     }
   }
 

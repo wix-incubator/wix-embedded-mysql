@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
@@ -71,6 +72,14 @@ public class EmbeddedMysql {
     public void dropSchema(final SchemaConfig schema) {
         Charset effectiveCharset = or(schema.getCharset(), config.getCharset());
         getClient(SystemDefaults.SCHEMA, effectiveCharset).executeCommands(format("DROP DATABASE %s", schema.getName()));
+    }
+    
+    public void executeScripts(final String schemaName, final SqlScriptSource... scripts) {
+        getClient(schemaName, config.getCharset()).executeScripts(Arrays.asList(scripts));
+    }
+    
+    public void executeScripts(final String schemaName, final List<SqlScriptSource> scripts) {
+        getClient(schemaName, config.getCharset()).executeScripts(scripts);
     }
 
     public EmbeddedMysql addSchema(final SchemaConfig schema) {
