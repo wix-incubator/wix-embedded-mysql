@@ -51,7 +51,7 @@ public class ScriptResolver {
             JarFile jar;
 
             try {
-                jar = new JarFile(URLDecoder.decode(jarPath, "UTF-8"));
+                jar = new JarFile(jarPath);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
