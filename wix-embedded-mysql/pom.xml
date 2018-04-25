@@ -19,6 +19,7 @@
         <mysql.connector.version>5.1.38</mysql.connector.version>
         <slf4j.version>1.7.10</slf4j.version>
         <logback.version>1.1.6</logback.version>
+        <commons-compress.version>1.14</commons-compress.version>
     </properties>
 
     <dependencies>
@@ -27,18 +28,12 @@
             <groupId>de.flapdoodle.embed</groupId>
             <artifactId>de.flapdoodle.embed.process</artifactId>
             <version>${flapdoodle.process.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.apache.commons</groupId>
-                    <artifactId>commons-compress</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
 
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-compress</artifactId>
-            <version>1.14</version>
+            <version>${commons-compress.version}</version>
         </dependency>
 
         <dependency>
