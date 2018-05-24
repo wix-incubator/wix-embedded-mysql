@@ -33,7 +33,6 @@ matrix:
           jdk: openjdk10
         - os: osx
           language: java
-          jdk: oraclejdk8
 
 notifications:
   email:
