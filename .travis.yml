@@ -28,7 +28,8 @@ matrix:
           dist: trusty
           sudo: required
           jdk: oraclejdk9
-        - os: linux
+        - env: JDK='Oracle JDK 10'
+          os: linux
           dist: trusty
           sudo: required
           install: . ./install-jdk.sh -F 10 -L BCL # until jdk10 is available
