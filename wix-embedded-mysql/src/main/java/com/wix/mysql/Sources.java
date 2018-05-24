@@ -1,7 +1,6 @@
 package com.wix.mysql;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
+import com.wix.mysql.utils.Utils;
 
 import java.io.File;
 import java.io.IOException;
@@ -44,7 +43,7 @@ public class Sources {
 
         @Override
         public String read() throws IOException {
-            return FileUtils.readFileToString(str);
+            return new String(java.nio.file.Files.readAllBytes(str.toPath()));
         }
     }
 
@@ -57,12 +56,8 @@ public class Sources {
 
         @Override
         public String read() throws IOException {
-            InputStream in = url.openStream();
-
-            try {
-                return IOUtils.toString(in);
-            } finally {
-                IOUtils.closeQuietly(in);
+            try (InputStream in = url.openStream()) {
+                return Utils.streamToString(in);
             }
         }
     }

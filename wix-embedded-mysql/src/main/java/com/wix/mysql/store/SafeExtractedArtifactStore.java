@@ -4,9 +4,9 @@ import de.flapdoodle.embed.process.config.store.IDownloadConfig;
 import de.flapdoodle.embed.process.distribution.Distribution;
 import de.flapdoodle.embed.process.extract.DirectoryAndExecutableNaming;
 import de.flapdoodle.embed.process.extract.IExtractedFileSet;
+import de.flapdoodle.embed.process.io.file.Files;
 import de.flapdoodle.embed.process.store.ExtractedArtifactStore;
 import de.flapdoodle.embed.process.store.IDownloader;
-import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,7 +25,7 @@ class SafeExtractedArtifactStore extends ExtractedArtifactStore {
 
     @Override
     public IExtractedFileSet extractFileSet(Distribution distribution) throws IOException {
-        FileUtils.deleteDirectory(new File(directory));
+        Files.forceDelete(new File(directory));
 
         return super.extractFileSet(distribution);
     }
