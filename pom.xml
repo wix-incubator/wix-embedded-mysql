@@ -45,7 +45,7 @@
         <maven.compiler.target>1.8</maven.compiler.target>
         <encoding>UTF-8</encoding>
 
-        <flapdoodle.process.version>2.0.1</flapdoodle.process.version>
+        <flapdoodle.process.version>2.0.3</flapdoodle.process.version>
         <scala.library.version>2.12</scala.library.version>
         <scala.version>2.12.6</scala.version>
         <specs2.version>3.8.9</specs2.version>
