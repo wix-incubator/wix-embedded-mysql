@@ -11,6 +11,7 @@ public class FileSet {
             new Win56FileSetEmitter(),
             new Win57FileSetEmitter(),
             new Win57_18_UpFileSetEmitter(),
+            new Win8FileSetEmitter(),
             new Nix55FileSetEmitter(),
             new Nix56FileSetEmitter(),
             new Nix57FileSetEmitter(),
