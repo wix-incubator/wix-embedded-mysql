@@ -19,8 +19,6 @@ public class Win8FileSetEmitter implements FileSetEmitter {
     public FileSet emit() {
         return FileSet.builder()
                 .addEntry(Executable, "bin/mysqld.exe")
-                .addEntry(Library, "bin/msvcp120.dll")
-                .addEntry(Library, "bin/msvcr120.dll")
                 .addEntry(Library, "bin/mysql.exe")
                 .addEntry(Library, "bin/mysqladmin.exe")
                 .addEntry(Library, "share/english/errmsg.sys")
