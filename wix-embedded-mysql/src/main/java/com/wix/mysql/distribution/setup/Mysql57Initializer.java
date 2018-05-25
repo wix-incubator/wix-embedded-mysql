@@ -4,7 +4,7 @@ import com.wix.mysql.config.MysqldConfig;
 import com.wix.mysql.distribution.Version;
 import de.flapdoodle.embed.process.config.IRuntimeConfig;
 import de.flapdoodle.embed.process.extract.IExtractedFileSet;
-import de.flapdoodle.embed.process.io.file.Files;
+import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -22,7 +22,7 @@ public class Mysql57Initializer implements Initializer {
     public void apply(IExtractedFileSet files, IRuntimeConfig runtimeConfig, MysqldConfig config) throws IOException {
         File baseDir = files.baseDir();
         // TODO: wait until https://github.com/flapdoodle-oss/de.flapdoodle.embed.process/pull/41 is merged
-        Files.forceDelete(new File(baseDir, "data"));
+        FileUtils.deleteDirectory(new File(baseDir, "data"));
 
         Process p = Runtime.getRuntime().exec(new String[] {
                         files.executable().getAbsolutePath(),

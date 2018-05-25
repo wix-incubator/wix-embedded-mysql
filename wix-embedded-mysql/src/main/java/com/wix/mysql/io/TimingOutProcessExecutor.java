@@ -1,6 +1,6 @@
 package com.wix.mysql.io;
 
-import com.wix.mysql.utils.Utils;
+import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
 
@@ -29,11 +29,8 @@ public class TimingOutProcessExecutor {
             }
             rem = timeoutNanos - (System.nanoTime() - startTime);
         } while (rem > 0);
-
-        String collectedOutput = Utils.streamToString(p.getInputStream()) + Utils.streamToString(p.getErrorStream());
-
+        String collectedOutput = IOUtils.toString(p.getInputStream()) + IOUtils.toString(p.getErrorStream());
         p.destroy();
-
         throw new InterruptedException(format("Timeout of %s sec exceeded while waiting for '%s' to complete. Collected output: %s",
                 NANOSECONDS.toSeconds(timeoutNanos),
                 this.cmd,

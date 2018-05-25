@@ -2,6 +2,7 @@ package com.wix.mysql.support
 
 import java.util.UUID
 import java.util.concurrent.TimeUnit
+import javax.sql.DataSource
 
 import ch.qos.logback.classic.Level.INFO
 import ch.qos.logback.classic.spi.ILoggingEvent
@@ -11,34 +12,26 @@ import com.wix.mysql.config.MysqldConfig
 import com.wix.mysql.distribution.Version
 import com.wix.mysql.{EmbeddedMysql, Sources, SqlScriptSource}
 import de.flapdoodle.embed.process.io.directories.UserHome
-import javax.sql.DataSource
 import org.apache.commons.dbcp2.BasicDataSource
 import org.apache.commons.io.FileUtils._
 import org.slf4j
 import org.slf4j.LoggerFactory
 import org.slf4j.LoggerFactory.getLogger
-import org.specs2.execute.{AsResult, Result}
 import org.specs2.mutable.SpecWithJUnit
-import org.specs2.specification.AroundEach
+import org.specs2.specification.BeforeAfterEach
 import org.springframework.dao.DataAccessException
 import org.springframework.jdbc.core.JdbcTemplate
 
 import scala.collection.JavaConversions._
 import scala.reflect._
 
-abstract class IntegrationTest extends SpecWithJUnit with AroundEach
+abstract class IntegrationTest extends SpecWithJUnit with BeforeAfterEach
   with InstanceMatchers with TestResourceSupport with JdbcSupport {
 
   sequential
 
   var mysqldInstances: Seq[EmbeddedMysql] = Seq()
   val log: slf4j.Logger = getLogger(this.getClass)
-
-  def around[R: AsResult](r: => R): Result = {
-    mysqldInstances = Seq()
-    try AsResult(r)
-    finally mysqldInstances.foreach(_.stop)
-  }
 
   def before: Any = mysqldInstances = Seq()
 

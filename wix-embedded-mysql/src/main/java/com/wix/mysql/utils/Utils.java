@@ -1,11 +1,9 @@
 package com.wix.mysql.utils;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.Reader;
 import java.nio.CharBuffer;
 import java.util.List;
-import java.util.Scanner;
 import java.util.TimeZone;
 
 import static java.lang.String.format;
@@ -13,14 +11,6 @@ import static java.util.concurrent.TimeUnit.HOURS;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 public class Utils {
-
-    public static String streamToString(InputStream s) {
-        try (Scanner scanner = new Scanner(s).useDelimiter("\\A")) {
-            return scanner.next();
-        }
-
-    }
-
     public static void closeCloseables(Reader... readers) {
 
         for (Reader reader : readers) {

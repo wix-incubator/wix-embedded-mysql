@@ -4,7 +4,6 @@ import com.wix.mysql.config.Charset;
 import com.wix.mysql.config.MysqldConfig;
 import com.wix.mysql.config.MysqldConfig.SystemDefaults;
 import com.wix.mysql.exceptions.CommandFailedException;
-import com.wix.mysql.utils.Utils;
 import de.flapdoodle.embed.process.distribution.Platform;
 import org.apache.commons.io.IOUtils;
 
@@ -68,8 +67,8 @@ class MysqlClient {
             p.getOutputStream().close();
 
             if (p.waitFor() != 0) {
-                String out = Utils.streamToString(p.getInputStream());
-                String err = Utils.streamToString(p.getErrorStream());
+                String out = IOUtils.toString(p.getInputStream());
+                String err = IOUtils.toString(p.getErrorStream());
 
                 if (isNullOrEmpty(out))
                     throw new CommandFailedException(command, schemaName, p.waitFor(), err);
