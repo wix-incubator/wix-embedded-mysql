@@ -1,10 +1,9 @@
 package com.wix.mysql.distribution.service
 
+import org.specs2.mutable.SpecWithJUnit
+
 import scala.collection.JavaConverters._
 import scala.collection.convert.wrapAll._
-
-
-import org.specs2.mutable.SpecWithJUnit
 
 class ServiceCommandBuilderTest extends SpecWithJUnit {
   "ServiceCommandBuilder" should {

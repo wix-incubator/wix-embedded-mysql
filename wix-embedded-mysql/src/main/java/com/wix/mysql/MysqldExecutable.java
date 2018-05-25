@@ -2,10 +2,6 @@ package com.wix.mysql;
 
 import com.wix.mysql.config.MysqldConfig;
 import com.wix.mysql.distribution.Setup;
-import com.wix.mysql.distribution.setup.FilePermissionsInitializer;
-import com.wix.mysql.distribution.setup.Initializer;
-import com.wix.mysql.distribution.setup.Mysql57Initializer;
-import com.wix.mysql.distribution.setup.NixBefore57Initializer;
 import de.flapdoodle.embed.process.config.IRuntimeConfig;
 import de.flapdoodle.embed.process.distribution.Distribution;
 import de.flapdoodle.embed.process.extract.IExtractedFileSet;
@@ -15,8 +11,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 class MysqldExecutable extends Executable<MysqldConfig, MysqldProcess> {
 

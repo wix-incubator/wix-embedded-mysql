@@ -7,8 +7,8 @@ Wix Embedded MySql library provides a way to run **real** MySql within your inte
 - Its easy, much easier than installing right version by hand;
 - You can use different versions/configuration per project without any local set-up;
 - Supports multiple platforms: Windows, Linux and OSX;
-- Provides constantly updated multiple versions of MySql - 5.5, 5.6, 5.7;
-- Testing matrix for all supported OSes (x86/x64) and versions (5.5, 5.6, 5.7).
+- Provides constantly updated multiple versions of MySql - 5.5, 5.6, 5.7, 8.0;
+- Testing matrix for all supported OSes (x86/x64) and versions (5.5, 5.6, 5.7, 8.0).
 
 ## Maven
 Add dependency to your pom.xml:

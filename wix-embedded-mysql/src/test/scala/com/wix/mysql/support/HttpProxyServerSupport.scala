@@ -2,8 +2,8 @@ package com.wix.mysql.support
 
 import de.flapdoodle.embed.process.io.directories.UserHome
 import org.apache.commons.io.FileUtils.deleteDirectory
-import org.littleshoot.proxy.{ActivityTrackerAdapter, FlowContext, HttpProxyServer}
 import org.littleshoot.proxy.impl.DefaultHttpProxyServer
+import org.littleshoot.proxy.{ActivityTrackerAdapter, FlowContext, HttpProxyServer}
 
 trait HttpProxyServerSupport {
 

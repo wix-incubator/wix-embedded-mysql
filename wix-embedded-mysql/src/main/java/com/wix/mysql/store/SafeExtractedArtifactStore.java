@@ -10,7 +10,6 @@ import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 
 /**
  * This is a wrapper around `ExtractedArtifactStore` which deletes the temp directory BEFORE extracting
