@@ -36,11 +36,14 @@ public enum Version implements IVersion {
     v5_7_17("5.7", 17, MacOsVersion.v10_12),
     v5_7_18("5.7", 18, MacOsVersion.v10_12),
     v5_7_19("5.7", 19, MacOsVersion.v10_12),
-    v5_7_latest(v5_7_19);
+    v5_7_latest(v5_7_19),
+    v8_0_11("8.0", 11, MacOsVersion.v10_13),
+    v8_latest(v8_0_11);
+
 
     private enum MacOsVersion {
         v10_6("osx"), v10_9("osx"), v10_10("osx"), v10_11("osx"),
-        v10_12("macos");
+        v10_12("macos"), v10_13("macos");
 
         private final String osName;
 
@@ -111,6 +114,8 @@ public enum Version implements IVersion {
     }
 
     private String gcLibVersion() {
+        if(majorVersion.equals("8.0") && minorVersion > 18)
+            return "linux-glibc2.12";
         if(majorVersion.equals("5.7") && minorVersion > 18)
             return "linux-glibc2.12";
         if (majorVersion.equals("5.6") || (majorVersion.equals("5.7") && minorVersion <= 18))

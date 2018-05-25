@@ -82,8 +82,9 @@ abstract class IntegrationTest extends SpecWithJUnit with BeforeAfterEach
 
 object IntegrationTest {
   val targetTestVersion: Version = Version.v5_7_latest
-  def testConfigBuilder: MysqldConfig.Builder = MysqldConfig
-    .aMysqldConfig(targetTestVersion)
+
+  def testConfigBuilder(version: Version = targetTestVersion): MysqldConfig.Builder = MysqldConfig
+    .aMysqldConfig(version)
     .withTimeout(60, TimeUnit.SECONDS)
 }
 
