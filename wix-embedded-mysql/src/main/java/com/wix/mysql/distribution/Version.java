@@ -114,7 +114,7 @@ public enum Version implements IVersion {
     }
 
     private String gcLibVersion() {
-        if(majorVersion.equals("8.0") && minorVersion > 18)
+        if(majorVersion.equals("8.0"))
             return "linux-glibc2.12";
         if(majorVersion.equals("5.7") && minorVersion > 18)
             return "linux-glibc2.12";
