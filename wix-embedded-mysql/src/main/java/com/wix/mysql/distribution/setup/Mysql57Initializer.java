@@ -21,7 +21,6 @@ public class Mysql57Initializer implements Initializer {
     @Override
     public void apply(IExtractedFileSet files, IRuntimeConfig runtimeConfig, MysqldConfig config) throws IOException {
         File baseDir = files.baseDir();
-        // TODO: wait until https://github.com/flapdoodle-oss/de.flapdoodle.embed.process/pull/41 is merged
         FileUtils.deleteDirectory(new File(baseDir, "data"));
 
         Process p = Runtime.getRuntime().exec(new String[] {

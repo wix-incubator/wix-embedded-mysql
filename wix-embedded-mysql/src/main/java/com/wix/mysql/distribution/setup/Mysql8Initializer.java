@@ -4,6 +4,7 @@ import com.wix.mysql.config.MysqldConfig;
 import com.wix.mysql.distribution.Version;
 import de.flapdoodle.embed.process.config.IRuntimeConfig;
 import de.flapdoodle.embed.process.extract.IExtractedFileSet;
+import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -20,6 +21,7 @@ public class Mysql8Initializer implements Initializer {
     @Override
     public void apply(IExtractedFileSet files, IRuntimeConfig runtimeConfig, MysqldConfig config) throws IOException {
         File baseDir = files.baseDir();
+        FileUtils.deleteDirectory(new File(baseDir, "data"));
 
         Process p = Runtime.getRuntime().exec(new String[]{
                 files.executable().getAbsolutePath(),
