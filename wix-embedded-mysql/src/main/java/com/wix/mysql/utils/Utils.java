@@ -3,6 +3,7 @@ package com.wix.mysql.utils;
 import java.io.IOException;
 import java.io.Reader;
 import java.nio.CharBuffer;
+import java.util.Calendar;
 import java.util.List;
 import java.util.TimeZone;
 
@@ -22,7 +23,7 @@ public class Utils {
     }
 
     public static String asHHmmOffset(TimeZone timeZone) {
-        long offsetInMillis = timeZone.getRawOffset();
+        long offsetInMillis = timeZone.getOffset(Calendar.getInstance().getTimeInMillis());
         return format("%s%02d:%02d",
                 offsetInMillis >= 0 ? "+" : "-",
                 Math.abs(MILLISECONDS.toHours(offsetInMillis)),
