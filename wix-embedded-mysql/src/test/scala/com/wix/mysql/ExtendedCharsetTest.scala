@@ -13,14 +13,13 @@ class ExtendedCharsetTest extends IntegrationTest {
 
     "support non-latin characters in login/password" in {
       skipped("not really supported for windows")
-      
-      val config = testConfigBuilder
-        .withCharset(Charset.UTF8MB4)
-        .withUser("你", "好").build
-
-      val mysqld = start(anEmbeddedMysql(config))
-
-      mysqld must beAvailableOn(3310, "你", "好", SystemDefaults.SCHEMA)
+//      val config = testConfigBuilder
+//        .withCharset(Charset.UTF8MB4)
+//        .withUser("你", "好").build
+//
+//      val mysqld = start(anEmbeddedMysql(config))
+//
+//      mysqld must beAvailableOn(3310, "你", "好", SystemDefaults.SCHEMA)
     }
 
     "support migration from file with extended charset" in {
