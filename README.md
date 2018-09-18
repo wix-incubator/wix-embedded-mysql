@@ -191,6 +191,7 @@ Build on top of [de.flapdoodle.embed.process](https://github.com/flapdoodle-oss/
 # Known issues
  - starting version 5.7.18, Microsoft Visual C++ 2013 Redistributable Package needs to be pre-installed on windows.
  - starting version 5.5.10 `libaio1.so` needs to be pre-installed on linux, but that is not the case for some linux distributions. Proper error is emitted if it's missing and you have to install it manually (ex. ubuntu):
+
 ```bash
 sudo apt-get install libaio1
 ```
