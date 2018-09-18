@@ -46,9 +46,9 @@
         <encoding>UTF-8</encoding>
 
         <flapdoodle.process.version>2.0.1</flapdoodle.process.version>
-        <scala.library.version>2.11</scala.library.version>
-        <scala.version>2.11.7</scala.version>
-        <specs2.version>3.7.1</specs2.version>
+        <scala.library.version>2.12</scala.library.version>
+        <scala.version>2.12.6</scala.version>
+        <specs2.version>4.3.4</specs2.version>
     </properties>
 
     <build>
