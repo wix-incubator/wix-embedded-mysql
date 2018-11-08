@@ -63,6 +63,12 @@ class MysqlClient {
                     format("--port=%s", config.getPort()),
                     schemaName}).start();
 
+            // Process can fail due to missing shared library, thus attempt to input cmd will hide initial problem
+            if (!p.isAlive()) {
+                String err = IOUtils.toString(p.getErrorStream());
+                throw new CommandFailedException(command, schemaName, p.exitValue(), err);
+            }
+
             IOUtils.copy(new StringReader(sql), p.getOutputStream(), java.nio.charset.Charset.defaultCharset());
             p.getOutputStream().close();
 
