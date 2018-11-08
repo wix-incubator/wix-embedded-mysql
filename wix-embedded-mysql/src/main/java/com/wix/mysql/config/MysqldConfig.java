@@ -4,6 +4,7 @@ import com.wix.mysql.distribution.Version;
 import de.flapdoodle.embed.process.config.ExecutableProcessConfig;
 import de.flapdoodle.embed.process.config.ISupportConfig;
 import de.flapdoodle.embed.process.distribution.IVersion;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -98,6 +99,11 @@ public class MysqldConfig extends ExecutableProcessConfig {
 
     public static Builder aMysqldConfig(final Version version) {
         return new Builder(version);
+    }
+
+    @Override
+    public String toString() {
+        return ToStringBuilder.reflectionToString(this);
     }
 
     public static class Builder {
