@@ -46,8 +46,7 @@ public class EmbeddedMysql {
         try {
             executable.start();
             getClient(SCHEMA, mysqldConfig.getCharset()).executeCommands(
-                    format("CREATE USER '%s'@'%%' IDENTIFIED BY '%s';", mysqldConfig.getUsername(),
-                            mysqldConfig.getPassword()));
+                    format("CREATE USER '%s'@'%%' IDENTIFIED BY '%s';", mysqldConfig.getUsername(), mysqldConfig.getPassword()));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -72,8 +71,7 @@ public class EmbeddedMysql {
 
     public void dropSchema(final SchemaConfig schema) {
         Charset effectiveCharset = or(schema.getCharset(), config.getCharset());
-        getClient(SystemDefaults.SCHEMA, effectiveCharset).executeCommands(format("DROP DATABASE %s",
-                schema.getName()));
+        getClient(SystemDefaults.SCHEMA, effectiveCharset).executeCommands(format("DROP DATABASE %s", schema.getName()));
     }
 
     public List<String> executeScripts(final String schemaName, final SqlScriptSource... scripts) {
