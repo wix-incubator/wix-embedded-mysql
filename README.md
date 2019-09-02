@@ -196,6 +196,12 @@ Build on top of [de.flapdoodle.embed.process](https://github.com/flapdoodle-oss/
 sudo apt-get install libaio1
 ```
 
+ - if tests are failing with 'Broken pipe' or 'Stream closed' exceptions on linux, you might be missing `libncurses5`:
+
+```bash
+sudo apt-get install libncurses5
+```
+
 # License
 Use of this source code is governed by a [BSD License](LICENSE.md), which basically means you can use and modify it freely.
 
