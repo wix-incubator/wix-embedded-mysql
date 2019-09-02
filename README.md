@@ -172,7 +172,7 @@ Source for examples can be found [here](https://github.com/wix/wix-embedded-mysq
 
 Some build tools strongly encourages you to have tests which are isolated from the internet.  
 To support such a use-case you can use the `wix-embedded-mysql-download-and-extract` utility.  
-It produces a runnable jar (`wix-embedded-mysql-download-and-extract-2.2.7-SNAPSHOT-jar-with-dependencies.jar`) which you can call with `java -jar wix-embedded-mysql-download-and-extract-2.2.7-SNAPSHOT-jar-with-dependencies.jar $majorVersion $minorVersion` and it will download and extract the needed installer for you.  
+It produces a runnable jar (`wix-embedded-mysql-download-and-extract-[[VERSION]]-jar-with-dependencies.jar`) which you can call with `java -jar wix-embedded-mysql-download-and-extract-[[VERSION]]-jar-with-dependencies.jar $downloadDir $majorVersion $minorVersion` and it will download and extract the needed installer for you.  
 Additionally you should pass the download directory to your test so that it can configure your `DownloadConfig#withCacheDir` to use that directory instead of downloading it from the internet.
 
 # Dependencies
