@@ -4,6 +4,7 @@ import com.wix.mysql.distribution.Version;
 import de.flapdoodle.embed.process.config.ExecutableProcessConfig;
 import de.flapdoodle.embed.process.config.ISupportConfig;
 import de.flapdoodle.embed.process.distribution.IVersion;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.io.IOException;
@@ -205,6 +206,11 @@ public class MysqldConfig extends ExecutableProcessConfig {
             this.name = name;
             this.password = password;
         }
+
+        @Override
+        public String toString() {
+            return ReflectionToStringBuilder.toStringExclude(this, "password");
+        }
     }
 
     private static class Timeout {
@@ -219,6 +225,11 @@ public class MysqldConfig extends ExecutableProcessConfig {
         long to(TimeUnit target) {
             return target.convert(length, unit);
         }
+
+        @Override
+        public String toString() {
+            return ToStringBuilder.reflectionToString(this);
+        }
     }
 
     public static class ServerVariable<T> {
@@ -232,6 +243,11 @@ public class MysqldConfig extends ExecutableProcessConfig {
 
         public String toCommandLineArgument() {
             return String.format("--%s=%s", name, value);
+        }
+
+        @Override
+        public String toString() {
+            return ToStringBuilder.reflectionToString(this);
         }
     }
 
