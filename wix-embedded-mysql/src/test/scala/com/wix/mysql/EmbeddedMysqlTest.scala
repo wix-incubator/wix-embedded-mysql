@@ -52,11 +52,17 @@ class EmbeddedMysqlTest extends IntegrationTest with HttpProxyServerSupport {
 
 
     "allow to provide network proxy" in {
-      withProxyOn(3210) { (proxy, port) =>
-        val config = aMysqldConfig(Version.v5_7_latest).build
+      val targetVersion = Version.v5_6_latest
+      anEmbeddedMysql(targetVersion).start().stop()
+
+      withProxyOn(3210, 3220, targetVersion) { (proxy, proxyPort, targetPort, version) =>
+        val config = aMysqldConfig(version).build
 
         val mysqld = start(anEmbeddedMysql(config)
-          .withDownloadConfig(aDownloadConfig().withProxy(aHttpProxy("127.0.0.1", port)).build())
+          .withDownloadConfig(aDownloadConfig()
+            .withProxy(aHttpProxy("127.0.0.1", proxyPort))
+            .withBaseUrl(s"http://localhost:$targetPort")
+            .build())
           .addSchema("aschema"))
 
         mysqld must beAvailableOn(config, "aschema")
@@ -238,12 +244,12 @@ class EmbeddedMysqlTest extends IntegrationTest with HttpProxyServerSupport {
       mysqld.addSchema(schemaConfig) must throwA[CommandFailedException]
     }
   }
-  
+
   "EmbeddedMysql sql execution" should {
-    
+
     "Execute arbitrary scripts without dropping existing data" in {
       val schemaName = "aSchema"
-      
+
       val config = aSchemaConfig(schemaName)
         .withScripts(aMigrationWith("create table t1 (col1 INTEGER);"))
         .build
@@ -252,13 +258,13 @@ class EmbeddedMysqlTest extends IntegrationTest with HttpProxyServerSupport {
         .addSchema(config)
 
       def rowCountInTable() = aSelect[java.lang.Long](mysqld, onSchema = schemaName, sql = "select count(*) from t1;")
-      
+
       rowCountInTable() mustEqual 0
-      
+
       mysqld.executeScripts(schemaName, classPathScript("data/arbitrary_script.sql"))
 
       rowCountInTable() mustEqual 1
-      
+
       mysqld.executeScripts(schemaName, classPathScript("data/arbitrary_script.sql"))
 
       rowCountInTable() mustEqual 2
