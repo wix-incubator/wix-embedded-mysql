@@ -52,13 +52,17 @@ class EmbeddedMysqlTest extends IntegrationTest with HttpProxyServerSupport {
 
 
     "allow to provide network proxy" in {
-      anEmbeddedMysql(Version.v5_5_40).start().stop()
+      val targetVersion = Version.v5_6_latest
+      anEmbeddedMysql(targetVersion).start().stop()
 
-      withProxyOn(3210, 3220, Version.v5_5_40) { (proxy, proxyPort, targetPort, version) =>
+      withProxyOn(3210, 3220, targetVersion) { (proxy, proxyPort, targetPort, version) =>
         val config = aMysqldConfig(version).build
 
         val mysqld = start(anEmbeddedMysql(config)
-          .withDownloadConfig(aDownloadConfig().withProxy(aHttpProxy("127.0.0.1", proxyPort)).withBaseUrl(s"http://localhost:$targetPort").build())
+          .withDownloadConfig(aDownloadConfig()
+            .withProxy(aHttpProxy("127.0.0.1", proxyPort))
+            .withBaseUrl(s"http://localhost:$targetPort")
+            .build())
           .addSchema("aschema"))
 
         mysqld must beAvailableOn(config, "aschema")
