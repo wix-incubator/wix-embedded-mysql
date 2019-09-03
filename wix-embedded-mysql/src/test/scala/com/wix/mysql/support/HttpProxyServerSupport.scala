@@ -2,6 +2,7 @@ package com.wix.mysql.support
 
 import java.io.{File, FileInputStream}
 import java.nio.file.Files
+import java.util.UUID
 
 import com.wix.mysql.PackagePaths
 import com.wix.mysql.distribution.Version
@@ -12,32 +13,8 @@ import org.littleshoot.proxy.impl.DefaultHttpProxyServer
 import org.littleshoot.proxy.{ActivityTrackerAdapter, FlowContext, HttpProxyServer}
 
 trait HttpProxyServerSupport {
-  val tmpDir: File = new UserHome(".embedmysql").asFile()
 
   def withProxyOn[T](proxyPort: Int, targetPort: Int, servedVersion: Version)(f: (ConnectedActivityTracker, Int, Int, Version) => T): T = {
-    def copyDownloadedFile() = {
-      val source = new File(tmpDir, new PackagePaths().getPath(Distribution.detectFor(servedVersion)))
-      val target = new File(tmpDir, "to-download.tar.gz")
-      if (!target.exists()) {
-        Files.copy(source.toPath, target.toPath)
-      }
-      Files.delete(source.toPath)
-      target
-    }
-
-    def copyBack() = {
-      val source = new File(tmpDir, "to-download.tar.gz")
-      val target = new File(tmpDir, new PackagePaths().getPath(Distribution.detectFor(servedVersion)))
-
-      if (!target.exists()) {
-        Files.copy(source.toPath, target.toPath)
-      }
-      Files.delete(source.toPath)
-    }
-
-
-    val FileToServe = copyDownloadedFile()
-
     val tracker = new ConnectedActivityTracker()
     val proxyBootstrap = DefaultHttpProxyServer
       .bootstrap()
@@ -46,20 +23,16 @@ trait HttpProxyServerSupport {
 
     var proxyServer: Option[HttpProxyServer] = None
     var staticsServer: Option[StaticsServer] = None
-
+    val (fileToProxy, restoreFiles) = ProxyFiles(servedVersion)
     try {
-      staticsServer = {
-        val srv = new StaticsServer(targetPort, FileToServe)
-        srv.start()
-        Some(srv)
-      }
+      staticsServer = new StaticsServer(targetPort, fileToProxy).doStart()
       proxyServer = Some(proxyBootstrap.start())
 
       f(tracker, proxyPort, targetPort, servedVersion)
     } finally {
       proxyServer.foreach(_.stop())
       staticsServer.foreach(_.stop())
-      copyBack()
+      restoreFiles()
     }
   }
 }
@@ -77,7 +50,34 @@ class ConnectedActivityTracker extends ActivityTrackerAdapter {
 
 class StaticsServer(port: Int, fileToServe: File) extends NanoHTTPD(port) {
 
+  def doStart(): Option[StaticsServer] = {
+    start()
+    Some(this)
+  }
+
   override def serve(session: NanoHTTPD.IHTTPSession): NanoHTTPD.Response = {
-    NanoHTTPD.newChunkedResponse(NanoHTTPD.Response.Status.ACCEPTED, "application/tar+gzip", new FileInputStream(fileToServe))// .newFixedLengthResponse("qwe")
+    NanoHTTPD.newChunkedResponse(NanoHTTPD.Response.Status.ACCEPTED, "application/tar+gzip", new FileInputStream(fileToServe))
+  }
+}
+
+object ProxyFiles {
+  val tmpDir: File = new UserHome(".embedmysql").asFile()
+  type Restore = (File, () => Unit)
+
+  def apply(version: Version): Restore = {
+    val source = new File(tmpDir, new PackagePaths().getPath(Distribution.detectFor(version)))
+    val target = new File(tmpDir, UUID.randomUUID().toString)
+    if (!target.exists()) {
+      Files.copy(source.toPath, target.toPath)
+    }
+    Files.delete(source.toPath)
+
+    (target, () => {
+      if (!source.exists()) {
+        Files.copy(target.toPath, source.toPath)
+      }
+      Files.delete(target.toPath)
+    })
+
   }
 }
