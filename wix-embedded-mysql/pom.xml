@@ -119,6 +119,12 @@
             <scope>test</scope>
         </dependency>
 
+        <dependency>
+            <groupId>org.nanohttpd</groupId> <!-- <groupId>com.nanohttpd</groupId> for 2.1.0 and earlier -->
+            <artifactId>nanohttpd</artifactId>
+            <version>2.3.1</version>
+        </dependency>
+
     </dependencies>
 
 </project>
