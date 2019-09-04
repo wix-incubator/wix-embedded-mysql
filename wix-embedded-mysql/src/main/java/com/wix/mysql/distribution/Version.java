@@ -39,7 +39,8 @@ public enum Version implements IVersion {
     v5_7_27("5.7", 27, MacOsVersion.v10_14),
     v5_7_latest(v5_7_27),
     v8_0_11("8.0", 11, MacOsVersion.v10_13),
-    v8_latest(v8_0_11);
+    v8_0_17("8.0", 17, MacOsVersion.v10_14),
+    v8_latest(v8_0_17);
 
     private enum MacOsVersion {
         v10_6("osx"),
