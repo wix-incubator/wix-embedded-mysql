@@ -2,7 +2,6 @@ package com.wix.mysql.support
 
 import java.util.UUID
 import java.util.concurrent.TimeUnit
-import javax.sql.DataSource
 
 import ch.qos.logback.classic.Level.INFO
 import ch.qos.logback.classic.spi.ILoggingEvent
@@ -12,6 +11,7 @@ import com.wix.mysql.config.MysqldConfig
 import com.wix.mysql.distribution.Version
 import com.wix.mysql.{EmbeddedMysql, Sources, SqlScriptSource}
 import de.flapdoodle.embed.process.io.directories.UserHome
+import javax.sql.DataSource
 import org.apache.commons.dbcp2.BasicDataSource
 import org.apache.commons.io.FileUtils._
 import org.slf4j
@@ -82,8 +82,9 @@ abstract class IntegrationTest extends SpecWithJUnit with BeforeAfterEach
 
 object IntegrationTest {
   val targetTestVersion: Version = Version.v5_7_latest
-  def testConfigBuilder: MysqldConfig.Builder = MysqldConfig
-    .aMysqldConfig(targetTestVersion)
+
+  def testConfigBuilder(version: Version = targetTestVersion): MysqldConfig.Builder = MysqldConfig
+    .aMysqldConfig(version)
     .withTimeout(60, TimeUnit.SECONDS)
 }
 

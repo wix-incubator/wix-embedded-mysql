@@ -27,6 +27,10 @@ class SafeExtractedArtifactStore extends ExtractedArtifactStore {
     public IExtractedFileSet extractFileSet(Distribution distribution) throws IOException {
         FileUtils.deleteDirectory(new File(directory));
 
-        return super.extractFileSet(distribution);
+        IExtractedFileSet extractedFiles = super.extractFileSet(distribution);
+
+//        Files.createDirectory(new File(directory, "data").toPath());
+
+        return extractedFiles;
     }
 }

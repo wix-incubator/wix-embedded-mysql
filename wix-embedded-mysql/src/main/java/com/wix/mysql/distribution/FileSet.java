@@ -11,10 +11,13 @@ public class FileSet {
             new Win56FileSetEmitter(),
             new Win57FileSetEmitter(),
             new Win57_18_UpFileSetEmitter(),
+            new Win8FileSetEmitter(),
             new Nix55FileSetEmitter(),
             new Nix56FileSetEmitter(),
             new Nix57FileSetEmitter(),
-            new Nix57_18_AndUpFileSetEmitter());
+            new Nix57_18_AndUpFileSetEmitter(),
+            new Nix8FileSetEmitter(),
+            new OSX8FileSetEmitter());
 
     public static de.flapdoodle.embed.process.config.store.FileSet emit(
             final Platform platform,

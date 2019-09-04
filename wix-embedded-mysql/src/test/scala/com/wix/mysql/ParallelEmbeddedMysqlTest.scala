@@ -23,7 +23,7 @@ class ParallelEmbeddedMysqlTest extends IntegrationTest {
   }
 
   def runMysql(onPort: Int) = Future {
-    val config = testConfigBuilder.withPort(onPort).withTimeout(2, TimeUnit.MINUTES).build
+    val config = testConfigBuilder().withPort(onPort).withTimeout(2, TimeUnit.MINUTES).build
     val mysqld = start(anEmbeddedMysql(config))
 
     mysqld must beAvailableOn(onPort, "auser", "sa", SystemDefaults.SCHEMA)

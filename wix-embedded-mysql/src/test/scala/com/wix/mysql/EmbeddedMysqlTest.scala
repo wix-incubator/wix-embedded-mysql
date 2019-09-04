@@ -20,7 +20,7 @@ class EmbeddedMysqlTest extends IntegrationTest with HttpProxyServerSupport {
   "EmbeddedMysql instance" should {
 
     "start with default values" in {
-      val config = testConfigBuilder.build
+      val config = testConfigBuilder().build
 
       val mysqld = start(anEmbeddedMysql(config))
 
@@ -33,7 +33,7 @@ class EmbeddedMysqlTest extends IntegrationTest with HttpProxyServerSupport {
 
     "use custom values provided via MysqldConfig" in {
       val tempDir = System.getProperty("java.io.tmpdir")
-      val config = testConfigBuilder
+      val config = testConfigBuilder()
         .withCharset(LATIN1)
         .withUser("zeUser", "zePassword")
         .withPort(1112)
@@ -72,7 +72,7 @@ class EmbeddedMysqlTest extends IntegrationTest with HttpProxyServerSupport {
 
 
     "accept system variables" in {
-      val config = testConfigBuilder
+      val config = testConfigBuilder()
         .withServerVariable("max_connect_errors", 666)
         .build
 
@@ -82,7 +82,7 @@ class EmbeddedMysqlTest extends IntegrationTest with HttpProxyServerSupport {
     }
 
     "not allow to override library-managed system variables" in {
-      val config = testConfigBuilder
+      val config = testConfigBuilder()
         .withTimeZone("US/Michigan")
         .withServerVariable("default-time-zone", "US/Eastern")
         .build
@@ -98,7 +98,7 @@ class EmbeddedMysqlTest extends IntegrationTest with HttpProxyServerSupport {
 
   "EmbeddedMysql schema reload" should {
     "reset schema" in {
-      val mysqldConfig = testConfigBuilder.build
+      val mysqldConfig = testConfigBuilder().build
       val schemaConfig = aSchemaConfig("aSchema")
         .withScripts(aMigrationWith("create table t1 (col1 INTEGER);"))
         .build
@@ -117,7 +117,7 @@ class EmbeddedMysqlTest extends IntegrationTest with HttpProxyServerSupport {
 
   "EmbeddedMysql schema creation" should {
     "use defaults" in {
-      val config = testConfigBuilder.build
+      val config = testConfigBuilder().build
 
       val mysqld = start(anEmbeddedMysql(config).addSchema("aSchema"))
 
@@ -127,7 +127,7 @@ class EmbeddedMysqlTest extends IntegrationTest with HttpProxyServerSupport {
     }
 
     "use custom values" in {
-      val config = testConfigBuilder.build
+      val config = testConfigBuilder().build
       val schema = aSchemaConfig("aSchema")
         .withCharset(LATIN1)
         .build
@@ -140,7 +140,7 @@ class EmbeddedMysqlTest extends IntegrationTest with HttpProxyServerSupport {
     }
 
     "inherit schema charset from instance" in {
-      val config = testConfigBuilder.withCharset(LATIN1).build
+      val config = testConfigBuilder().withCharset(LATIN1).build
       val schema = aSchemaConfig("aSchema").build
 
       val mysqld = start(anEmbeddedMysql(config).addSchema(schema))
@@ -151,14 +151,14 @@ class EmbeddedMysqlTest extends IntegrationTest with HttpProxyServerSupport {
     }
 
     "apply migrations when providing single file" in {
-      val mysqld = start(anEmbeddedMysql(testConfigBuilder.build)
+      val mysqld = start(anEmbeddedMysql(testConfigBuilder().build)
         .addSchema("aSchema", aMigrationWith("create table t1 (col1 INTEGER);")))
 
       aQuery(mysqld, onSchema = "aSchema", sql = "select count(col1) from t1;") must beSuccessful
     }
 
     "apply migrations from multiple files" in {
-      val mysqld = start(anEmbeddedMysql(testConfigBuilder.build)
+      val mysqld = start(anEmbeddedMysql(testConfigBuilder().build)
         .addSchema("aSchema",
           aMigrationWith("create table t1 (col1 INTEGER);"),
           aMigrationWith("create table t2 (col1 INTEGER);"))
@@ -178,7 +178,7 @@ class EmbeddedMysqlTest extends IntegrationTest with HttpProxyServerSupport {
             "create table t4 (col2 INTEGER)")
         .build
 
-      val mysqld = start(anEmbeddedMysql(testConfigBuilder.build).addSchema(config))
+      val mysqld = start(anEmbeddedMysql(testConfigBuilder().build).addSchema(config))
 
       aQuery(mysqld, onSchema = "aSchema", sql = "select count(col1) from t1;") must beSuccessful
       aQuery(mysqld, onSchema = "aSchema", sql = "select count(col1) from t2;") must beSuccessful
@@ -191,7 +191,7 @@ class EmbeddedMysqlTest extends IntegrationTest with HttpProxyServerSupport {
         .withScripts(aMigrationWith("create table t1 (col1 INTEGER);"))
         .build
 
-      val mysqld = start(anEmbeddedMysql(testConfigBuilder.build).addSchema(config))
+      val mysqld = start(anEmbeddedMysql(testConfigBuilder().build).addSchema(config))
 
       aQuery(mysqld, onSchema = "a-table", sql = "select count(col1) from t1;") must beSuccessful
     }
@@ -203,7 +203,7 @@ class EmbeddedMysqlTest extends IntegrationTest with HttpProxyServerSupport {
     "drop existing schema" in {
       val schemaConfig = aSchemaConfig("aSchema").build
 
-      val mysqld = start(anEmbeddedMysql(testConfigBuilder.build).addSchema(schemaConfig))
+      val mysqld = start(anEmbeddedMysql(testConfigBuilder().build).addSchema(schemaConfig))
 
       mysqld must haveSchemaCharsetOf(UTF8MB4, schemaConfig.getName)
 
@@ -215,7 +215,7 @@ class EmbeddedMysqlTest extends IntegrationTest with HttpProxyServerSupport {
     "fail on dropping of non existing schema" in {
       val schemaConfig = aSchemaConfig("aSchema").build
 
-      val mysqld = start(anEmbeddedMysql(testConfigBuilder.build))
+      val mysqld = start(anEmbeddedMysql(testConfigBuilder().build))
 
       mysqld must notHaveSchema(schemaConfig.getName)
 
@@ -225,7 +225,7 @@ class EmbeddedMysqlTest extends IntegrationTest with HttpProxyServerSupport {
     "add schema after mysqld start" in {
       val schemaConfig = aSchemaConfig("aSchema").build
 
-      val mysqld = start(anEmbeddedMysql(testConfigBuilder.build))
+      val mysqld = start(anEmbeddedMysql(testConfigBuilder().build))
 
       mysqld must notHaveSchema(schemaConfig.getName)
 
@@ -237,7 +237,7 @@ class EmbeddedMysqlTest extends IntegrationTest with HttpProxyServerSupport {
     "fail on adding existing schema" in {
       val schemaConfig = aSchemaConfig("aSchema").build
 
-      val mysqld = start(anEmbeddedMysql(testConfigBuilder.build).addSchema(schemaConfig))
+      val mysqld = start(anEmbeddedMysql(testConfigBuilder().build).addSchema(schemaConfig))
 
       mysqld must haveSchemaCharsetOf(UTF8MB4, schemaConfig.getName)
 
@@ -254,7 +254,7 @@ class EmbeddedMysqlTest extends IntegrationTest with HttpProxyServerSupport {
         .withScripts(aMigrationWith("create table t1 (col1 INTEGER);"))
         .build
 
-      val mysqld = start(anEmbeddedMysql(testConfigBuilder.build))
+      val mysqld = start(anEmbeddedMysql(testConfigBuilder().build))
         .addSchema(config)
 
       def rowCountInTable() = aSelect[java.lang.Long](mysqld, onSchema = schemaName, sql = "select count(*) from t1;")
