@@ -257,19 +257,22 @@ class EmbeddedMysqlTest extends IntegrationTest with HttpProxyServerSupport {
 
       var result0 = mysqld.executeScripts(schemaName, classPathScript("data/arbitrary_script.sql"))
 
-      println("6660");
-
-      println(result0);
+      result0 mustEqual "";
 
       rowCountInTable() mustEqual 1
 
       var result1 = mysqld.executeScripts(schemaName, classPathScript("data/arbitrary_script.sql"))
 
-      println("6661");
-
-      println(result0);
+      result1 mustEqual "";
 
       rowCountInTable() mustEqual 2
+
+      var result2 = mysqld.executeScripts(schemaName, classPathScript("data/arbitrary_script.sql"))
+
+      println("6060");
+
+      println(result2);
+
     }
   }
 
