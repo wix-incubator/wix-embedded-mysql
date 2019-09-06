@@ -273,6 +273,7 @@ class EmbeddedMysqlTest extends IntegrationTest with HttpProxyServerSupport {
 
       println(result2);
 
+      rowCountInTable() mustEqual 2
     }
   }
 
