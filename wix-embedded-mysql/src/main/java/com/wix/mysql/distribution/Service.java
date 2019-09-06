@@ -14,6 +14,7 @@ public class Service {
             new BaseCommandEmitter(),
             new Pre57CommandEmitter(),
             new Mysql57CommandEmitter(),
+            new Mysql8CommandEmitter(),
             new UserProvidedArgumentsEmitter());
 
     public static List<String> commandLine(final MysqldConfig config, final IExtractedFileSet exe) throws IOException {

@@ -12,10 +12,10 @@ import java.io.IOException;
 import static java.lang.String.format;
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
 
-public class Mysql57Initializer implements Initializer {
+public class Mysql8Initializer implements Initializer {
     @Override
     public boolean matches(Version version) {
-        return version.getMajorVersion().equals("5.7");
+        return version.getMajorVersion().equals("8.0");
     }
 
     @Override
@@ -23,14 +23,12 @@ public class Mysql57Initializer implements Initializer {
         File baseDir = files.baseDir();
         FileUtils.deleteDirectory(new File(baseDir, "data"));
 
-        Process p = Runtime.getRuntime().exec(new String[] {
-                        files.executable().getAbsolutePath(),
-                        "--no-defaults",
-                        "--initialize-insecure",
-                        "--ignore-db-dir",
-                        format("--basedir=%s", baseDir),
-                        format("--datadir=%s/data", baseDir)
-        });
+        Process p = Runtime.getRuntime().exec(new String[]{
+                files.executable().getAbsolutePath(),
+                "--no-defaults",
+                "--initialize-insecure",
+                format("--basedir=%s", baseDir),
+                format("--datadir=%s/data", baseDir)});
 
         new ProcessRunner(files.executable().getAbsolutePath()).run(p, runtimeConfig, config.getTimeout(NANOSECONDS));
     }

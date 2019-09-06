@@ -20,7 +20,7 @@ class DownloadConfigTest extends IntegrationTest with FileMatchers {
       withTempDir { tempDir =>
         val defaultCachePath = aDownloadConfig().build().getCacheDir
         val downloadConfig = aDownloadConfig().withCacheDir(tempDir).build()
-        val mysqld = start(anEmbeddedMysql(testConfigBuilder.build, downloadConfig))
+        val mysqld = start(anEmbeddedMysql(testConfigBuilder().build, downloadConfig))
 
         tempDir must not(beEqualToIgnoringSep(defaultCachePath))
         aPath(tempDir, "extracted") must beADirectory and exist
@@ -34,14 +34,14 @@ class DownloadConfigTest extends IntegrationTest with FileMatchers {
           .withBaseUrl(s"http://localhost:2222")
           .build()
 
-        start(anEmbeddedMysql(testConfigBuilder.build, downloadConfig)) must throwA[DistributionException].like {
+        start(anEmbeddedMysql(testConfigBuilder().build, downloadConfig)) must throwA[DistributionException].like {
           case e => e.getMessage must contain("Could not open inputStream for http://localhost:2222/MySQL-5.7")
         }
       }
     }
 
     "downloads via custom download base url" in new context {
-      val mysqldConfig = testConfigBuilder.build
+      val mysqldConfig = testConfigBuilder().build
 
       ensureVersionPresentInCache(mysqldConfig)
 

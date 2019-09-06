@@ -1,6 +1,5 @@
 package com.wix.mysql.config;
 
-import de.flapdoodle.embed.process.config.store.HttpProxyFactory;
 import de.flapdoodle.embed.process.config.store.IProxyFactory;
 import de.flapdoodle.embed.process.config.store.NoProxyFactory;
 
