@@ -238,12 +238,12 @@ class EmbeddedMysqlTest extends IntegrationTest with HttpProxyServerSupport {
       mysqld.addSchema(schemaConfig) must throwA[CommandFailedException]
     }
   }
-  
+
   "EmbeddedMysql sql execution" should {
-    
+
     "Execute arbitrary scripts without dropping existing data" in {
       val schemaName = "aSchema"
-      
+
       val config = aSchemaConfig(schemaName)
         .withScripts(aMigrationWith("create table t1 (col1 INTEGER);"))
         .build
@@ -252,14 +252,22 @@ class EmbeddedMysqlTest extends IntegrationTest with HttpProxyServerSupport {
         .addSchema(config)
 
       def rowCountInTable() = aSelect[java.lang.Long](mysqld, onSchema = schemaName, sql = "select count(*) from t1;")
-      
+
       rowCountInTable() mustEqual 0
-      
-      mysqld.executeScripts(schemaName, classPathScript("data/arbitrary_script.sql"))
+
+      var result0 = mysqld.executeScripts(schemaName, classPathScript("data/arbitrary_script.sql"))
+
+      println("6660");
+
+      println(result0);
 
       rowCountInTable() mustEqual 1
-      
-      mysqld.executeScripts(schemaName, classPathScript("data/arbitrary_script.sql"))
+
+      var result1 = mysqld.executeScripts(schemaName, classPathScript("data/arbitrary_script.sql"))
+
+      println("6661");
+
+      println(result0);
 
       rowCountInTable() mustEqual 2
     }
