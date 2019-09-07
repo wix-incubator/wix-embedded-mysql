@@ -15,6 +15,9 @@ import com.wix.mysql.exceptions.CommandFailedException
 import com.wix.mysql.support.IntegrationTest._
 import com.wix.mysql.support.{HttpProxyServerSupport, IntegrationTest}
 
+import scala.collection.JavaConverters._
+
+
 class EmbeddedMysqlTest extends IntegrationTest with HttpProxyServerSupport {
 
   "EmbeddedMysql instance" should {
@@ -261,11 +264,13 @@ class EmbeddedMysqlTest extends IntegrationTest with HttpProxyServerSupport {
 
       rowCountInTable() mustEqual 0
 
-      mysqld.executeScripts(schemaName, classPathScript("data/arbitrary_script.sql"))
-
+      mysqld.executeScripts(schemaName, classPathScript("data/arbitrary_script.sql")).asScala must contain(exactly(""))
       rowCountInTable() mustEqual 1
 
       mysqld.executeScripts(schemaName, classPathScript("data/arbitrary_script.sql"))
+      rowCountInTable() mustEqual 2
+
+      mysqld.executeScripts(schemaName, classPathScript("data/arbitrary_script2.sql")).asScala must haveSize(1) and contain(contain("col1"))
 
       rowCountInTable() mustEqual 2
     }

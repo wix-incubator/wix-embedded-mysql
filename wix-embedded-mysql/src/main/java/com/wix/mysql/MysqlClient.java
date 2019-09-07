@@ -10,6 +10,7 @@ import org.apache.commons.io.IOUtils;
 import java.io.IOException;
 import java.io.StringReader;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.wix.mysql.utils.Utils.isNullOrEmpty;
@@ -34,24 +35,29 @@ class MysqlClient {
         this.effectiveCharset = effectiveCharset;
     }
 
-    void executeScripts(final List<SqlScriptSource> sqls) {
+    List<String> executeScripts(final List<SqlScriptSource> sqls) {
+        List<String> res = new ArrayList<>(sqls.size());
         try {
             for (SqlScriptSource sql : sqls) {
-                execute(sql.read());
+                res.add(execute(sql.read()));
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+        return res;
     }
 
-    public void executeCommands(final String... sqls) {
+    public List<String> executeCommands(final String... sqls) {
+        List<String> res = new ArrayList<>(sqls.length);
         for (String sql : sqls) {
-            execute(sql);
+            res.add(execute(sql));
         }
+        return res;
     }
 
-    private void execute(final String sql) {
+    private String execute(final String sql) {
         String command = (Platform.detect() == Windows) ? format("\"%s\"", sql) : sql;
+        String out = "";
         try {
             Process p = new ProcessBuilder(new String[]{
                     Paths.get(executable.getBaseDir().getAbsolutePath(), "bin", "mysql").toString(),
@@ -72,8 +78,10 @@ class MysqlClient {
             IOUtils.copy(new StringReader(sql), p.getOutputStream(), java.nio.charset.Charset.defaultCharset());
             p.getOutputStream().close();
 
+            out = IOUtils.toString(p.getInputStream());
+
             if (p.waitFor() != 0) {
-                String out = IOUtils.toString(p.getInputStream());
+
                 String err = IOUtils.toString(p.getErrorStream());
 
                 if (isNullOrEmpty(out))
@@ -85,5 +93,6 @@ class MysqlClient {
         } catch (IOException | InterruptedException e) {
             throw new CommandFailedException(command, schemaName, e.getMessage(), e);
         }
+        return out;
     }
 }
