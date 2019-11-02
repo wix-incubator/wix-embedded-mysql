@@ -26,15 +26,18 @@ class SupportedVersionsTest extends IntegrationTest {
     }
   }
 
-  def versionsToTest(): Seq[Version] = {
-    val osSupportedVersions = Version.values filter (_.supportsCurrentPlatform)
-    val distinctMajorVersions = osSupportedVersions.foldLeft(Seq[Version]())((collected, v) => {
-      collected.find(alreadyCollected => alreadyCollected.getMajorVersion == v.getMajorVersion) match {
-        case Some(_) => collected
-        case _ => collected :+ v
-      }
-    })
+//    val versionsToTest = Seq(Version.v5_5_latest, Version.v5_6_latest, Version.v5_7_latest, Version.v8_latest)
+    def versionsToTest(): Seq[Version] = Seq(Version.v8_latest, Version.v8_0_11)
 
-    distinctMajorVersions
-  }
+//  def versionsToTest(): Seq[Version] = {
+//    val osSupportedVersions = Version.values filter (_.supportsCurrentPlatform)
+//    val distinctMajorVersions = osSupportedVersions.foldLeft(Seq[Version]())((collected, v) => {
+//      collected.find(alreadyCollected => alreadyCollected.getMajorVersion == v.getMajorVersion) match {
+//        case Some(_) => collected
+//        case _ => collected :+ v
+//      }
+//    })
+//
+//    distinctMajorVersions
+//  }
 }
