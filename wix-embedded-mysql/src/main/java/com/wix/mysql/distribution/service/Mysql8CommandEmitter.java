@@ -17,6 +17,6 @@ public class Mysql8CommandEmitter implements CommandEmitter {
     @Override
     public List<String> emit(MysqldConfig config, IExtractedFileSet exe) throws IOException {
         return Collections
-                .newArrayList("--default_authentication_plugin=mysql_native_password", "--log_syslog=0");
+                .newArrayList("--default_authentication_plugin=mysql_native_password");
     }
 }

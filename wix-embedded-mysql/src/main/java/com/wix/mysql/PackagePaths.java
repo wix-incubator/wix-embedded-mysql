@@ -7,8 +7,7 @@ import de.flapdoodle.embed.process.distribution.ArchiveType;
 import de.flapdoodle.embed.process.distribution.BitSize;
 import de.flapdoodle.embed.process.distribution.Distribution;
 
-import static de.flapdoodle.embed.process.distribution.ArchiveType.TGZ;
-import static de.flapdoodle.embed.process.distribution.ArchiveType.ZIP;
+import static de.flapdoodle.embed.process.distribution.ArchiveType.*;
 import static de.flapdoodle.embed.process.distribution.BitSize.B32;
 import static java.lang.String.format;
 
@@ -22,18 +21,22 @@ public class PackagePaths implements IPackageResolver {
 
     @Override
     public ArchiveType getArchiveType(Distribution distribution) {
-        return distribution.getPlatform().isUnixLike() ? TGZ : ZIP;
+        Version version = (Version)distribution.getVersion();
+        return version.archiveType();
     }
 
     @Override
     public String getPath(Distribution distribution) {
         String downloadPath = distribution.getVersion().asInDownloadPath();
+        Version version = (Version)distribution.getVersion();
+
         BitSize bs = distribution.getBitsize();
         switch (distribution.getPlatform()) {
             case OS_X:
                 return format("%s-x86%s.tar.gz", downloadPath, bs == B32 ? "" : "_64");
             case Linux:
-                return format("%s-%s.tar.gz", downloadPath, bs == B32 ? "i686" : "x86_64");
+                String gzOrXz = version.archiveType() == TXZ ? "xz" : "gz";
+                return format("%s-%s.tar.%s", downloadPath, bs == B32 ? "i686" : "x86_64", gzOrXz);
             case Windows:
                 return format("%s-win%s.zip", downloadPath, bs == B32 ? "32" : "x64");
             default:

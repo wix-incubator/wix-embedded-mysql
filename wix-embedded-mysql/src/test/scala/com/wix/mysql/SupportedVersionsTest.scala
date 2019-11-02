@@ -10,11 +10,18 @@ import org.specs2.specification.core.Fragment
 
 class SupportedVersionsTest extends IntegrationTest {
 
+  val versionsToTest: Seq[Version] = Seq(
+    Version.v5_5_latest,
+    Version.v5_6_latest,
+    Version.v5_7_latest,
+    Version.v8_0_11,
+    Version.v8_latest) filter (_.supportsCurrentPlatform)
+
   trait Context extends Scope {
     val log: Iterable[String] = aLogFor("root")
   }
 
-  Fragment.foreach(versionsToTest()) { version =>
+  Fragment.foreach(versionsToTest) { version =>
     s"$version should work on ${System.getProperty("os.name")}" in new Context {
       val config: MysqldConfig = testConfigBuilder(version).build
 
@@ -26,15 +33,4 @@ class SupportedVersionsTest extends IntegrationTest {
     }
   }
 
-  def versionsToTest(): Seq[Version] = {
-    val osSupportedVersions = Version.values filter (_.supportsCurrentPlatform)
-    val distinctMajorVersions = osSupportedVersions.foldLeft(Seq[Version]())((collected, v) => {
-      collected.find(alreadyCollected => alreadyCollected.getMajorVersion == v.getMajorVersion) match {
-        case Some(_) => collected
-        case _ => collected :+ v
-      }
-    })
-
-    distinctMajorVersions
-  }
 }
