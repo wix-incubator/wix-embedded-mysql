@@ -104,7 +104,15 @@ public enum Version implements IVersion {
     }
 
     public ArchiveType archiveType() {
-        return currentPlatform().isUnixLike() ? this.linuxArchive : ZIP;
+        switch (currentPlatform()) {
+            case Windows:
+                return ZIP;
+            case Linux:
+                return this.linuxArchive;
+            case OS_X:
+            default:
+                return TGZ;
+        }
     }
 
     @Override
