@@ -22,10 +22,10 @@ public class Win8FileSetEmitter implements FileSetEmitter {
                 .addEntry(Library, "bin/mysql.exe")
                 .addEntry(Library, "bin/mysqladmin.exe")
                 .addEntry(Library, "share/english/errmsg.sys")
-                .addEntry(Library, "share/fill_help_tables.sql")
-                .addEntry(Library, "share/mysql_sys_schema.sql")
-                .addEntry(Library, "share/mysql_system_tables.sql")
-                .addEntry(Library, "share/mysql_system_tables_data.sql")
+//                .addEntry(Library, "share/fill_help_tables.sql")
+//                .addEntry(Library, "share/mysql_sys_schema.sql")
+//                .addEntry(Library, "share/mysql_system_tables.sql")
+//                .addEntry(Library, "share/mysql_system_tables_data.sql")
                 .build();
     }
 }
