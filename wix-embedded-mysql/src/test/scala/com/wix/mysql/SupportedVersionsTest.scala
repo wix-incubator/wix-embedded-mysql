@@ -10,6 +10,13 @@ import org.specs2.specification.core.Fragment
 
 class SupportedVersionsTest extends IntegrationTest {
 
+  val versionsToTest: Seq[Version] = Seq(
+    Version.v5_5_latest,
+    Version.v5_6_latest,
+    Version.v5_7_latest,
+    Version.v8_0_11,
+    Version.v8_latest) filter (_.supportsCurrentPlatform)
+
   trait Context extends Scope {
     val log: Iterable[String] = aLogFor("root")
   }
@@ -26,10 +33,4 @@ class SupportedVersionsTest extends IntegrationTest {
     }
   }
 
-    val versionsToTest: Seq[Version] = Seq(
-      Version.v5_5_latest,
-      Version.v5_6_latest,
-      Version.v5_7_latest,
-      Version.v8_0_11,
-      Version.v8_latest) filter (_.supportsCurrentPlatform)
 }
