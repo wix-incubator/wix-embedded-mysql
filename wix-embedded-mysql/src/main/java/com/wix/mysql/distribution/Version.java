@@ -2,20 +2,22 @@ package com.wix.mysql.distribution;
 
 import com.wix.mysql.exceptions.UnsupportedPlatformException;
 import com.wix.mysql.utils.Utils;
+import de.flapdoodle.embed.process.distribution.ArchiveType;
 import de.flapdoodle.embed.process.distribution.IVersion;
 import de.flapdoodle.embed.process.distribution.Platform;
 
 import java.util.Arrays;
 import java.util.List;
 
+import static de.flapdoodle.embed.process.distribution.ArchiveType.*;
 import static java.lang.String.format;
 
 public enum Version implements IVersion {
 
-    v5_5_40("5.5", 40, MacOsVersion.v10_6, Platform.Linux, Platform.OS_X),
-    v5_5_50("5.5", 50, MacOsVersion.v10_9, Platform.Linux, Platform.OS_X),
-    v5_5_51("5.5", 51, MacOsVersion.v10_9, Platform.Linux, Platform.OS_X),
-    v5_5_52("5.5", 52, MacOsVersion.v10_9, Platform.Linux, Platform.OS_X),
+    v5_5_40("5.5", 40, MacOsVersion.v10_6, TGZ, Platform.Linux, Platform.OS_X),
+    v5_5_50("5.5", 50, MacOsVersion.v10_9, TGZ, Platform.Linux, Platform.OS_X),
+    v5_5_51("5.5", 51, MacOsVersion.v10_9, TGZ, Platform.Linux, Platform.OS_X),
+    v5_5_52("5.5", 52, MacOsVersion.v10_9, TGZ, Platform.Linux, Platform.OS_X),
     v5_5_latest(v5_5_52),
     v5_6_21("5.6", 21, MacOsVersion.v10_9),
     v5_6_22("5.6", 22, MacOsVersion.v10_9),
@@ -39,7 +41,7 @@ public enum Version implements IVersion {
     v5_7_27("5.7", 27, MacOsVersion.v10_14),
     v5_7_latest(v5_7_27),
     v8_0_11("8.0", 11, MacOsVersion.v10_13),
-    v8_0_17("8.0", 17, MacOsVersion.v10_14),
+    v8_0_17("8.0", 17, MacOsVersion.v10_14, TXZ, Platform.Linux, Platform.Windows, Platform.OS_X),
     v8_latest(v8_0_17);
 
     private enum MacOsVersion {
@@ -48,7 +50,7 @@ public enum Version implements IVersion {
         v10_10("osx"),
         v10_11("osx"),
         v10_12("macos"),
-        v10_13("macos"),      
+        v10_13("macos"),
         v10_14("macos");
 
         private final String osName;
@@ -67,16 +69,18 @@ public enum Version implements IVersion {
     private final int minorVersion;
     private final MacOsVersion macOsVersion;
     private final List<Platform> supportedPlatforms;
+    private final ArchiveType linuxArchive;
 
-    Version(String majorVersion, int minorVersion, MacOsVersion macOsVersion, Platform... supportedPlatforms) {
+    Version(String majorVersion, int minorVersion, MacOsVersion macOsVersion, ArchiveType linuxArchiveType, Platform... supportedPlatforms) {
         this.majorVersion = majorVersion;
         this.minorVersion = minorVersion;
         this.macOsVersion = macOsVersion;
         this.supportedPlatforms = Arrays.asList(supportedPlatforms);
+        this.linuxArchive = linuxArchiveType;
     }
 
     Version(String majorVersion, int minorVersion, MacOsVersion macOsVersion) {
-        this(majorVersion, minorVersion, macOsVersion, Platform.Linux, Platform.Windows, Platform.OS_X);
+        this(majorVersion, minorVersion, macOsVersion, TGZ, Platform.Linux, Platform.Windows, Platform.OS_X);
     }
 
     Version(Version other) {
@@ -84,6 +88,7 @@ public enum Version implements IVersion {
         this.minorVersion = other.minorVersion;
         this.macOsVersion = other.macOsVersion;
         this.supportedPlatforms = other.supportedPlatforms;
+        this.linuxArchive = other.linuxArchive;
     }
 
     public boolean supportsCurrentPlatform() {
@@ -96,6 +101,18 @@ public enum Version implements IVersion {
 
     private boolean worksOnMacOsSierra() {
         return currentPlatform() == Platform.OS_X && !majorVersion.equals("5.7") || minorVersion >= 15;
+    }
+
+    public ArchiveType archiveType() {
+        switch (currentPlatform()) {
+            case Windows:
+                return ZIP;
+            case Linux:
+                return this.linuxArchive;
+            case OS_X:
+            default:
+                return TGZ;
+        }
     }
 
     @Override
@@ -120,9 +137,9 @@ public enum Version implements IVersion {
     }
 
     private String gcLibVersion() {
-        if(majorVersion.equals("8.0"))
+        if (majorVersion.equals("8.0"))
             return "linux-glibc2.12";
-        if(majorVersion.equals("5.7") && minorVersion > 18)
+        if (majorVersion.equals("5.7") && minorVersion > 18)
             return "linux-glibc2.12";
         if (majorVersion.equals("5.6") || (majorVersion.equals("5.7") && minorVersion <= 18))
             return "linux-glibc2.5";
@@ -139,7 +156,9 @@ public enum Version implements IVersion {
         return format("MySQL-%s", majorVersion);
     }
 
-    private String toVersionString() { return majorVersion + "." + minorVersion; }
+    private String toVersionString() {
+        return majorVersion + "." + minorVersion;
+    }
 
     private void assertPlatformIsSupported() {
         if (isMacOsSierra() && !worksOnMacOsSierra()) {
