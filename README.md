@@ -202,6 +202,11 @@ sudo apt-get install libaio1
 sudo apt-get install libncurses5
 ```
 
+ - starting version 8.x.x more libraries from underlying os are required. Known list:
+ ```
+ libnuma1 libssl1.0 libcrypto++6
+ ```
+
 # License
 Use of this source code is governed by a [BSD License](LICENSE.md), which basically means you can use and modify it freely.
 
