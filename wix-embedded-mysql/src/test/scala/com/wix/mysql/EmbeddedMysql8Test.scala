@@ -53,7 +53,7 @@ class EmbeddedMysql8Test extends IntegrationTest with HttpProxyServerSupport {
         haveServerTimezoneMatching("US/Michigan") //and
 //        haveSystemVariable("basedir", contain(pathFor(tempDir, "/mysql-8.0-")))
     }
-
+/*
     "allow to provide network proxy" in {
       val targetVersion = Version.v8_latest
       anEmbeddedMysql(targetVersion).start().stop()
@@ -73,7 +73,6 @@ class EmbeddedMysql8Test extends IntegrationTest with HttpProxyServerSupport {
       }
     }
 
-/*
     "accept system variables" in {
       val config = testConfigBuilder(v8_latest)
         .withServerVariable("max_connect_errors", 666)
