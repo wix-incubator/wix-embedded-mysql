@@ -59,7 +59,9 @@ class EmbeddedMysql8Test extends IntegrationTest with HttpProxyServerSupport {
       anEmbeddedMysql(targetVersion).start().stop()
 
       withProxyOn(3210, 3220, targetVersion) { (proxy, proxyPort, targetPort, version) =>
-        val config = aMysqldConfig(version).build
+        val config = aMysqldConfig(version)
+        .withTimeout(40, TimeUnit.SECONDS)
+        .build
 
         val mysqld = start(anEmbeddedMysql(config)
           .withDownloadConfig(aDownloadConfig()
