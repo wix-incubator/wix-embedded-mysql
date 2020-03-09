@@ -15,6 +15,7 @@ public class Setup {
             new FilePermissionsInitializer(),
             new Mysql57Initializer(),
             new NixBefore57Initializer(),
+            new NixBefore8Initializer(),
             new Mysql8Initializer());
 
 
