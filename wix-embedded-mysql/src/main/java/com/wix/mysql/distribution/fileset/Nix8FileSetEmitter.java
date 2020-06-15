@@ -15,7 +15,8 @@ public class Nix8FileSetEmitter extends Nix implements FileSetEmitter {
     @Override
     public boolean matches(Platform platform, Version version) {
         return platform.isUnixLike() && (Platform.detect() != OS_X)
-                && Objects.equals(version.getMajorVersion(), "8.0");
+                && Objects.equals(version.getMajorVersion(), "8.0")
+                && version.getMinorVersion() <= 17;
     }
 
     @Override
