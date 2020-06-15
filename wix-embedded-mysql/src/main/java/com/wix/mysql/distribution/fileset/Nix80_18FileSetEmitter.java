@@ -29,7 +29,7 @@ public class Nix80_18FileSetEmitter extends Nix implements FileSetEmitter {
                 .addEntry(Library, "share/english/errmsg.sys")
                 .addEntry(Library, "lib/libssl.so.1.1")
                 .addEntry(Library, "lib/libcrypto.so.1.1")
-                .addEntry(Library, "lib/private/protobuf-lite.so.3.6.1")
+                .addEntry(Library, "lib/private/libprotobuf-lite.so.3.6.1")
                 .build();
     }
 }
