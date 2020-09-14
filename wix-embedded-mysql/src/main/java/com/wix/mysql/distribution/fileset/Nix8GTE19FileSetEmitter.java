@@ -29,6 +29,10 @@ public class Nix8GTE19FileSetEmitter extends Nix implements FileSetEmitter {
                 .addEntry(Library, "share/english/errmsg.sys")
                 .addEntry(FileType.Library, "lib/private/libssl.so.1.1")
                 .addEntry(FileType.Library, "lib/private/libcrypto.so.1.1")
+                .addEntry(FileType.Library, "lib/private/libprotobuf.so.3.11.4")
+                .addEntry(FileType.Library, "lib/private/libprotobuf-lite.so.3.11.4")
+                .addEntry(FileType.Library, "lib/private/libprotobuf.so.3.11.4")
+                .addEntry(FileType.Library, "lib/private/libprotobuf-lite.so.3.11.4")
                 .build();
     }
 }
