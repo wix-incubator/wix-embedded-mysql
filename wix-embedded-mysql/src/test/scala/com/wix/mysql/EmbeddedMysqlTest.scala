@@ -49,7 +49,7 @@ class EmbeddedMysqlTest extends IntegrationTest with HttpProxyServerSupport {
         haveCharsetOf(LATIN1, "zeUser") and
         beAvailableOn(1112, "zeUser", "zePassword", SystemDefaults.SCHEMA) and
         haveServerTimezoneMatching("US/Michigan", "zeUser") and
-        haveSystemVariable("basedir", "auser", contain(pathFor(tempDir, "/mysql-5.7-")))
+        haveSystemVariable("basedir", "zeUser", contain(pathFor(tempDir, "/mysql-5.7-")))
     }
 
 
