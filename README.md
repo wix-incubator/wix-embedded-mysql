@@ -1,6 +1,6 @@
 # Wix Embedded MySql [![Build Status (Travis: Linux/OSX)](https://img.shields.io/travis/wix/wix-embedded-mysql/master.svg?label=linux%2FOSX%20build)](https://travis-ci.org/wix/wix-embedded-mysql) [![Build Status (AppVeyor: Windows)](https://img.shields.io/appveyor/ci/viliusl/wix-embedded-mysql/master.svg?label=windows%20build)](https://ci.appveyor.com/project/viliusl/wix-embedded-mysql) [![Maven Central](https://img.shields.io/maven-central/v/com.wix/wix-embedded-mysql.svg)](http://mvnrepository.com/artifact/com.wix/wix-embedded-mysql)
 
-Wix Embedded MySql library provides a way to run **real** MySql within your integration tests.
+[DEPRECATED] - mostly due to substantial changes in packaging between version changes and emergence of new and better ways to run embedded mysql. Please check-out [Testcontainers](https://www.testcontainers.org/) as a better alternative.
 
 ## Why?
 - Your tests can run on production-like environment: match version, encoding, timezone, database/schema/user settings;
