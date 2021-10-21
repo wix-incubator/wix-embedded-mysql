@@ -9,6 +9,7 @@ import de.flapdoodle.embed.process.distribution.Distribution;
 
 import static de.flapdoodle.embed.process.distribution.ArchiveType.*;
 import static de.flapdoodle.embed.process.distribution.BitSize.B32;
+import static de.flapdoodle.embed.process.distribution.BitSize.B64;
 import static java.lang.String.format;
 
 public class PackagePaths implements IPackageResolver {
@@ -33,6 +34,10 @@ public class PackagePaths implements IPackageResolver {
         BitSize bs = distribution.getBitsize();
         switch (distribution.getPlatform()) {
             case OS_X:
+                String arch = (String)System.getProperties().get("os.arch");
+                if (arch.equals("aarch64")) {
+                    bs = B64;
+                }
                 return format("%s-x86%s.tar.gz", downloadPath, bs == B32 ? "" : "_64");
             case Linux:
                 String gzOrXz = version.archiveType() == TXZ ? "xz" : "gz";
